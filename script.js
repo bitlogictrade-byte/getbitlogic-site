@@ -1,8 +1,8 @@
 /* Rolling hero text */
 const phrases = [
-    { line1: '시장의 소음을 끄다.', line2: '본질에 몰입' },
-    { line1: '가장 복잡한 데이터를', line2: '정교한 직관으로' },
-    { line1: '차트 뒤에 숨겨진 흐름', line2: '데이터로 읽다.' }
+    { line1: '이장이 이긴다.', line2: '본질에 집중하라' },
+    { line1: '시장의 소음을 끄다', line2: '진짜 신호만 따라라' },
+    { line1: '가짜 신호는 걷어내고', line2: '흐름만 읽어라' },
 ];
 let phraseIdx = 0;
 
@@ -66,6 +66,70 @@ function setupNav() {
     });
 }
 
+/* Modal */
+function setupModal() {
+    const loginModal  = document.getElementById('loginModal');
+    const signupModal = document.getElementById('signupModal');
+    if (!loginModal || !signupModal) return;
+
+    function openModal(modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    function closeAll() {
+        closeModal(loginModal);
+        closeModal(signupModal);
+    }
+
+    /* Triggers */
+    ['navLoginBtn', 'mobileLoginBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', e => { e.preventDefault(); openModal(loginModal); });
+    });
+
+    /* Close buttons */
+    document.getElementById('modalClose')?.addEventListener('click', () => closeModal(loginModal));
+    document.getElementById('signupModalClose')?.addEventListener('click', () => closeModal(signupModal));
+
+    /* Switch between login / signup */
+    document.getElementById('switchToSignup')?.addEventListener('click', () => { closeModal(loginModal); openModal(signupModal); });
+    document.getElementById('switchToLogin')?.addEventListener('click', () => { closeModal(signupModal); openModal(loginModal); });
+
+    /* Overlay click to close */
+    [loginModal, signupModal].forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) closeAll(); });
+    });
+
+    /* Esc key */
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+    /* Password toggle */
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = btn.previousElementSibling;
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.setAttribute('aria-label', input.type === 'password' ? '비밀번호 보기' : '비밀번호 숨기기');
+        });
+    });
+
+    /* Login form submit (placeholder) */
+    document.getElementById('loginForm')?.addEventListener('submit', e => {
+        e.preventDefault();
+        alert('로그인 기능은 준비 중입니다.');
+    });
+
+    /* Signup form submit (placeholder) */
+    document.getElementById('signupForm')?.addEventListener('submit', e => {
+        e.preventDefault();
+        alert('회원가입 기능은 준비 중입니다.');
+    });
+}
+
 /* Init */
 window.addEventListener('DOMContentLoaded', () => {
     const tw = document.querySelector('.hero-title .tw');
@@ -78,4 +142,5 @@ window.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupFaq();
     setupNav();
+    setupModal();
 });
