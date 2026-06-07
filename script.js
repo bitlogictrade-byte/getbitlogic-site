@@ -1,8 +1,8 @@
 /* Rolling hero text */
 const phrases = [
-    { line1: '이장이 이긴다.', line2: '본질에 집중하라' },
-    { line1: '시장의 소음을 끄다', line2: '진짜 신호만 따라라' },
-    { line1: '가짜 신호는 걷어내고', line2: '흐름만 읽어라' },
+    { line1: '시장의 소음을 끄다.', line2: '본질에 몰입 하는 순간.' },
+    { line1: '가장 복잡한 데이터를', line2: '정교한 직관으로.' },
+    { line1: '차트 뒤에 숨겨진 흐름', line2: '데이터로 읽다.' },
 ];
 let phraseIdx = 0;
 
