@@ -1,34 +1,81 @@
+/* Rolling hero text */
 const phrases = [
     { line1: '시장의 소음을 끄다.', line2: '본질에 몰입' },
     { line1: '가장 복잡한 데이터를', line2: '정교한 직관으로' },
     { line1: '차트 뒤에 숨겨진 흐름', line2: '데이터로 읽다.' }
 ];
-let currentPhrase = 0;
+let phraseIdx = 0;
 
-function updateRollingText(element, phrase) {
-    element.innerHTML = `<span class="line-white">${phrase.line1}</span><br><span class="line-gradient">${phrase.line2}</span>`;
+function renderPhrase(idx) {
+    const el = document.querySelector('.hero-title .tw');
+    if (!el) return;
+    el.innerHTML =
+        `<span class="line-white">${phrases[idx].line1}</span>` +
+        `<span class="line-cyan">${phrases[idx].line2}</span>`;
 }
 
-function startRollingText() {
-    const rollingText = document.getElementById('rollingText');
-    if (!rollingText) return;
-
-    updateRollingText(rollingText, phrases[currentPhrase]);
-
-    const cycle = () => {
-        rollingText.style.opacity = '0';
-        rollingText.style.transform = 'translateY(-8px)';
-
-        setTimeout(() => {
-            currentPhrase = (currentPhrase + 1) % phrases.length;
-            updateRollingText(rollingText, phrases[currentPhrase]);
-            rollingText.style.opacity = '1';
-            rollingText.style.transform = 'translateY(0)';
-            setTimeout(cycle, 3800);
-        }, 320);
-    };
-
-    setTimeout(cycle, 4200);
+function cyclePhrase() {
+    const el = document.querySelector('.hero-title .tw');
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-10px)';
+    setTimeout(() => {
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+        renderPhrase(phraseIdx);
+        el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+    }, 350);
 }
 
-window.addEventListener('DOMContentLoaded', startRollingText);
+/* Plan tabs */
+function setupTabs() {
+    document.querySelectorAll('.plan-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.plan-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const plan = tab.dataset.plan;
+            document.getElementById('planBasic').classList.toggle('hidden', plan !== 'basic');
+            document.getElementById('planPro').classList.toggle('hidden', plan !== 'pro');
+        });
+    });
+}
+
+/* FAQ accordion */
+function setupFaq() {
+    document.querySelectorAll('.faq-q').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!expanded));
+            const answer = btn.nextElementSibling;
+            if (answer) answer.classList.toggle('open', !expanded);
+        });
+    });
+}
+
+/* Mobile nav */
+function setupNav() {
+    const hamburger = document.getElementById('navHamburger');
+    const mobile = document.getElementById('navMobile');
+    if (!hamburger || !mobile) return;
+    hamburger.addEventListener('click', () => {
+        mobile.classList.toggle('open');
+    });
+    mobile.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => mobile.classList.remove('open'));
+    });
+}
+
+/* Init */
+window.addEventListener('DOMContentLoaded', () => {
+    const tw = document.querySelector('.hero-title .tw');
+    if (tw) {
+        tw.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        tw.style.display = 'block';
+    }
+    renderPhrase(0);
+    setInterval(cyclePhrase, 4200);
+    setupTabs();
+    setupFaq();
+    setupNav();
+});

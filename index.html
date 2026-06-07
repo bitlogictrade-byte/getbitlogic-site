@@ -1,48 +1,217 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>GetBitLogic | 시장의 소음을 끄다</title>
+    <title>BitLogic | 시장의 소음을 끄다</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=ABeeZee:wght@400;700&family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="page-shell">
-        <header class="hero-section">
-            <div class="hero-copy">
-                <p class="hero-eyebrow">Algorithm 검증 프리미엄 지표</p>
-                <h1 class="hero-title">
-                    <span id="rollingText" class="rolling-text">
-                        <span class="line-white">시장의 소음을 끄다.</span><br>
-                        <span class="line-gradient">본질에 몰입</span>
-                    </span>
-                </h1>
-                <p class="hero-subtitle">
-                    백테스팅을 거쳐 검증된 비트로직 알고리즘 (Algorithm)
-                    <span class="hero-subtitle-break"></span>
-                    더 이상 흔들리지 않는 본인만의 매매 기준을 만들어보세요.
-                </p>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">BitLogic</a>
+            <div class="nav-links">
+                <a href="#pricing">플랜 안내</a>
+                <a href="#faq">FAQ</a>
+                <a href="#" class="nav-btn">로그인</a>
+            </div>
+            <button class="nav-hamburger" id="navHamburger" aria-label="메뉴 열기">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="#pricing">플랜 안내</a>
+            <a href="#faq">FAQ</a>
+            <a href="#">로그인</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <img src="bg.png" alt="" class="hero-bg-img">
+            <div class="hero-bg-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <p class="hero-eyebrow">Algorithm 검증 프리미엄 지표</p>
+            <h1 class="hero-title">
+                <span class="hero-title-sub" id="rollingText">
+                    <span class="tw"></span>
+                </span>
+            </h1>
+            <p class="hero-desc">
+                백테스팅을 거쳐 검증된 비트로직 알고리즘 (Algorithm)<br>
+                더 이상 흔들리지 않는 본인만의 매매 기준을 만들어보세요.
+            </p>
+            <div class="hero-cta">
+                <a href="#pricing" class="btn btn-primary">1개월 구독하기</a>
+                <a href="#faq" class="btn btn-ghost">더 알아보기</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+        <div class="pricing-header">
+            <h2 class="pricing-title">
+                <span class="cyan">비트로직</span><br>멤버십 플랜
+            </h2>
+            <div class="plan-tabs">
+                <button class="plan-tab active" data-plan="basic">Basic</button>
+                <button class="plan-tab" data-plan="pro">Pro</button>
+            </div>
+        </div>
+
+        <div class="pricing-stage">
+            <!-- Left: chart -->
+            <div class="stage-chart">
+                <img src="chart.png" alt="BitLogic 차트" class="stage-chart-img">
             </div>
 
-            <section class="chart-panel">
-                <div class="chart-card">
-                    <div class="chart-image-wrap">
-                        <img src="chart.png" alt="비트로직 차트" class="chart-image">
-                        <div class="chart-glow"></div>
+            <!-- Right: info panel -->
+            <div class="stage-panel" id="stagePanel">
+
+                <!-- Basic -->
+                <div class="plan-info" id="planBasic">
+                    <div class="plan-info-top">
+                        <div>
+                            <h3 class="plan-name">Basic</h3>
+                            <p class="plan-sub">개인용 초급 분석 팩</p>
+                        </div>
+                        <div class="plan-thumb-wrap">
+                            <img src="chart.png" alt="차트 미리보기" class="plan-thumb">
+                        </div>
                     </div>
-                    <p class="chart-note">자유로운 구독 해지 및 관리 | 부담 없이 시작하는 프리미엄 지표</p>
+                    <p class="plan-price"><strong>49,000</strong><span>원/ 월</span></p>
+                    <ul class="plan-features">
+                        <li>비트로직 자체 개발 알고리즘 지표</li>
+                        <li>가짜 움직임을 걷어내는 노이즈 필터</li>
+                        <li>직관적인 기본 차트 분석 환경</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full">결제하기</a>
                 </div>
 
-                <div class="hero-actions">
-                    <a href="#subscribe" class="btn btn-primary">1개월 구독하기</a>
-                    <a href="#learn-more" class="btn btn-secondary">더 알아보기</a>
+                <!-- Pro -->
+                <div class="plan-info hidden" id="planPro">
+                    <div class="plan-info-top">
+                        <div>
+                            <h3 class="plan-name">Pro</h3>
+                            <p class="plan-sub">전문가용 프리미엄 플랜</p>
+                        </div>
+                        <div class="plan-thumb-wrap">
+                            <img src="chart.png" alt="차트 미리보기" class="plan-thumb">
+                        </div>
+                    </div>
+                    <p class="plan-price"><strong>79,000</strong><span>원/ 월</span></p>
+                    <ul class="plan-features">
+                        <li>모든 Basic 기능 포함</li>
+                        <li>고급 매매 신호 및 전략 알림</li>
+                        <li>프리미엄 고객 전용 서포트</li>
+                        <li>멀티 타임프레임 분석 도구</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary btn-full">결제하기</a>
                 </div>
-            </section>
-        </header>
-    </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="features-inner">
+            <p class="section-eyebrow">WHY BITLOGIC</p>
+            <h2 class="section-title">왜 비트로직인가요?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>검증된 알고리즘</h4>
+                    <p>수백 회의 백테스팅으로 검증된 신호만을 제공합니다.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔇</div>
+                    <h4>노이즈 필터</h4>
+                    <p>가짜 움직임을 걸러내어 핵심 신호에 집중합니다.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h4>즉시 사용 가능</h4>
+                    <p>결제 후 즉시 트레이딩뷰에서 지표를 활성화할 수 있습니다.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h4>자유로운 해지</h4>
+                    <p>언제든 부담 없이 구독을 시작하고 해지할 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+        <div class="faq-inner">
+            <p class="section-eyebrow">FAQs</p>
+            <h2 class="section-title">자주 묻는 질문</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>비트로직(BitLogic) 지표는 합법적인 서비스인가요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-a">네, BitLogic 지표는 합법적인 보조지표 서비스로서 투자 판단을 돕기 위해 설계되었습니다.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>트레이딩뷰를 한 번도 안 써본 초보자도 활용이 가능한가요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-a">네, 누구나 쉽게 사용할 수 있도록 직관적인 인터페이스와 상세한 가이드가 제공됩니다.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>결제하면 언제부터 지표를 쓸 수 있나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-a">결제 완료 후 바로 제공되는 가입 정보로 즉시 사용이 가능합니다.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>이걸 사용하면 모든 거래에서 이길 수 있나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-a">아닙니다. 본 서비스는 보조 자료로 수익을 보장하지 않으며, 항상 신중한 판단이 필요합니다.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-q" aria-expanded="false">
+                        <span>프로그램 이용 중 환불 규정은 어떻게 되나요?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-a">환불 정책은 이용약관 및 환불정책 페이지에서 안내드리고 있습니다.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <p class="footer-brand">BitLogic</p>
+                <p class="footer-info">비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
+                <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
+                <p class="footer-copy">© 2025 BitLogic. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">이용약관</a>
+                <a href="#">개인정보처리방침</a>
+                <a href="#">환불정책</a>
+            </div>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
