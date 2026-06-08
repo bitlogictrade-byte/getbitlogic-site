@@ -127,6 +127,109 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .nav-mobile.open { display: flex; }
 .nav-mobile a:hover { color: #fff; }
 
+.mobile-logout-btn {
+    background: none;
+    border: none;
+    color: #fa5757;
+    font-size: 0.95rem;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+}
+
+/* ── 유저 드롭다운 ── */
+.nav-user-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 999px;
+    padding: 6px 14px 6px 10px;
+    color: #e0eaf4;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.nav-user-btn:hover {
+    background: rgba(0,229,255,0.15);
+    border-color: rgba(0,229,255,0.5);
+}
+
+.nav-user-email {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nav-chevron {
+    opacity: 0.6;
+    transition: transform 0.2s;
+}
+
+.nav-user-btn[aria-expanded="true"] .nav-chevron {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 160px;
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.nav-dropdown.open { display: block; }
+
+.nav-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #c0d4e4;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+    width: 100%;
+    background: none;
+    border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    text-align: left;
+}
+
+.nav-dropdown-item:hover {
+    background: rgba(255,255,255,0.07);
+    color: #fff;
+}
+
+.nav-logout-btn {
+    color: #fa8080;
+}
+
+.nav-logout-btn:hover {
+    background: rgba(250,87,87,0.1) !important;
+    color: #fa5757 !important;
+}
+
 /* ── BUTTONS ── */
 .btn {
     display: inline-flex;

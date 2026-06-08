@@ -611,11 +611,11 @@
     </footer>
 
     <script type="module">
-        import { supabase, getSession } from './supabase-auth.js';
+        import { supabase, getUser } from './supabase-auth.js';
 
-        /* ── PortOne 설정 (포트원 대시보드에서 발급) ── */
-        const PORTONE_STORE_ID  = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';  // 포트원 상점 아이디
-        const PORTONE_CHANNEL_KEY = 'channel-key-8394e3df-d441-403b-b12a-4e6299f0bfc1';     // 결제 채널 키 (카드 등)
+        /* ── PortOne 설정 ── */
+        const PORTONE_STORE_ID    = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
+        const PORTONE_CHANNEL_KEY = 'channel-key-8394e3df-d441-403b-b12a-4e6299f0bfc1';
 
         /* ── 플랜 데이터 ── */
         const PLANS = {
@@ -646,27 +646,32 @@
             },
         };
 
+        /* ── 로그인 확인 (비로그인 시 리다이렉트) ── */
+        const currentUser = await getUser();
+        if (!currentUser) {
+            alert('결제하려면 먼저 로그인해 주세요.');
+            window.location.href = 'index.html';
+        }
+
         /* ── URL 파라미터에서 플랜 읽기 ── */
-        const params = new URLSearchParams(location.search);
+        const params  = new URLSearchParams(location.search);
         const planKey = PLANS[params.get('plan')] ? params.get('plan') : 'basic';
-        const plan = PLANS[planKey];
+        const plan    = PLANS[planKey];
 
         /* ── 플랜 카드 렌더 ── */
         function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
 
         document.getElementById('planBadgeText').textContent = plan.badge;
-        document.getElementById('planName').textContent = plan.name;
-        document.getElementById('planSub').textContent = plan.sub;
-        document.getElementById('planPriceNum').textContent = plan.price.toLocaleString('ko-KR') + ',';
-        document.getElementById('planPriceNum').textContent = plan.price.toLocaleString('ko-KR');
-        document.getElementById('summaryPrice').textContent = fmt(plan.price);
-        document.getElementById('totalPrice').textContent = fmt(plan.price);
+        document.getElementById('planName').textContent      = plan.name;
+        document.getElementById('planSub').textContent       = plan.sub;
+        document.getElementById('planPriceNum').textContent  = plan.price.toLocaleString('ko-KR');
+        document.getElementById('summaryPrice').textContent  = fmt(plan.price);
+        document.getElementById('totalPrice').textContent    = fmt(plan.price);
 
-        const featureList = document.getElementById('planFeatureList');
         plan.features.forEach(f => {
             const li = document.createElement('li');
             li.textContent = f;
-            featureList.appendChild(li);
+            document.getElementById('planFeatureList').appendChild(li);
         });
 
         /* ── Mobile nav ── */
@@ -679,21 +684,20 @@
             );
         }
 
-        /* ── 전화번호: 숫자만 허용 ── */
+        /* ── 전화번호: 숫자만 ── */
         document.getElementById('coPhone').addEventListener('input', e => {
             e.target.value = e.target.value.replace(/\D/g, '');
         });
 
         /* ── 전체동의 체크박스 ── */
-        const agreeAll = document.getElementById('agreeAll');
-        const subChecks = document.querySelectorAll('.co-sub-check');
+        const agreeAll      = document.getElementById('agreeAll');
+        const subChecks     = document.querySelectorAll('.co-sub-check');
         const agreeAllLabel = document.getElementById('agreeAllLabel');
 
         agreeAll.addEventListener('change', () => {
             subChecks.forEach(cb => { cb.checked = agreeAll.checked; });
             agreeAllLabel.classList.toggle('checked', agreeAll.checked);
         });
-
         subChecks.forEach(cb => {
             cb.addEventListener('change', () => {
                 const allChecked = [...subChecks].every(c => c.checked);
@@ -705,101 +709,134 @@
         /* ── 폼 유효성 검사 ── */
         function validateForm() {
             let ok = true;
-
             const name  = document.getElementById('coName').value.trim();
             const phone = document.getElementById('coPhone').value.trim();
             const tvId  = document.getElementById('coTvId').value.trim();
 
-            const nameErr  = document.getElementById('nameErr');
-            const phoneErr = document.getElementById('phoneErr');
-            const tvErr    = document.getElementById('tvErr');
-            const agreeErr = document.getElementById('agreeErr');
-
-            [nameErr, phoneErr, tvErr, agreeErr].forEach(el => el.classList.remove('show'));
-            [document.getElementById('coName'), document.getElementById('coPhone'),
-             document.getElementById('coTvId')].forEach(el => el.classList.remove('error'));
+            document.getElementById('nameErr').classList.remove('show');
+            document.getElementById('phoneErr').classList.remove('show');
+            document.getElementById('tvErr').classList.remove('show');
+            document.getElementById('agreeErr').classList.remove('show');
+            ['coName','coPhone','coTvId'].forEach(id =>
+                document.getElementById(id).classList.remove('error'));
 
             if (!name) {
-                nameErr.classList.add('show');
+                document.getElementById('nameErr').classList.add('show');
                 document.getElementById('coName').classList.add('error');
                 ok = false;
             }
             if (!/^01[0-9]{8,9}$/.test(phone)) {
-                phoneErr.classList.add('show');
+                document.getElementById('phoneErr').classList.add('show');
                 document.getElementById('coPhone').classList.add('error');
                 ok = false;
             }
             if (!tvId) {
-                tvErr.classList.add('show');
+                document.getElementById('tvErr').classList.add('show');
                 document.getElementById('coTvId').classList.add('error');
                 ok = false;
             }
-            const agreeTerms = document.getElementById('agreeTerms').checked;
-            const agreeTvId  = document.getElementById('agreeTvId').checked;
-            if (!agreeTerms || !agreeTvId) {
-                agreeErr.classList.add('show');
+            if (!document.getElementById('agreeTerms').checked ||
+                !document.getElementById('agreeTvId').checked) {
+                document.getElementById('agreeErr').classList.add('show');
                 ok = false;
             }
-
             return ok;
         }
 
-        /* ── 결제하기 ── */
+        /* ── 결제하기 (빌링키 발급 방식) ── */
         document.getElementById('payBtn').addEventListener('click', async () => {
             if (!validateForm()) return;
 
-            const name  = document.getElementById('coName').value.trim();
-            const phone = document.getElementById('coPhone').value.trim();
-            const tvId  = document.getElementById('coTvId').value.trim();
+            const name   = document.getElementById('coName').value.trim();
+            const phone  = document.getElementById('coPhone').value.trim();
+            const tvId   = document.getElementById('coTvId').value.trim();
             const payBtn = document.getElementById('payBtn');
+            const termsAgreedAt = new Date().toISOString();
 
-            payBtn.disabled = true;
-            payBtn.textContent = '결제 처리 중...';
+            payBtn.disabled    = true;
+            payBtn.textContent = '카드 등록 중...';
 
             try {
-                const paymentId = `bitlogic-${planKey}-${Date.now()}`;
-
-                const response = await PortOne.requestPayment({
-                    storeId: PORTONE_STORE_ID,
-                    channelKey: PORTONE_CHANNEL_KEY,
-                    paymentId,
-                    orderName: `BitLogic ${plan.name} 플랜`,
-                    totalAmount: plan.price,
-                    currency: 'KRW',
-                    payMethod: 'CARD',
+                /* 1. 빌링키 발급 (정기결제용 카드 등록) */
+                const issueId = `bitlogic-${planKey}-${Date.now()}`;
+                const response = await PortOne.requestIssueBillingKey({
+                    storeId:         PORTONE_STORE_ID,
+                    channelKey:      PORTONE_CHANNEL_KEY,
+                    billingKeyMethod: 'CARD',
+                    issueId,
+                    issueName:       `BitLogic ${plan.name} 정기결제`,
                     customer: {
-                        fullName: name,
+                        customerId:  currentUser.id,
+                        fullName:    name,
                         phoneNumber: phone,
-                    },
-                    customData: {
-                        plan: planKey,
-                        tradingviewId: tvId,
+                        email:       currentUser.email,
                     },
                 });
 
                 if (response.code != null) {
-                    throw new Error(response.message || '결제가 취소되었습니다.');
+                    throw new Error(response.message || '카드 등록이 취소되었습니다.');
                 }
 
-                /* 결제 성공 → Supabase에 구독 정보 저장 */
-                const session = await getSession();
-                if (session) {
-                    await supabase.from('subscriptions').upsert({
-                        user_id:        session.user.id,
-                        plan:           planKey,
-                        tradingview_id: tvId,
-                        payment_id:     paymentId,
-                        amount:         plan.price,
-                        status:         'active',
+                const billingKey = response.billingKey;
+
+                /* 2. 프로필 저장 */
+                const { error: profileErr } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id:              currentUser.id,
+                        name,
+                        phone,
+                        tradingview_id:  tvId,
+                        terms_agreed_at: termsAgreedAt,
                     });
-                }
+                if (profileErr) throw profileErr;
 
-                alert(`결제가 완료되었습니다!\n\nTradingView 아이디(${tvId})로\n24시간 이내에 지표 권한이 부여됩니다.\n\n문의: bitlogictrade@gmail.com`);
-                window.location.href = 'index.html';
+                /* 3. 구독 레코드 생성 (status: pending) */
+                const { data: subData, error: subErr } = await supabase
+                    .from('subscriptions')
+                    .insert({
+                        user_id:     currentUser.id,
+                        plan_type:   planKey,
+                        billing_key: billingKey,
+                        amount:      plan.price,
+                        status:      'pending',
+                    })
+                    .select('id')
+                    .single();
+                if (subErr) throw subErr;
+
+                /* 4. 서버(/api/charge)로 실제 결제 요청 */
+                payBtn.textContent = '결제 처리 중...';
+                const chargeRes = await fetch('/api/charge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        billingKey,
+                        subscriptionId: subData.id,
+                        userId:         currentUser.id,
+                        planType:       planKey,
+                        amount:         plan.price,
+                        customerName:   name,
+                        customerEmail:  currentUser.email,
+                    }),
+                });
+
+                const chargeData = await chargeRes.json();
+                if (!chargeRes.ok) throw new Error(chargeData.error || '결제 실패');
+
+                alert(
+                    `결제가 완료되었습니다!\n\n` +
+                    `플랜: BitLogic ${plan.name}\n` +
+                    `TradingView ID: ${tvId}\n\n` +
+                    `24시간 이내에 지표 권한이 부여되며\n` +
+                    `매월 자동 결제됩니다.\n\n` +
+                    `문의: bitlogictrade@gmail.com`
+                );
+                window.location.href = 'mypage.html';
 
             } catch (err) {
-                alert('결제 실패: ' + (err.message || '다시 시도해 주세요.'));
-                payBtn.disabled = false;
+                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                payBtn.disabled    = false;
                 payBtn.textContent = '결제하기';
             }
         });
