@@ -332,10 +332,14 @@
                 </form>
             </div>
 
-            <!-- 로그아웃 -->
+            <!-- 로그아웃 + 탈퇴 -->
             <div class="mypage-section">
                 <p class="section-title">계정 관리</p>
                 <button class="logout-btn" id="logoutBtn">로그아웃</button>
+                <button class="logout-btn" id="deleteAccountBtn"
+                    style="margin-top:12px;border-color:rgba(150,150,150,0.3);color:#6a8aaa;font-size:0.82rem;">
+                    회원 탈퇴
+                </button>
             </div>
         </div>
     </main>
@@ -367,7 +371,7 @@
     </footer>
 
     <script type="module">
-        import { supabase, getUser, signOut, updatePassword, onAuthStateChange } from './supabase-auth.js';
+        import { supabase, getUser, signOut, updatePassword, onAuthStateChange, getSession } from './supabase-auth.js';
 
         /* Mobile nav */
         const hamburger = document.getElementById('navHamburger');
@@ -564,6 +568,40 @@
                 alert('오류: ' + (err.message || '다시 시도해 주세요.'));
             } finally {
                 btn.disabled = false; btn.textContent = '변경 저장';
+            }
+        });
+
+        /* 회원 탈퇴 */
+        document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
+            const confirmed = confirm(
+                '정말 탈퇴하시겠습니까?\n\n' +
+                '탈퇴 시 구독이 해지되고 모든 데이터가 삭제됩니다.\n' +
+                '이 작업은 되돌릴 수 없습니다.'
+            );
+            if (!confirmed) return;
+
+            const btn = document.getElementById('deleteAccountBtn');
+            btn.disabled = true; btn.textContent = '처리 중...';
+
+            try {
+                const session = await getSession();
+                if (!session) throw new Error('세션이 만료되었습니다.');
+
+                const res = await fetch('/api/delete-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`,
+                    },
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                alert('탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                btn.disabled = false; btn.textContent = '회원 탈퇴';
             }
         });
 

@@ -509,7 +509,7 @@
         ['navLoginBtn','mobileLoginBtn'].forEach(id => {
             document.getElementById(id)?.addEventListener('click', e => {
                 e.preventDefault();
-                openModal(loginModal);
+                window.location.href = 'login.html';
             });
         });
 
