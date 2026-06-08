@@ -72,8 +72,14 @@ CREATE TRIGGER set_profiles_updated_at
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, created_at, updated_at)
-    VALUES (NEW.id, NOW(), NOW())
+    INSERT INTO public.profiles (id, name, phone, created_at, updated_at)
+    VALUES (
+        NEW.id,
+        NEW.raw_user_meta_data->>'name',
+        NEW.raw_user_meta_data->>'phone',
+        NOW(),
+        NOW()
+    )
     ON CONFLICT (id) DO NOTHING;
     RETURN NEW;
 END;

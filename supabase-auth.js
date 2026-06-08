@@ -9,8 +9,12 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ─── 이메일 회원가입 ─── */
-export async function signUp(email, password) {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+export async function signUp(email, password, metadata = {}) {
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: metadata },
+    });
     if (error) throw error;
     return data;
 }

@@ -375,7 +375,7 @@
     </footer>
 
     <script type="module">
-        import { supabase, signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
+        import { signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
 
         /* Mobile nav */
         const hamburger = document.getElementById('navHamburger');
@@ -435,16 +435,8 @@
             btn.textContent = '가입 중...';
 
             try {
-                const data = await signUp(email, pw);
-
-                /* 가입 직후 profiles에 이름/전화번호 저장 */
-                if (data?.user?.id) {
-                    await supabase.from('profiles').upsert({
-                        id:    data.user.id,
-                        name,
-                        phone,
-                    });
-                }
+                /* name, phone을 metadata로 같이 전달 → trigger가 profiles에 저장 */
+                await signUp(email, pw, { name, phone });
 
                 alert('가입 완료! 이메일을 확인하여 인증 링크를 클릭해 주세요.');
                 window.location.href = 'index.html';
