@@ -53,6 +53,15 @@ function setupFaq() {
     });
 }
 
+/* Nav scroll: transparent at top → dark when scrolled (Netflix style) */
+function setupNavScroll() {
+    const nav = document.querySelector('.nav');
+    if (!nav) return;
+    const update = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+}
+
 /* Mobile nav */
 function setupNav() {
     const hamburger = document.getElementById('navHamburger');
@@ -78,4 +87,5 @@ window.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupFaq();
     setupNav();
+    setupNavScroll();
 });

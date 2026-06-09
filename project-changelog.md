@@ -2,6 +2,22 @@
 
 ---
 
+## 2026-06-09 (12차)
+
+### style.css + script.js - Netflix 방식 Nav 스크롤 투명 처리
+
+**style.css**
+- `.nav` 기본 상태: `background: transparent`, `backdrop-filter: none`, `border: transparent` + 0.4s transition
+- `.nav.scrolled`: `background: rgba(0,0,0,0.88)` + `backdrop-filter: blur(20px)` + border 복원
+- 노치 영역은 `padding-top: env(safe-area-inset-top)` (11차에서 추가)로 nav 배경색이 자동으로 채워짐
+
+**script.js**
+- `setupNavScroll()` 추가: `scrollY > 10` 기준으로 `.scrolled` 클래스 토글 (passive scroll listener)
+- 페이지 로드 시 즉시 실행(페이지 중간에서 새로고침할 경우 대응)
+- `DOMContentLoaded` 초기화 블록에서 호출
+
+---
+
 ## 2026-06-09 (11차)
 
 ### style.css - 모바일 Safe Area 처리 추가
