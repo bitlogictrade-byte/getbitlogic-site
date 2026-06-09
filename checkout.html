@@ -460,15 +460,6 @@
                             <p class="co-error" id="phoneErr">올바른 휴대폰 번호를 입력해 주세요.</p>
                         </div>
 
-                        <!-- TradingView ID -->
-                        <div>
-                            <label class="co-label" for="coTvId">TradingView 아이디 <span>*</span></label>
-                            <input class="co-input" type="text" id="coTvId"
-                                placeholder="TradingView 사용자 이름 입력" autocomplete="off" required>
-                            <p class="co-input-hint">지표 권한 부여에 사용됩니다. 대소문자를 정확히 입력해 주세요.</p>
-                            <p class="co-error" id="tvErr">TradingView 아이디를 입력해 주세요.</p>
-                        </div>
-
                         <div class="co-divider"></div>
 
                         <!-- Agreement: All -->
@@ -501,20 +492,6 @@
                                 </span>
                             </label>
 
-                            <!-- TradingView ID mismatch -->
-                            <label class="co-agree-item" for="agreeTvId">
-                                <input type="checkbox" id="agreeTvId" class="co-sub-check">
-                                <span class="co-check-sm">
-                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                        <path d="M1 4l2.5 2.5L9 1" stroke="#000" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                                <span class="co-agree-text">
-                                    <span class="tag-req">[필수]</span>
-                                    TradingView 아이디 오입력 시 지표 권한 부여가 불가하며, 이에 따른 책임은 구매자에게 있음에 동의합니다.
-                                </span>
-                            </label>
                         </div>
                         <p class="co-agree-err" id="agreeErr">필수 약관에 모두 동의해 주세요.</p>
 
@@ -555,7 +532,6 @@
                         <span class="co-total-label">이 결제금액</span>
                         <span class="co-total-value" id="totalPrice">49,000원</span>
                     </div>
-                    <p class="co-vat-note">VAT 포함</p>
 
                     <button class="co-pay-btn" id="payBtn" type="button">결제하기</button>
 
@@ -600,13 +576,15 @@
                 <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
                 <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com </p>
                 <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
-                <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
             </div>
             <div class="footer-links">
-                <a href="#">이용약관</a>
+                <a href="terms-of-service.html">이용약관</a>
                 <a href="privacy-policy.html">개인정보처리방침</a>
                 <a href="refund-policy.html">환불정책</a>
             </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
         </div>
     </footer>
 
@@ -652,6 +630,15 @@
             alert('결제하려면 먼저 로그인해 주세요.');
             window.location.href = 'index.html';
         }
+
+        /* ── 프로필 자동입력 ── */
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('name, phone')
+            .eq('id', currentUser.id)
+            .single();
+        if (profile?.name)  document.getElementById('coName').value  = profile.name;
+        if (profile?.phone) document.getElementById('coPhone').value = profile.phone;
 
         /* ── URL 파라미터에서 플랜 읽기 ── */
         const params  = new URLSearchParams(location.search);
@@ -711,13 +698,11 @@
             let ok = true;
             const name  = document.getElementById('coName').value.trim();
             const phone = document.getElementById('coPhone').value.trim();
-            const tvId  = document.getElementById('coTvId').value.trim();
 
             document.getElementById('nameErr').classList.remove('show');
             document.getElementById('phoneErr').classList.remove('show');
-            document.getElementById('tvErr').classList.remove('show');
             document.getElementById('agreeErr').classList.remove('show');
-            ['coName','coPhone','coTvId'].forEach(id =>
+            ['coName','coPhone'].forEach(id =>
                 document.getElementById(id).classList.remove('error'));
 
             if (!name) {
@@ -730,13 +715,7 @@
                 document.getElementById('coPhone').classList.add('error');
                 ok = false;
             }
-            if (!tvId) {
-                document.getElementById('tvErr').classList.add('show');
-                document.getElementById('coTvId').classList.add('error');
-                ok = false;
-            }
-            if (!document.getElementById('agreeTerms').checked ||
-                !document.getElementById('agreeTvId').checked) {
+            if (!document.getElementById('agreeTerms').checked) {
                 document.getElementById('agreeErr').classList.add('show');
                 ok = false;
             }
@@ -749,7 +728,6 @@
 
             const name   = document.getElementById('coName').value.trim();
             const phone  = document.getElementById('coPhone').value.trim();
-            const tvId   = document.getElementById('coTvId').value.trim();
             const payBtn = document.getElementById('payBtn');
             const termsAgreedAt = new Date().toISOString();
 
@@ -786,7 +764,6 @@
                         id:              currentUser.id,
                         name,
                         phone,
-                        tradingview_id:  tvId,
                         terms_agreed_at: termsAgreedAt,
                     });
                 if (profileErr) throw profileErr;
@@ -824,15 +801,7 @@
                 const chargeData = await chargeRes.json();
                 if (!chargeRes.ok) throw new Error(chargeData.error || '결제 실패');
 
-                alert(
-                    `결제가 완료되었습니다!\n\n` +
-                    `플랜: BitLogic ${plan.name}\n` +
-                    `TradingView ID: ${tvId}\n\n` +
-                    `24시간 이내에 지표 권한이 부여되며\n` +
-                    `매월 자동 결제됩니다.\n\n` +
-                    `문의: bitlogictrade@gmail.com`
-                );
-                window.location.href = 'mypage.html';
+                window.location.href = `success.html?plan=${planKey}&sub=${subData.id}`;
 
             } catch (err) {
                 alert('오류: ' + (err.message || '다시 시도해 주세요.'));

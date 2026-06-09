@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>결제 완료 | BitLogic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .success-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 24px 80px;
+        }
+        .success-wrap {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .success-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(0,229,255,0.12);
+            border: 1.5px solid rgba(0,229,255,0.3);
+            margin: 0 auto 4px;
+        }
+        .success-badge svg { color: var(--cyan); }
+        .success-header {
+            text-align: center;
+        }
+        .success-eyebrow {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .success-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .success-desc {
+            font-size: 0.88rem;
+            color: #6a8aaa;
+            line-height: 1.6;
+        }
+        .success-plan-info {
+            background: rgba(0,229,255,0.05);
+            border: 1px solid rgba(0,229,255,0.15);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .success-plan-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .success-plan-price {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        /* TV ID Card */
+        .tv-card {
+            background: #0d0d0d;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 32px 28px;
+        }
+        .tv-card-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .tv-card-desc {
+            font-size: 0.82rem;
+            color: #6a8aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .tv-input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tv-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.06em;
+        }
+        .tv-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: #fff;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .tv-input::placeholder { color: rgba(255,255,255,0.3); }
+        .tv-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+        }
+        .tv-input-hint {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+        }
+        .tv-error {
+            font-size: 0.78rem;
+            color: #ff5c5c;
+            display: none;
+            margin-top: -4px;
+        }
+        .tv-error.show { display: block; }
+        .tv-submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--cyan);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: 800;
+            font-family: inherit;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            margin-bottom: 12px;
+        }
+        .tv-submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .tv-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .tv-skip-btn {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            color: #6a8aaa;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .tv-skip-btn:hover { border-color: rgba(255,255,255,0.25); color: #a0b8cc; }
+        .tv-skip-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .sms-sent-box {
+            background: rgba(0,229,255,0.05);
+            border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 12px;
+            padding: 16px 18px;
+            font-size: 0.85rem;
+            color: #a0d4e0;
+            line-height: 1.6;
+            display: none;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .sms-sent-box.show { display: block; }
+
+        @media (max-width: 480px) {
+            .tv-card { padding: 24px 20px; }
+            .success-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <svg width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="navGlow" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <circle cx="60" cy="60" r="58" fill="#010d1a"/>
+                    <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.9" filter="url(#navGlow)"/>
+                    <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2" filter="url(#navGlow)"/>
+                    <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.45"/>
+                    <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5" filter="url(#navGlow)">BITLOGIC</text>
+                </svg>
+                <span class="nav-logo-text">BitLogic</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#pricing">플랜 안내</a>
+                <a href="index.html#features">서비스 소개</a>
+                <a href="mypage.html" class="nav-btn">마이페이지</a>
+            </div>
+            <button class="nav-hamburger" id="navHamburger" aria-label="메뉴 열기">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="index.html#pricing">플랜 안내</a>
+            <a href="index.html#features">서비스 소개</a>
+            <a href="mypage.html">마이페이지</a>
+        </div>
+    </nav>
+
+    <main class="success-page">
+        <div class="success-wrap">
+
+            <!-- 완료 배지 -->
+            <div class="success-badge">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+
+            <div class="success-header">
+                <p class="success-eyebrow">Payment Success</p>
+                <h1 class="success-title">결제가 완료되었습니다!</h1>
+                <p class="success-desc">
+                    구독이 활성화되었습니다.<br>
+                    지표 권한 부여를 위해 TradingView 아이디를 입력해 주세요.
+                </p>
+            </div>
+
+            <!-- 플랜 정보 -->
+            <div class="success-plan-info">
+                <span class="success-plan-name" id="planDisplayName">BitLogic Basic</span>
+                <span class="success-plan-price" id="planDisplayPrice">49,000원 / 월</span>
+            </div>
+
+            <!-- TradingView ID 입력 -->
+            <div class="tv-card">
+                <h2 class="tv-card-title">TradingView 아이디 입력</h2>
+                <p class="tv-card-desc">
+                    입력하신 아이디로 지표 권한이 부여됩니다.<br>
+                    대소문자를 정확히 입력해 주세요. 마이페이지에서 1회 수정 가능합니다.
+                </p>
+
+                <div class="tv-input-wrap">
+                    <label class="tv-label" for="tvIdInput">TRADINGVIEW USERNAME</label>
+                    <input type="text" id="tvIdInput" class="tv-input"
+                        placeholder="TradingView 사용자 이름" autocomplete="off">
+                    <span class="tv-input-hint">예) username123 (TradingView 프로필 URL의 이름)</span>
+                    <span class="tv-error" id="tvIdError">TradingView 아이디를 입력해 주세요.</span>
+                </div>
+
+                <button class="tv-submit-btn" id="tvSubmitBtn">입력 완료 → 마이페이지로</button>
+                <button class="tv-skip-btn" id="tvSkipBtn">나중에 입력하기 (가입 전화번호로 문자 발송)</button>
+
+                <div class="sms-sent-box" id="smsSentBox">
+                    📱 가입하신 전화번호로 TradingView 아이디 입력 링크를 발송했습니다.<br>
+                    마이페이지에서도 1회 수정 가능합니다.
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand-wrap">
+                <div class="footer-logo-wrap">
+                    <svg width="44" height="44" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="60" cy="60" r="58" fill="#010d1a"/>
+                        <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.9"/>
+                        <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2"/>
+                        <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.45"/>
+                        <path d="M17 86 Q40 108 60 112 Q80 108 103 86" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.7"/>
+                        <line x1="49" y1="23" x2="49" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="60" y1="18" x2="60" y2="35" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="71" y1="23" x2="71" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="46" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <circle cx="60" cy="46" r="5.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <circle cx="74" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5">BITLOGIC</text>
+                    </svg>
+                    <p class="footer-brand">BitLogic</p>
+                </div>
+                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
+                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
+                <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
+                <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="terms-of-service.html">이용약관</a>
+                <a href="privacy-policy.html">개인정보처리방침</a>
+                <a href="refund-policy.html">환불정책</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { supabase, getUser } from './supabase-auth.js';
+
+        const hamburger = document.getElementById('navHamburger');
+        const mobileNav = document.getElementById('navMobile');
+        if (hamburger && mobileNav) {
+            hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+            mobileNav.querySelectorAll('a').forEach(a =>
+                a.addEventListener('click', () => mobileNav.classList.remove('open'))
+            );
+        }
+
+        const PLAN_INFO = {
+            basic: { name: 'BitLogic Basic', price: '49,000원 / 월' },
+            pro:   { name: 'BitLogic Pro',   price: '119,000원 / 월' },
+        };
+        const params  = new URLSearchParams(location.search);
+        const planKey = params.get('plan') || 'basic';
+        const info    = PLAN_INFO[planKey] || PLAN_INFO.basic;
+        document.getElementById('planDisplayName').textContent  = info.name;
+        document.getElementById('planDisplayPrice').textContent = info.price;
+
+        const user = await getUser();
+        if (!user) {
+            window.location.href = 'index.html';
+        }
+
+        /* TV ID 입력 완료 */
+        document.getElementById('tvSubmitBtn').addEventListener('click', async () => {
+            const tvId  = document.getElementById('tvIdInput').value.trim();
+            const errEl = document.getElementById('tvIdError');
+            errEl.classList.remove('show');
+
+            if (!tvId) {
+                errEl.classList.add('show');
+                return;
+            }
+
+            const btn = document.getElementById('tvSubmitBtn');
+            btn.disabled = true;
+            btn.textContent = '저장 중...';
+
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .upsert({ id: user.id, tradingview_id: tvId });
+                if (error) throw error;
+
+                window.location.href = 'mypage.html';
+            } catch (err) {
+                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                btn.disabled = false;
+                btn.textContent = '입력 완료 → 마이페이지로';
+            }
+        });
+
+        /* 나중에 입력 (문자 발송) */
+        document.getElementById('tvSkipBtn').addEventListener('click', async () => {
+            const skipBtn   = document.getElementById('tvSkipBtn');
+            const submitBtn = document.getElementById('tvSubmitBtn');
+            skipBtn.disabled   = true;
+            submitBtn.disabled = true;
+            skipBtn.textContent = '발송 중...';
+
+            try {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('phone')
+                    .eq('id', user.id)
+                    .single();
+
+                await fetch('/api/send-tv-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId:   user.id,
+                        phone:    profile?.phone,
+                        planType: planKey,
+                    }),
+                });
+            } catch (_) {
+                /* SMS API 미구현 시 무시하고 안내 표시 */
+            }
+
+            skipBtn.style.display   = 'none';
+            submitBtn.style.display = 'none';
+            document.getElementById('smsSentBox').classList.add('show');
+
+            setTimeout(() => {
+                window.location.href = 'mypage.html';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

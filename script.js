@@ -17,15 +17,13 @@ function renderPhrase(idx) {
 function cyclePhrase() {
     const el = document.querySelector('.hero-title .tw');
     if (!el) return;
+    el.style.transition = 'opacity 0.35s ease';
     el.style.opacity = '0';
-    el.style.transform = 'translateY(-10px)';
     setTimeout(() => {
         phraseIdx = (phraseIdx + 1) % phrases.length;
         renderPhrase(phraseIdx);
-        el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
         el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-    }, 350);
+    }, 380);
 }
 
 /* Plan tabs */
@@ -37,6 +35,8 @@ function setupTabs() {
             const plan = tab.dataset.plan;
             document.getElementById('planBasic').classList.toggle('hidden', plan !== 'basic');
             document.getElementById('planPro').classList.toggle('hidden', plan !== 'pro');
+            const chartImg = document.getElementById('stageChartImg');
+            if (chartImg) chartImg.src = plan === 'pro' ? 'pro.png' : 'basic.png';
         });
     });
 }
@@ -70,8 +70,8 @@ function setupNav() {
 window.addEventListener('DOMContentLoaded', () => {
     const tw = document.querySelector('.hero-title .tw');
     if (tw) {
-        tw.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
         tw.style.display = 'block';
+        tw.style.transition = 'opacity 0.35s ease';
     }
     renderPhrase(0);
     setInterval(cyclePhrase, 4200);

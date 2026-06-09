@@ -1,0 +1,14 @@
+# 이미지 파일
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.webp
+
+# SQL 스키마 (필요할 때 직접 열어서 확인)
+*.sql
+
+# 기타
+*.map

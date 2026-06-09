@@ -300,6 +300,26 @@
                 </div>
             </div>
 
+            <!-- TradingView ID -->
+            <div class="mypage-section" id="tvIdSection">
+                <p class="section-title">TradingView 아이디</p>
+                <div class="info-row">
+                    <span class="info-label">현재 아이디</span>
+                    <span class="info-value" id="tvIdDisplay">—</span>
+                </div>
+                <!-- 수정 가능한 경우에만 표시 -->
+                <div id="tvIdEditWrap" style="display:none; margin-top:16px;">
+                    <p style="font-size:0.78rem;color:#f0a500;margin-bottom:12px;">⚠ 1회 수정 가능합니다. 신중하게 입력해 주세요.</p>
+                    <div style="display:flex;gap:10px;align-items:flex-start;">
+                        <input type="text" id="tvIdEditInput" class="pw-input"
+                            placeholder="새 TradingView 아이디" style="flex:1;">
+                        <button class="pw-save-btn" id="tvIdSaveBtn" style="white-space:nowrap;">수정 저장</button>
+                    </div>
+                    <span style="font-size:0.72rem;color:#4a6070;margin-top:6px;display:block;">대소문자를 정확히 입력해 주세요.</span>
+                </div>
+                <p id="tvIdLockedMsg" style="display:none;font-size:0.78rem;color:#6a8aaa;margin-top:12px;">수정 기회가 사용되었습니다.</p>
+            </div>
+
             <!-- 비밀번호 변경 (이메일 로그인 시에만 표시) -->
             <div class="mypage-section" id="pwChangeSection">
                 <p class="section-title">비밀번호 변경</p>
@@ -357,16 +377,19 @@
                     </svg>
                     <p class="footer-brand">BitLogic</p>
                 </div>
-                <p class="footer-info">비트로직(BitLogic) | 대표자 : 김성지 | 사업자등록번호 : 472-13-03084</p>
-                <p class="footer-info">주소 : 인천 남동구 라고가로 188번길 2</p>
+                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
+                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
                 <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
                 <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
             </div>
             <div class="footer-links">
-                <a href="#">이용약관</a>
+                <a href="terms-of-service.html">이용약관</a>
                 <a href="privacy-policy.html">개인정보처리방침</a>
                 <a href="refund-policy.html">환불정책</a>
             </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
         </div>
     </footer>
 
@@ -546,11 +569,52 @@
 
             renderUserInfo(user, profile);
             renderSubscription(subs?.[0] ?? null);
+            renderTvId(profile);
         }
 
         /* 인증 상태 변화 감지 (로그아웃 시 리다이렉트) */
         onAuthStateChange(user => {
             if (!user) window.location.href = 'index.html';
+        });
+
+        /* TV ID 렌더링 */
+        function renderTvId(profile) {
+            const displayEl   = document.getElementById('tvIdDisplay');
+            const editWrap    = document.getElementById('tvIdEditWrap');
+            const lockedMsg   = document.getElementById('tvIdLockedMsg');
+
+            displayEl.textContent = profile?.tradingview_id || '미입력';
+
+            if (!profile?.tv_id_changed) {
+                editWrap.style.display = 'block';
+            } else {
+                lockedMsg.style.display = 'block';
+            }
+        }
+
+        /* TV ID 수정 저장 */
+        document.getElementById('tvIdSaveBtn')?.addEventListener('click', async () => {
+            const newId = document.getElementById('tvIdEditInput').value.trim();
+            if (!newId) { alert('아이디를 입력해 주세요.'); return; }
+
+            const btn = document.getElementById('tvIdSaveBtn');
+            btn.disabled = true; btn.textContent = '저장 중...';
+
+            try {
+                const user = await getUser();
+                const { error } = await supabase
+                    .from('profiles')
+                    .upsert({ id: user.id, tradingview_id: newId, tv_id_changed: true });
+                if (error) throw error;
+
+                document.getElementById('tvIdDisplay').textContent = newId;
+                document.getElementById('tvIdEditWrap').style.display = 'none';
+                document.getElementById('tvIdLockedMsg').style.display = 'block';
+                alert('TradingView 아이디가 수정되었습니다.');
+            } catch (err) {
+                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                btn.disabled = false; btn.textContent = '수정 저장';
+            }
         });
 
         /* 비밀번호 변경 폼 */

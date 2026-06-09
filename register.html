@@ -360,22 +360,24 @@
                     </svg>
                     <p class="footer-brand">BitLogic</p>
                 </div>
-                <p class="footer-info">비트로직(BitLogic) | 대표자 : 김성지 | 사업자등록번호 : 472-13-03084</p>
-                <p class="footer-info">주소 : 인천 남동구 라고가로 188번길 2</p>
+                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
+                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
                 <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
                 <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
-                <p class="footer-disclaimer">본 서비스는 투자 자문이 아닌 보조지표 제공 서비스입니다. 투자 결과에 대한 책임은 이용자 본인에게 있습니다.</p>
             </div>
             <div class="footer-links">
-                <a href="#">이용약관</a>
+                <a href="terms-of-service.html">이용약관</a>
                 <a href="privacy-policy.html">개인정보처리방침</a>
                 <a href="refund-policy.html">환불정책</a>
             </div>
         </div>
+        <div class="footer-bottom">
+            <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
+        </div>
     </footer>
 
     <script type="module">
-        import { signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
+        import { supabase, signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
 
         /* Mobile nav */
         const hamburger = document.getElementById('navHamburger');
@@ -417,10 +419,12 @@
             const pw    = document.getElementById('regPassword').value;
             const conf  = document.getElementById('regPasswordConfirm').value;
 
-            /* 에러 초기화 */
+            /* 에러 초기화 + 메시지 기본값 복원 */
             ['nameError','phoneError','emailError','pwError','confirmError'].forEach(id =>
                 document.getElementById(id).classList.remove('show')
             );
+            document.getElementById('phoneError').textContent = '올바른 휴대폰 번호를 입력해 주세요.';
+            document.getElementById('emailError').textContent = '올바른 이메일 주소를 입력해 주세요.';
 
             let valid = true;
             if (!name)                                          { document.getElementById('nameError').classList.add('show');  valid = false; }
@@ -432,16 +436,49 @@
 
             const btn = e.target.querySelector('.auth-submit');
             btn.disabled = true;
-            btn.textContent = '가입 중...';
+            btn.textContent = '확인 중...';
 
             try {
-                /* name, phone을 metadata로 같이 전달 → trigger가 profiles에 저장 */
-                await signUp(email, pw, { name, phone });
+                /* 전화번호 중복 체크 */
+                const { data: phoneCheck } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('phone', phone)
+                    .maybeSingle();
 
-                alert('가입 완료! 이메일을 확인하여 인증 링크를 클릭해 주세요.');
+                if (phoneCheck) {
+                    document.getElementById('phoneError').textContent = '이미 가입된 전화번호입니다.';
+                    document.getElementById('phoneError').classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = '회원가입';
+                    return;
+                }
+
+                btn.textContent = '가입 중...';
+
+                /* 회원가입 */
+                const data = await signUp(email, pw, { name, phone });
+
+                /* profiles에 email 저장 (비밀번호 찾기 & 중복 체크용) */
+                if (data?.user) {
+                    await supabase.from('profiles').upsert({
+                        id: data.user.id,
+                        email,
+                        name,
+                        phone,
+                    });
+                }
+
+                alert('가입이 완료되었습니다!');
                 window.location.href = 'index.html';
             } catch (err) {
-                alert('회원가입 실패: ' + (err.message || '다시 시도해 주세요.'));
+                const msg = (err.message || '').toLowerCase();
+                if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('email already')) {
+                    document.getElementById('emailError').textContent = '이미 가입된 이메일입니다.';
+                    document.getElementById('emailError').classList.add('show');
+                } else {
+                    alert('회원가입 실패: ' + (err.message || '다시 시도해 주세요.'));
+                }
                 btn.disabled = false;
                 btn.textContent = '회원가입';
             }

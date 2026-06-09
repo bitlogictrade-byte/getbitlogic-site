@@ -63,6 +63,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     transition: filter 0.3s;
 }
 
+.nav-logo-img {
+    height: 36px;
+    width: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
 .nav-logo-link:hover .nav-logo-svg {
     filter: drop-shadow(0 0 12px rgba(0,229,255,0.8));
 }
@@ -264,16 +271,18 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     position: relative;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding: 120px 2rem 80px;
+    justify-content: flex-start;
+    overflow: visible;
+    padding: 160px 2rem 100px;
 }
 
 .hero-bg {
     position: absolute;
     inset: 0;
     z-index: 0;
+    overflow: hidden;
 }
 
 .hero-bg-img {
@@ -304,27 +313,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     margin: 0 auto;
 }
 
-.hero-logo-badge {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.8rem;
-    animation: logoPulse 3s ease-in-out infinite;
-}
-
 .hero-logo-svg {
     filter: drop-shadow(0 0 18px rgba(0,229,255,0.55))
             drop-shadow(0 0 40px rgba(0,229,255,0.2));
     transition: filter 0.4s;
-}
-
-.hero-logo-svg:hover {
-    filter: drop-shadow(0 0 28px rgba(0,229,255,0.8))
-            drop-shadow(0 0 60px rgba(0,229,255,0.35));
-}
-
-@keyframes logoPulse {
-    0%, 100% { filter: drop-shadow(0 0 18px rgba(0,229,255,0.55)) drop-shadow(0 0 40px rgba(0,229,255,0.2)); }
-    50%       { filter: drop-shadow(0 0 28px rgba(0,229,255,0.75)) drop-shadow(0 0 60px rgba(0,229,255,0.3)); }
 }
 
 .hero-eyebrow {
@@ -339,11 +331,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .hero-title {
-    font-size: clamp(3rem, 8vw, 88px);
+    font-size: clamp(1.6rem, 6.5vw, 80px);
     font-weight: 900;
-    line-height: 1;
+    line-height: 1.1;
     letter-spacing: -0.03em;
-    min-height: 2.2em;
+    min-height: 2.4em;
+    overflow: visible;
 }
 
 .hero-title .line-white { display: block; color: #fff; }
@@ -369,6 +362,26 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 2.5rem;
+}
+
+.hero-image-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1100px;
+    margin: 60px auto 0;
+    padding: 0 2rem;
+}
+
+.hero-main-img {
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 229, 255, 0.18);
+    box-shadow:
+        0 0 0 1px rgba(0,229,255,0.08),
+        0 40px 80px rgba(0,0,0,0.7),
+        0 0 60px rgba(0,229,255,0.08);
+    display: block;
 }
 
 /* ── PRICING ── */
@@ -410,7 +423,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* Tab switcher */
 .plan-tabs {
-    display: inline-flex;
+    display: flex;
+    width: fit-content;
+    margin: 0 auto 2rem;
     background: rgba(255,255,255,0.06);
     border: 1px solid var(--border);
     border-radius: 999px;
@@ -437,44 +452,38 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     display: grid;
     grid-template-columns: 1fr 340px;
     gap: 1.5rem;
-    align-items: stretch;
+    align-items: center;
 }
 
 .stage-chart {
     border-radius: 20px;
     overflow: hidden;
-    background: #0a0a0a;
-    border: 1px solid var(--border);
-    position: relative;
-    box-shadow: 0 0 40px rgba(0,229,255,0.06), inset 0 0 0 1px rgba(0,229,255,0.08);
-}
-
-.stage-chart::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    border: 1px solid rgba(0,229,255,0.12);
-    pointer-events: none;
+    aspect-ratio: 16/9;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }
 
 .stage-chart-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    min-height: 420px;
+    object-position: center;
     display: block;
-    border-radius: 20px;
 }
 
 /* Info panel */
 .stage-panel {
-    background: #0d0d0d;
-    border: 1px solid var(--border);
+    background:
+        radial-gradient(ellipse at 110% -10%, rgba(0,229,255,0.13) 0%, transparent 55%),
+        radial-gradient(ellipse at -10% 110%, rgba(120,80,255,0.08) 0%, transparent 50%),
+        #0d0d0d;
+    border: 1px solid rgba(0,229,255,0.18);
     border-radius: 20px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 0 0 1px rgba(0,229,255,0.06), 0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.05);
+    position: relative;
+    overflow: hidden;
 }
 
 .plan-info {
@@ -754,22 +763,29 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 .footer-info {
     font-size: 0.8rem;
-    color: #444;
+    color: rgba(255,255,255,0.38);
     line-height: 1.9;
 }
 
 .footer-copy {
     font-size: 0.78rem;
-    color: #333;
+    color: rgba(255,255,255,0.25);
     margin-top: 0.75rem;
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 1.5rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
 }
 
 .footer-disclaimer {
     font-size: 0.72rem;
-    color: #2a2a2a;
-    margin-top: 0.4rem;
+    color: rgba(255,255,255,0.22);
+    font-style: italic;
     line-height: 1.6;
-    max-width: 420px;
 }
 
 .footer-links {
@@ -787,13 +803,38 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 .footer-links a:hover { color: #aaa; }
 
+/* 데스크탑: 카드 안 이미지 숨김 (왼쪽 큰 이미지 사용) */
+.plan-card-img { display: none; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-    .pricing-stage {
-        grid-template-columns: 1fr;
+    /* 모바일: 탭 스위치 유지, 왼쪽 차트 숨기고 카드 안 이미지 표시 */
+    .stage-chart { display: none; }
+    .pricing-stage { grid-template-columns: 1fr; }
+
+    .stage-panel {
+        background: #0d0d0d;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 28px 24px;
     }
 
-    .stage-chart-img { min-height: 260px; }
+    .plan-card-img-wrap {
+        width: 100%;
+        aspect-ratio: 16/9;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #0a0a0a;
+        margin: 8px 0;
+    }
+
+    .plan-card-img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
 
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -811,6 +852,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     .features-grid { grid-template-columns: 1fr; }
     .hero-cta { flex-direction: column; align-items: center; }
     .btn { width: 100%; max-width: 300px; }
+    .btn-full { max-width: 100%; }
 }
 
 /* ── Modal ── */
