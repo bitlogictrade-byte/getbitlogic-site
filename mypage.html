@@ -735,6 +735,15 @@
         });
 
         init();
+
+        // Nav scroll: transparent at top → dark when scrolled
+        (() => {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            const update = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+        })();
     </script>
 </body>
 </html>

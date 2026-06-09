@@ -381,6 +381,15 @@
             try { await signInWithGoogle(); }
             catch (err) { alert('Google 로그인 실패: ' + err.message); }
         });
+
+        // Nav scroll: transparent at top → dark when scrolled
+        (() => {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            const update = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+        })();
     </script>
 </body>
 </html>

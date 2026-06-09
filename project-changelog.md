@@ -2,6 +2,25 @@
 
 ---
 
+## 2026-06-09 (13차)
+
+### 전 페이지 Nav scroll 적용 완료 (login / register / checkout / mypage)
+
+**배경:** `setupNavScroll()`이 `script.js`에만 있어 `index.html` 외 페이지에선 nav가 항상 투명했던 문제 수정
+
+**변경 파일:** `login.html`, `register.html`, `checkout.html`, `mypage.html`
+- 각 파일 `</script>` 직전에 IIFE로 nav scroll 코드 추가
+- `scrollY > 10` 기준 `.scrolled` 클래스 토글 (passive scroll listener)
+- 페이지 로드 직후 `update()` 즉시 호출 (새로고침 중간 위치 대응)
+
+**현재 safe area 전체 적용 상태 (style.css 11차 + 이번 13차)**
+- `body`: 좌우 safe area (landscape 노치)
+- `.nav`: 상단 safe area (Dynamic Island) + 좌우 safe area + 투명→다크 스크롤 전환 (전 페이지)
+- `.footer`: 홈 인디케이터 하단 safe area
+- `.modal-overlay`: 4방향 safe area
+
+---
+
 ## 2026-06-09 (12차)
 
 ### style.css + script.js - Netflix 방식 Nav 스크롤 투명 처리
