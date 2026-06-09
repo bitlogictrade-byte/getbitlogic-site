@@ -272,7 +272,7 @@
     </footer>
 
     <script type="module">
-        import { signIn, signInWithGoogle, signInWithKakao, resetPassword, getUser } from './supabase-auth.js';
+        import { supabase, signIn, signInWithGoogle, signInWithKakao, resetPassword, getUser } from './supabase-auth.js';
 
         /* 이미 로그인 된 경우 mypage로 */
         getUser().then(user => { if (user) window.location.href = 'mypage.html'; });
@@ -316,13 +316,29 @@
             const errEl  = document.getElementById('resetEmailError');
             const btn    = document.getElementById('resetSubmitBtn');
             errEl.classList.remove('show');
+            errEl.textContent = '올바른 이메일 주소를 입력해 주세요.';
 
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 errEl.classList.add('show');
                 return;
             }
-            btn.disabled = true; btn.textContent = '전송 중...';
+            btn.disabled = true; btn.textContent = '확인 중...';
             try {
+                /* profiles 테이블에서 이메일 존재 확인 */
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (!profile) {
+                    errEl.textContent = '가입된 계정 정보가 없습니다.';
+                    errEl.classList.add('show');
+                    btn.disabled = false; btn.textContent = '재설정 링크 보내기';
+                    return;
+                }
+
+                btn.textContent = '전송 중...';
                 await resetPassword(email);
                 resetModal.classList.remove('active');
                 alert('재설정 링크를 이메일로 보냈습니다.\n메일함을 확인해 주세요.');

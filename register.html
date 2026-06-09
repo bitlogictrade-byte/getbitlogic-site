@@ -184,9 +184,45 @@
             display: none;
         }
         .form-error.show { display: block; }
+        /* 토스트 */
+        .toast-wrap {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .toast {
+            background: #1e0808; border: 1px solid rgba(250,87,87,0.4); color: #fa9090;
+            padding: 11px 22px; border-radius: 10px; font-size: 0.875rem; font-weight: 600;
+            pointer-events: auto; white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            animation: toastIn 0.26s ease;
+        }
+        .toast.ok { background: #071a0e; border-color: rgba(0,229,180,0.4); color: #00e5b4; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0); }
+            to   { opacity: 0; transform: translateY(-10px); }
+        }
+        /* 전화번호 중복 복구 섹션 */
+        .phone-dup-recovery {
+            display: none; flex-direction: column; gap: 10px;
+            margin-top: 6px; padding: 16px;
+            background: rgba(250,87,87,0.06);
+            border: 1px solid rgba(250,87,87,0.2); border-radius: 10px;
+        }
+        .phone-dup-recovery.show { display: flex; }
+        .phone-dup-recovery-desc { font-size: 0.8rem; color: #fa9090; line-height: 1.6; margin: 0; }
+        .phone-dup-result { font-size: 0.78rem; display: none; }
+        .phone-dup-result.show { display: block; }
+        .phone-dup-result.ok { color: var(--cyan); }
+        .phone-dup-result.err { color: #fa5757; }
         @media (max-width: 480px) {
             .auth-card { padding: 36px 24px; }
             .auth-title { font-size: 1.7rem; }
+            .toast { white-space: normal; text-align: center; max-width: calc(100vw - 48px); }
         }
     </style>
 </head>
@@ -236,6 +272,9 @@
         </div>
     </nav>
 
+    <!-- 토스트 컨테이너 -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
     <!-- REGISTER FORM -->
     <main class="auth-page">
         <div class="auth-card">
@@ -262,6 +301,20 @@
                             maxlength="11" inputmode="numeric" required>
                     </div>
                     <span class="form-error" id="phoneError">올바른 휴대폰 번호를 입력해 주세요.</span>
+                </div>
+
+                <!-- 전화번호 중복 시 비밀번호 재설정 안내 -->
+                <div class="phone-dup-recovery" id="phoneDupRecovery">
+                    <p class="phone-dup-recovery-desc">
+                        비밀번호를 잊으셨나요? 가입 이메일로 재설정 링크를 보내드립니다.
+                    </p>
+                    <input class="form-input" type="email" id="phoneDupEmail"
+                        placeholder="가입 이메일 주소" autocomplete="email" style="font-size:0.9rem;">
+                    <button type="button" class="auth-submit" id="phoneDupResetBtn"
+                        style="margin-top:0;padding:11px;font-size:0.875rem;">
+                        비밀번호 재설정 메일 보내기
+                    </button>
+                    <span class="phone-dup-result" id="phoneDupResult"></span>
                 </div>
 
                 <div class="form-group">
@@ -332,8 +385,8 @@
 
             <p class="auth-terms">
                 회원가입 시 BitLogic의
-                <a href="#" style="color:var(--cyan);text-decoration:none;">이용약관</a> 및
-                <a href="privacy-policy.html" style="color:var(--cyan);text-decoration:none;">개인정보처리방침</a>에
+                <a href="https://getbitlogic.com/terms-of-service.html" target="_blank" style="color:var(--cyan);text-decoration:none;">이용약관</a> 및
+                <a href="https://getbitlogic.com/privacy-policy.html" target="_blank" style="color:var(--cyan);text-decoration:none;">개인정보처리방침</a>에
                 동의하는 것으로 간주됩니다.
             </p>
         </div>
@@ -377,7 +430,26 @@
     </footer>
 
     <script type="module">
-        import { supabase, signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
+        import { supabase, signUp, signInWithGoogle, signInWithKakao, resetPassword } from './supabase-auth.js';
+
+        /* 토스트 */
+        function showToast(message, type = 'error') {
+            const wrap = document.getElementById('toastWrap');
+            const el = document.createElement('div');
+            el.className = 'toast' + (type === 'ok' ? ' ok' : '');
+            el.textContent = message;
+            wrap.appendChild(el);
+            setTimeout(() => {
+                el.style.animation = 'toastOut 0.26s ease forwards';
+                setTimeout(() => el.remove(), 260);
+            }, 3500);
+        }
+
+        /* 전화번호 중복 복구 섹션 표시 */
+        function showPhoneDupRecovery() {
+            document.getElementById('phoneDupRecovery').classList.add('show');
+            document.getElementById('phoneDupEmail').focus();
+        }
 
         /* Mobile nav */
         const hamburger = document.getElementById('navHamburger');
@@ -425,6 +497,11 @@
             );
             document.getElementById('phoneError').textContent = '올바른 휴대폰 번호를 입력해 주세요.';
             document.getElementById('emailError').textContent = '올바른 이메일 주소를 입력해 주세요.';
+            document.getElementById('phoneDupRecovery').classList.remove('show');
+            document.getElementById('phoneDupEmail').value = '';
+            document.getElementById('phoneDupResult').className = 'phone-dup-result';
+
+            const btn = e.target.querySelector('.auth-submit');
 
             let valid = true;
             if (!name)                                          { document.getElementById('nameError').classList.add('show');  valid = false; }
@@ -434,21 +511,17 @@
             if (pw !== conf)                                    { document.getElementById('confirmError').classList.add('show'); valid = false; }
             if (!valid) return;
 
-            const btn = e.target.querySelector('.auth-submit');
             btn.disabled = true;
             btn.textContent = '확인 중...';
 
             try {
-                /* 전화번호 중복 체크 */
-                const { data: phoneCheck } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('phone', phone)
-                    .maybeSingle();
+                /* 전화번호 중복 체크 (SECURITY DEFINER RPC로 RLS 우회) */
+                const { data: phoneTaken, error: phoneRpcErr } = await supabase
+                    .rpc('is_phone_taken', { p_phone: phone });
 
-                if (phoneCheck) {
-                    document.getElementById('phoneError').textContent = '이미 가입된 전화번호입니다.';
-                    document.getElementById('phoneError').classList.add('show');
+                if (!phoneRpcErr && phoneTaken) {
+                    showToast('이미 가입된 전화번호입니다.');
+                    showPhoneDupRecovery();
                     btn.disabled = false;
                     btn.textContent = '회원가입';
                     return;
@@ -459,14 +532,27 @@
                 /* 회원가입 */
                 const data = await signUp(email, pw, { name, phone });
 
-                /* profiles에 email 저장 (비밀번호 찾기 & 중복 체크용) */
+                /* profiles에 email/phone 저장 (중복 체크 & 비밀번호 찾기용) */
                 if (data?.user) {
-                    await supabase.from('profiles').upsert({
+                    const { error: upsertErr } = await supabase.from('profiles').upsert({
                         id: data.user.id,
                         email,
                         name,
                         phone,
                     });
+
+                    if (upsertErr) {
+                        const upsertMsg = (upsertErr.message || '').toLowerCase();
+                        const isPhoneDup = upsertErr.code === '23505' &&
+                            (upsertMsg.includes('phone') || upsertMsg.includes('profiles_phone_unique'));
+                        if (isPhoneDup) {
+                            showToast('이미 가입된 전화번호입니다.');
+                            showPhoneDupRecovery();
+                            btn.disabled = false;
+                            btn.textContent = '회원가입';
+                            return;
+                        }
+                    }
                 }
 
                 alert('가입이 완료되었습니다!');
@@ -476,11 +562,47 @@
                 if (msg.includes('already registered') || msg.includes('already exists') || msg.includes('email already')) {
                     document.getElementById('emailError').textContent = '이미 가입된 이메일입니다.';
                     document.getElementById('emailError').classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = '회원가입';
+                } else if (err.code === '23505' && (msg.includes('phone') || msg.includes('profiles_phone_unique'))) {
+                    showToast('이미 가입된 전화번호입니다.');
+                    showPhoneDupRecovery();
+                    btn.disabled = false;
+                    btn.textContent = '회원가입';
                 } else {
                     alert('회원가입 실패: ' + (err.message || '다시 시도해 주세요.'));
+                    btn.disabled = false;
+                    btn.textContent = '회원가입';
                 }
-                btn.disabled = false;
-                btn.textContent = '회원가입';
+            }
+        });
+
+        /* 전화번호 중복 박스 → 비밀번호 재설정 메일 발송 */
+        document.getElementById('phoneDupResetBtn')?.addEventListener('click', async () => {
+            const email    = document.getElementById('phoneDupEmail').value.trim();
+            const resultEl = document.getElementById('phoneDupResult');
+            const resetBtn = document.getElementById('phoneDupResetBtn');
+            resultEl.className = 'phone-dup-result';
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                resultEl.textContent = '올바른 이메일 주소를 입력해 주세요.';
+                resultEl.classList.add('show', 'err');
+                return;
+            }
+
+            resetBtn.disabled = true;
+            resetBtn.textContent = '전송 중...';
+            try {
+                await resetPassword(email);
+                showToast('재설정 링크를 이메일로 보냈습니다.', 'ok');
+                resultEl.textContent = '메일함을 확인해 주세요.';
+                resultEl.classList.add('show', 'ok');
+                resetBtn.textContent = '전송 완료';
+            } catch (err) {
+                resultEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요.';
+                resultEl.classList.add('show', 'err');
+                resetBtn.disabled = false;
+                resetBtn.textContent = '비밀번호 재설정 메일 보내기';
             }
         });
 

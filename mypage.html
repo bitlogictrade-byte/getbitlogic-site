@@ -182,6 +182,23 @@
             background: rgba(250,87,87,0.08);
             border-color: #fa5757;
         }
+        .cancel-sub-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid rgba(250,87,87,0.45);
+            border-radius: 8px;
+            color: #fa5757;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .cancel-sub-btn:hover {
+            background: rgba(250,87,87,0.09);
+            border-color: #fa5757;
+        }
+        .cancel-sub-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .loading-state {
             text-align: center;
             padding: 60px 0;
@@ -293,6 +310,10 @@
                 <div class="info-row" id="planExpireRow" style="display:none;">
                     <span class="info-label">만료일</span>
                     <span class="info-value" id="planExpireDate">—</span>
+                </div>
+                <div class="info-row" id="cancelSubRow" style="display:none;">
+                    <span class="info-label"></span>
+                    <button class="cancel-sub-btn" id="cancelSubBtn">구독 해지</button>
                 </div>
                 <div class="info-row">
                     <span class="info-label"></span>
@@ -516,10 +537,13 @@
         }
 
         /* 구독 정보 렌더링 */
+        let activeSubId = null;
+
         function renderSubscription(sub) {
-            const planEl   = document.getElementById('currentPlan');
-            const expireRow = document.getElementById('planExpireRow');
-            const expireEl  = document.getElementById('planExpireDate');
+            const planEl      = document.getElementById('currentPlan');
+            const expireRow   = document.getElementById('planExpireRow');
+            const expireEl    = document.getElementById('planExpireDate');
+            const cancelRow   = document.getElementById('cancelSubRow');
 
             if (!sub) {
                 planEl.textContent = '미구독';
@@ -534,6 +558,8 @@
             if (sub.status === 'active' && sub.next_billing_at) {
                 expireRow.style.display = 'flex';
                 expireEl.textContent    = formatDate(sub.next_billing_at) + ' 다음 결제';
+                cancelRow.style.display = 'flex';
+                activeSubId = sub.id;
             } else if (sub.status === 'pending') {
                 expireRow.style.display = 'flex';
                 expireEl.textContent    = '결제 처리 중';
@@ -641,6 +667,36 @@
                 alert('오류: ' + (err.message || '다시 시도해 주세요.'));
             } finally {
                 btn.disabled = false; btn.textContent = '변경 저장';
+            }
+        });
+
+        /* 구독 해지 */
+        document.getElementById('cancelSubBtn')?.addEventListener('click', async () => {
+            if (!activeSubId) return;
+            const confirmed = confirm(
+                '구독을 해지하시겠습니까?\n\n' +
+                '해지 후에도 현재 결제 기간이 끝날 때까지 서비스를 이용할 수 있습니다.'
+            );
+            if (!confirmed) return;
+
+            const btn = document.getElementById('cancelSubBtn');
+            btn.disabled = true; btn.textContent = '처리 중...';
+
+            try {
+                const { error } = await supabase
+                    .from('subscriptions')
+                    .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+                    .eq('id', activeSubId);
+                if (error) throw error;
+
+                alert('구독이 해지되었습니다.');
+                document.getElementById('cancelSubRow').style.display = 'none';
+                document.getElementById('currentPlan').className = 'plan-badge none';
+                const expireEl = document.getElementById('planExpireDate');
+                if (expireEl) expireEl.textContent = '해지됨';
+            } catch (err) {
+                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                btn.disabled = false; btn.textContent = '구독 해지';
             }
         });
 
