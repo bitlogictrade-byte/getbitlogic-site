@@ -565,7 +565,7 @@
                         <div>
                             <label class="co-label" for="coName">주문자명 <span>*</span></label>
                             <input class="co-input" type="text" id="coName"
-                                placeholder="예) 홍길동" autocomplete="name" required>
+                                placeholder="예) 홍길동" autocomplete="name" required maxlength="50">
                             <p class="co-error" id="nameErr">이름을 입력해 주세요.</p>
                         </div>
 
@@ -936,10 +936,14 @@
             });
         });
 
+        function sanitizeInput(str) {
+            return String(str || '').trim().replace(/[<>"'&`]/g, '');
+        }
+
         /* ── 폼 유효성 검사 ── */
         function validateForm() {
             let ok = true;
-            const name  = document.getElementById('coName').value.trim();
+            const name  = sanitizeInput(document.getElementById('coName').value);
             const phone = document.getElementById('coPhone').value.trim();
 
             document.getElementById('nameErr').classList.remove('show');
@@ -969,7 +973,7 @@
         document.getElementById('payBtn').addEventListener('click', async () => {
             if (!validateForm()) return;
 
-            const name   = document.getElementById('coName').value.trim();
+            const name   = sanitizeInput(document.getElementById('coName').value);
             const phone  = document.getElementById('coPhone').value.trim();
             const payBtn = document.getElementById('payBtn');
             const termsAgreedAt = new Date().toISOString();
@@ -983,7 +987,7 @@
                 const response = await PortOne.requestIssueBillingKey({
                     storeId:         PORTONE_STORE_ID,
                     channelKey:      PORTONE_CHANNEL_KEY,
-                    billingKeyMethod: 'CARD',
+                    billingKeyMethod: 'EASY_PAY',
                     issueId,
                     issueName:       `BitLogic ${plan.name} 정기결제`,
                     customer: {
@@ -1009,7 +1013,7 @@
                         phone,
                         terms_agreed_at: termsAgreedAt,
                     });
-                if (profileErr) throw profileErr;
+                if (profileErr && profileErr.code !== '23505') throw profileErr;
 
                 /* 3. 구독 레코드 생성 (status: pending) */
                 const { data: subData, error: subErr } = await supabase

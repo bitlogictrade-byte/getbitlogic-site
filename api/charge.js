@@ -2,6 +2,7 @@
 // 환경변수 필요: PORTONE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 const PORTONE_SECRET      = process.env.PORTONE_SECRET_KEY;
+const PORTONE_STORE_ID    = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
 const SUPABASE_URL        = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -35,6 +36,16 @@ module.exports = async (req, res) => {
         const paymentId = `bitlogic-${planType}-${Date.now()}`;
         const planLabel = PLAN_NAMES[planType] || planType;
 
+        console.log('[charge] 포트원 API 호출 시작', {
+            paymentId,
+            planType,
+            amount,
+            userId,
+            billingKey: billingKey?.slice(0, 20) + '...',
+            storeId: PORTONE_STORE_ID,
+            hasSecret: !!PORTONE_SECRET,
+        });
+
         const portoneRes = await fetch(
             `https://api.portone.io/payments/${encodeURIComponent(paymentId)}/billing-key`,
             {
@@ -44,6 +55,7 @@ module.exports = async (req, res) => {
                     'Authorization': `PortOne ${PORTONE_SECRET}`,
                 },
                 body: JSON.stringify({
+                    storeId:   PORTONE_STORE_ID,
                     billingKey,
                     orderName: `BitLogic ${planLabel} 정기결제`,
                     amount: { total: amount },
@@ -57,10 +69,13 @@ module.exports = async (req, res) => {
             }
         );
 
-        const portoneData = await portoneRes.json();
+        const portoneText = await portoneRes.text();
+        console.log('[charge] 포트원 API 응답', { status: portoneRes.status, body: portoneText });
+
+        const portoneData = portoneText ? JSON.parse(portoneText) : {};
 
         if (!portoneRes.ok || portoneData.code != null) {
-            throw new Error(portoneData.message || '포트원 결제 실패');
+            throw new Error(portoneData.message || `포트원 결제 실패 (HTTP ${portoneRes.status})`);
         }
 
         /* 2. Supabase 구독 상태 active로 업데이트 */

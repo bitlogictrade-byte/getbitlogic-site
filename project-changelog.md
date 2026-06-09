@@ -2,6 +2,107 @@
 
 ---
 
+## 2026-06-09 (19차)
+
+### api/charge.js — 포트원 결제 요청에 storeId 누락 수정
+
+**수정 파일:** `api/charge.js`
+
+- 기존: 포트원 V2 빌링키 결제 API 요청 body에 `storeId` 없음 → 포트원이 요청 거부, 결제 기록 미생성
+- 수정: `PORTONE_STORE_ID` 상수 추가 후 결제 요청 body에 `storeId` 포함
+
+---
+
+## 2026-06-09 (18차)
+
+### api/charge.js — 포트원 빈 응답 JSON 파싱 에러 수정
+
+**수정 파일:** `api/charge.js`
+
+- 기존: `portoneRes.json()` 직접 호출 → 응답 body가 비어있을 때 `Unexpected end of JSON input` 에러 발생
+- 수정: `portoneRes.text()`로 먼저 읽은 후 내용이 있을 때만 `JSON.parse()` 실행, 비어있으면 빈 객체 `{}` 사용
+- 에러 메시지에 HTTP 상태코드 포함하여 디버깅 개선
+
+---
+
+## 2026-06-09 (17차)
+
+### checkout.html — profiles upsert 시 전화번호 중복 에러(23505) 무시
+
+**수정 파일:** `checkout.html`
+
+- 기존: `profileErr` 발생 시 무조건 throw → 이미 가입된 유저의 전화번호 unique 제약 위반(23505)으로 결제 진행 불가
+- 수정: `profileErr.code === '23505'`(unique violation)인 경우 에러 무시하고 기존 데이터 유지하며 결제 계속 진행
+
+---
+
+## 2026-06-09 (16차)
+
+### checkout.html — 포트원 결제 billingKeyMethod 변경
+
+**수정 파일:** `checkout.html`
+
+- `billingKeyMethod: 'CARD'` → `billingKeyMethod: 'EASY_PAY'` 로 변경
+- 간편결제(카카오페이, 토스페이 등) 방식으로 빌링키 발급 요청
+
+---
+
+## 2026-06-09 (15차)
+
+### XSS 방지 처리 — 모든 사용자 입력값 sanitize 및 특수문자 이스케이프
+
+**수정 파일:** `mypage.html`, `register.html`, `checkout.html`, `success.html`
+
+#### 주요 취약점 수정
+
+**1. mypage.html — `addInfoRow` innerHTML XSS 취약점 (Critical)**
+- 기존: `row.innerHTML = \`<span>...</span>\`` 으로 DB 데이터(이름, 전화번호, TV ID 등)를 직접 삽입 → 저장된 XSS 페이로드 실행 가능
+- 수정: `createElement` + `textContent` 방식으로 전면 교체 → HTML 삽입 원천 차단
+
+**2. sanitizeInput 유틸 함수 추가 (register.html, checkout.html)**
+- `< > " ' & \`` 등 HTML 특수문자를 폼 제출 전 제거
+- 이름 필드에 적용 (register / checkout)
+
+**3. sanitizeTvId 유틸 함수 추가 (success.html, mypage.html)**
+- TradingView ID: `[a-zA-Z0-9._-]` 외 문자 자동 제거
+- 정규식 패턴 검증 추가: `/^[a-zA-Z0-9._\-]{1,50}$/` — 범위 외 입력 시 에러 메시지 표시
+
+**4. maxlength 속성 추가**
+- `register.html` 이름 input: `maxlength="50"`
+- `checkout.html` 이름 input: `maxlength="50"`
+- `success.html` TV ID input: `maxlength="50"`
+- `mypage.html` TV ID 수정 input: `maxlength="50"`
+
+#### 보안 원칙 적용 사항
+- 표시(Display): 모든 DB 데이터를 `.textContent`로만 DOM에 삽입
+- 저장(Storage): 특수문자 strip 후 Supabase parameterized query로 저장
+- 유효성: 이메일은 기존 정규식, 전화번호는 기존 숫자 only 강제, 이름/TV ID는 이번에 추가
+
+---
+
+## 2026-06-09 (14차)
+
+### style.css - 모바일 nav 상단 검정 빈 공간 버그 수정
+
+**원인:** nav의 `padding-top: env(safe-area-inset-top)` 영역이 투명 상태(스크롤 최상단)일 때 body 검정 배경이 그대로 비쳐 status bar 아래에 빈 공간처럼 보임
+
+**수정:** `html::before` pseudo-element 추가
+```css
+html::before {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: env(safe-area-inset-top);
+    background: var(--black);
+    z-index: 9999;
+    pointer-events: none;
+}
+```
+- 노치/상태바 높이만큼 항상 검정으로 덮음 → status bar와 seamless 연결
+- 전 페이지(style.css 공통)에 자동 적용
+- `pointer-events: none`으로 터치 이벤트 영향 없음
+- nav 스크롤 투명→다크 동작은 유지됨
+
+---
+
 ## 2026-06-09 (13차)
 
 ### 전 페이지 Nav scroll 적용 완료 (login / register / checkout / mypage)

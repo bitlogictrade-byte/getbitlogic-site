@@ -288,7 +288,7 @@
                     <label class="form-label" for="regName">이름</label>
                     <div class="form-input-wrap">
                         <input class="form-input" type="text" id="regName" name="name"
-                            placeholder="홍길동" autocomplete="name" required>
+                            placeholder="홍길동" autocomplete="name" required maxlength="50">
                     </div>
                     <span class="form-error" id="nameError">이름을 입력해 주세요.</span>
                 </div>
@@ -482,10 +482,14 @@
             window.location.href = 'login.html';
         });
 
+        function sanitizeInput(str) {
+            return String(str || '').trim().replace(/[<>"'&`]/g, '');
+        }
+
         /* Register form submit */
         document.getElementById('registerForm')?.addEventListener('submit', async e => {
             e.preventDefault();
-            const name  = document.getElementById('regName').value.trim();
+            const name  = sanitizeInput(document.getElementById('regName').value);
             const phone = document.getElementById('regPhone').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const pw    = document.getElementById('regPassword').value;

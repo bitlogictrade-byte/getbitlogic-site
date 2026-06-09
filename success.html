@@ -265,7 +265,7 @@
                 <div class="tv-input-wrap">
                     <label class="tv-label" for="tvIdInput">TRADINGVIEW USERNAME</label>
                     <input type="text" id="tvIdInput" class="tv-input"
-                        placeholder="TradingView 사용자 이름" autocomplete="off">
+                        placeholder="TradingView 사용자 이름" autocomplete="off" maxlength="50">
                     <span class="tv-input-hint">예) username123 (TradingView 프로필 URL의 이름)</span>
                     <span class="tv-error" id="tvIdError">TradingView 아이디를 입력해 주세요.</span>
                 </div>
@@ -346,13 +346,22 @@
             window.location.href = 'index.html';
         }
 
+        function sanitizeTvId(str) {
+            return String(str || '').trim().replace(/[^a-zA-Z0-9._\-]/g, '');
+        }
+
         /* TV ID 입력 완료 */
         document.getElementById('tvSubmitBtn').addEventListener('click', async () => {
-            const tvId  = document.getElementById('tvIdInput').value.trim();
+            const tvId  = sanitizeTvId(document.getElementById('tvIdInput').value);
             const errEl = document.getElementById('tvIdError');
             errEl.classList.remove('show');
 
             if (!tvId) {
+                errEl.classList.add('show');
+                return;
+            }
+            if (!/^[a-zA-Z0-9._\-]{1,50}$/.test(tvId)) {
+                errEl.textContent = '영문, 숫자, 밑줄(_), 점(.), 하이픈(-)만 사용 가능합니다. (최대 50자)';
                 errEl.classList.add('show');
                 return;
             }

@@ -333,7 +333,7 @@
                     <p style="font-size:0.78rem;color:#f0a500;margin-bottom:12px;">⚠ 1회 수정 가능합니다. 신중하게 입력해 주세요.</p>
                     <div style="display:flex;gap:10px;align-items:flex-start;">
                         <input type="text" id="tvIdEditInput" class="pw-input"
-                            placeholder="새 TradingView 아이디" style="flex:1;">
+                            placeholder="새 TradingView 아이디" style="flex:1;" maxlength="50">
                         <button class="pw-save-btn" id="tvIdSaveBtn" style="white-space:nowrap;">수정 저장</button>
                     </div>
                     <span style="font-size:0.72rem;color:#4a6070;margin-top:6px;display:block;">대소문자를 정확히 입력해 주세요.</span>
@@ -532,8 +532,23 @@
             if (!container) return;
             const row = document.createElement('div');
             row.className = 'info-row';
-            row.innerHTML = `<span class="info-label">${label}</span><span class="info-value">${value}</span>`;
+            const labelEl = document.createElement('span');
+            labelEl.className = 'info-label';
+            labelEl.textContent = label;
+            const valueEl = document.createElement('span');
+            valueEl.className = 'info-value';
+            valueEl.textContent = value;
+            row.appendChild(labelEl);
+            row.appendChild(valueEl);
             container.appendChild(row);
+        }
+
+        function sanitizeInput(str) {
+            return String(str || '').trim().replace(/[<>"'&`]/g, '');
+        }
+
+        function sanitizeTvId(str) {
+            return String(str || '').trim().replace(/[^a-zA-Z0-9._\-]/g, '');
         }
 
         /* 구독 정보 렌더링 */
@@ -620,8 +635,12 @@
 
         /* TV ID 수정 저장 */
         document.getElementById('tvIdSaveBtn')?.addEventListener('click', async () => {
-            const newId = document.getElementById('tvIdEditInput').value.trim();
+            const newId = sanitizeTvId(document.getElementById('tvIdEditInput').value);
             if (!newId) { alert('아이디를 입력해 주세요.'); return; }
+            if (!/^[a-zA-Z0-9._\-]{1,50}$/.test(newId)) {
+                alert('TradingView 아이디는 영문, 숫자, 밑줄(_), 점(.), 하이픈(-)만 사용 가능합니다.');
+                return;
+            }
 
             const btn = document.getElementById('tvIdSaveBtn');
             btn.disabled = true; btn.textContent = '저장 중...';
