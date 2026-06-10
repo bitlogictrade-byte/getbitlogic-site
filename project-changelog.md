@@ -6,66 +6,57 @@
 
 ### Resend 이메일 연동 추가
 
-**신규 파일:** `api/_email.js`, `api/send-email.js`  
+**신규 파일:** `api/send-email.js`  
 **수정 파일:** `api/charge.js`, `register.html`, `login.html`, `success.html`, `mypage.html`, `CLAUDE.md`
 
 > **Vercel 환경변수 추가 필요:**
 > - `RESEND_API_KEY` — Resend 대시보드에서 발급
 
-#### 1. api/_email.js — 이메일 템플릿 + sendEmail 공유 헬퍼 (신규)
-- Vercel 라우트로 노출되지 않는 공유 모듈 (underscore prefix)
+#### 1. api/send-email.js — Resend 이메일 발송 Vercel Serverless Function (신규)
+- **모든 이메일 발송을 단일 파일에서 처리** (템플릿 포함 완전 자급)
 - 발신 주소: `noreply@getbitlogic.com`
-- 이메일 디자인: `#010d1a` 다크 헤더 + `#00e5ff` 청록 포인트 컬러 + 흰색 본문 카드
-- 템플릿 6종:
-  - `welcome(name)` — 환영 이메일
-  - `resetPassword(resetLink)` — 비밀번호 재설정 링크
-  - `payment(name, planType, amount, nextBillingAt)` — 결제 확인
-  - `upgrade(name, nextBillingAt)` — Pro 업그레이드 안내
-  - `downgradeScheduled(name, nextBillingAt)` — Basic 다운그레이드 예약 안내
-  - `tvReminder(name)` — TradingView ID 미입력 안내 ([지금 입력하기] → getbitlogic.com)
-- `RESEND_API_KEY` 미설정 시 스킵 모드 (graceful fallback)
-- XSS 방지: 모든 사용자 입력값 `escHtml()` 처리
+- 이메일 디자인: `#010d1a` 다크 헤더 + `#00e5ff` 청록 포인트 컬러 + 흰색 본문 카드 (이메일 클라이언트 호환 table 레이아웃)
+- 템플릿 6종 (`TEMPLATES` 맵):
+  - `welcome` — 환영 이메일
+  - `reset-password` — 비밀번호 재설정 링크
+  - `payment` — 결제 확인 (플랜명·금액·다음 결제일)
+  - `upgrade` — Pro 업그레이드 안내
+  - `downgrade-scheduled` — '다음 결제일부터 Basic으로 변경됩니다' 안내
+  - `tv-reminder` — TradingView ID 미입력 안내 ([지금 입력하기] → getbitlogic.com)
+- `reset-password` 처리:
+  - `profiles` 테이블 이메일 존재 확인 → 미가입 시 `{ ok: false, notFound: true }` 반환
+  - Supabase Admin API `generate_link({ type: 'recovery' })`로 복구 링크 생성
+- `RESEND_API_KEY` 미설정 시 `{ ok: true, skipped: true }` graceful fallback
+- XSS 방지: 사용자 입력값 `escHtml()` 처리
+- 발송 실패 시 `{ ok: false }` 반환 (주요 플로우 차단 없음)
 
-#### 2. api/send-email.js — HTTP 엔드포인트 (신규)
-- 클라이언트 직접 호출 허용 타입: `welcome`, `reset-password`, `tv-reminder`, `downgrade-scheduled`
-- `reset-password` 타입 처리:
-  - Supabase Admin API `generateLink({ type: 'recovery' })`로 재설정 링크 생성
-  - `profiles` 테이블에서 이메일 존재 여부 서버사이드 재확인 → `notFound: true` 반환
-  - 미가입 이메일 발송 방지
-- 이메일 형식 서버사이드 검증
-- 이메일 발송 실패 시 `{ ok: false }` 반환 (주요 플로우 차단 없음)
+#### 2. api/charge.js — 결제 완료 이메일 발송 추가
+- `_email.js` require 제거 → `/api/send-email` HTTP 호출로 교체
+- `VERCEL_URL` 환경변수 활용 (미설정 시 `getbitlogic.com` fallback)
+- Supabase 구독 업데이트 성공 후 fire-and-forget 발송
+  - `isUpgrade: true` → `upgrade` 타입
+  - 일반 결제 → `payment` 타입
 
-#### 3. api/charge.js — 결제 완료 이메일 발송 추가
-- `_email.js` require 추가
-- Supabase 구독 업데이트 성공 후 fire-and-forget 이메일 발송
-  - `isUpgrade: true` → upgrade 이메일
-  - 일반 결제 → payment 이메일
-- 이메일 실패는 `.catch()` 처리 — 결제 응답에 영향 없음
-
-#### 4. register.html — 환영 이메일 + 비밀번호 재설정 교체
-- 회원가입 성공 후 `/api/send-email?type=welcome` 호출 (fire-and-forget)
-- 전화번호 중복 복구 박스의 `resetPassword()` → `/api/send-email?type=reset-password` 교체
+#### 3. register.html — 환영 이메일 + 비밀번호 재설정 교체
+- 회원가입 성공 후 `welcome` 이메일 fire-and-forget
+- 전화번호 중복 복구 박스: `resetPassword()` → `reset-password` 타입 교체
   - `notFound: true` 응답 시 "가입된 계정 정보가 없습니다." 인라인 에러 표시
 - `resetPassword` import 제거
 
-#### 5. login.html — 비밀번호 재설정 Resend로 교체
-- `resetPassword()` → `/api/send-email?type=reset-password` 교체
-  - 기존 클라이언트 측 profiles 이메일 존재 확인 로직 제거 (서버에서 처리)
-  - `notFound: true` 응답 시 인라인 에러 표시
+#### 4. login.html — 비밀번호 재설정 Resend로 교체
+- `resetPassword()` → `reset-password` 타입 교체 (클라이언트 측 profiles 조회 제거, 서버에서 처리)
 - `resetPassword` import 제거
 
-#### 6. success.html — TV ID 미입력 시 reminder 이메일
-- '나중에 입력하기' 버튼 클릭 시 profiles에서 name 조회 후 `/api/send-email?type=tv-reminder` 호출
-- 이메일 발송은 fire-and-forget (페이지 이동 차단 없음)
+#### 5. success.html — TV ID 미입력 시 reminder 이메일
+- '나중에 입력하기' 버튼 클릭 시 profiles에서 name 조회 후 `tv-reminder` 이메일 fire-and-forget
 
-#### 7. mypage.html — 다운그레이드 예약 이메일
-- `currentUser`, `currentProfile` 모듈-레벨 변수 추가 (`init()` 완료 후 저장)
-- 다운그레이드 확인 후 `/api/send-email?type=downgrade-scheduled` 호출 (`sub.next_billing_at` 포함)
-- 이메일 발송은 fire-and-forget
+#### 6. mypage.html — 다운그레이드 예약 이메일
+- `currentUser`, `currentProfile` 모듈-레벨 변수 추가 (init() 완료 후 저장)
+- 다운그레이드 확인 후 `downgrade-scheduled` 이메일 fire-and-forget (sub.next_billing_at 포함)
 
-#### 8. CLAUDE.md — 환경변수 및 파일 구조 업데이트
+#### 7. CLAUDE.md
 - `RESEND_API_KEY` 환경변수 항목 추가
-- `api/send-email.js`, `api/_email.js` 파일 구조 테이블 추가
+- `api/send-email.js` 파일 구조 테이블 추가
 
 ---
 

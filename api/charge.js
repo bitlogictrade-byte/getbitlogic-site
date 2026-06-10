@@ -1,8 +1,6 @@
 // Vercel Serverless Function — 포트원 빌링키 결제 처리
 // 환경변수 필요: PORTONE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY
 
-const { sendEmail } = require('./_email');
-
 const PORTONE_SECRET      = process.env.PORTONE_SECRET_KEY;
 const SUPABASE_URL        = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -137,16 +135,21 @@ module.exports = async (req, res) => {
         }
 
         /* 3. 이메일 발송 (실패해도 결제 결과에 영향 없음) */
-        sendEmail(
-            isUpgrade ? 'upgrade' : 'payment',
-            customerEmail,
-            {
+        const emailBase = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : 'https://getbitlogic.com';
+        fetch(`${emailBase}/api/send-email`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type:          isUpgrade ? 'upgrade' : 'payment',
+                email:         customerEmail,
                 name:          customerName,
                 planType,
                 amount,
                 nextBillingAt: nextBillingAt.toISOString(),
-            }
-        ).catch(e => console.error('[charge] 이메일 발송 실패:', e.message));
+            }),
+        }).catch(e => console.error('[charge] 이메일 발송 실패:', e.message));
 
         return res.status(200).json({ success: true, paymentId });
 

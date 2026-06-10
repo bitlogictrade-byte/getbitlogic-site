@@ -50,8 +50,7 @@
 | `api/charge.js` | 포트원 결제 Vercel Serverless Function |
 | `api/delete-account.js` | 회원탈퇴 Vercel Serverless Function |
 | `api/invite-tv.js` | TradingView 스크립트 권한 초대/해제/만료동기화 Vercel Serverless Function |
-| `api/send-email.js` | Resend 이메일 발송 Vercel Serverless Function (클라이언트 호출용) |
-| `api/_email.js` | 이메일 템플릿 + sendEmail 공유 헬퍼 (Vercel 라우트 아님) |
+| `api/send-email.js` | Resend 이메일 발송 Vercel Serverless Function. 모든 이메일 발송 처리 |
 
 ## 플랜 정보
 
