@@ -2,6 +2,30 @@
 
 ---
 
+## 2026-06-10 (59차)
+
+### Dynamic Island safe area nav 배경 끊김 수정
+
+**수정 파일:** `style.css`
+
+#### 원인
+- `html::before` (z-index: 101)가 nav (z-index: 100) 위에 solid `#000`으로 safe area를 덮어 nav의 실제 배경(`rgba(0,0,0,0.88)` + blur)과 색상 불일치 발생
+- `.nav.at-top` 투명 상태에서 `html::before`는 여전히 `#000`을 표시하여 hero 콘텐츠와 시각적 단절
+
+#### 수정 내용
+
+**`style.css`**
+- `html::before` 블록 제거 (z-index 충돌 및 색상 불일치 원인)
+- `.nav.at-top::before` 추가: nav 내부에 `position: absolute`로 safe area 높이만큼 `#000` 배경 적용
+- nav가 `position: fixed; top: 0` + `padding-top: env(safe-area-inset-top)`이므로 배경이 Dynamic Island 위 영역까지 자연스럽게 채워짐
+- 스크롤 후(비-at-top) 상태: nav 자체 배경이 safe area를 커버, blur 효과도 safe area까지 일관 적용
+
+#### 확인 사항
+- `env(safe-area-inset-top)`은 Dynamic Island 기기(iPhone 14 Pro+, 15, 16 시리즈)에서 약 59px 반환 → Dynamic Island 높이 포함 ✓
+- `viewport-fit=cover` 전 페이지 설정 완료 ✓
+
+---
+
 ## 2026-06-10 (58차)
 
 ### iOS Safari safe area 배경색 미적용 수정
