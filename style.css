@@ -143,6 +143,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .nav-mobile.open { display: flex; }
 .nav-mobile a:hover { color: #fff; }
 
+/* 햄버거 메뉴 열릴 때: at-top 투명 상태여도 강제 불투명 */
+.nav.menu-open {
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-color: var(--border) !important;
+}
+
 .mobile-logout-btn {
     background: none;
     border: none;
@@ -1085,18 +1093,6 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 /* ── SAFE AREA (iOS notch / Dynamic Island / home indicator) ── */
-
-/* 노치/상태바 뒤를 항상 검정으로 채움 (전 페이지 공통)
-   nav가 투명 상태일 때도 검은 빈 공간 없이 status bar와 seamless 연결 */
-html::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: env(safe-area-inset-top);
-    background: var(--black);
-    z-index: 9999;
-    pointer-events: none;
-}
 
 body {
     padding-left: env(safe-area-inset-left);

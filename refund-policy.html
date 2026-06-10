@@ -249,10 +249,17 @@
     <script>
         const hamburger = document.getElementById('navHamburger');
         const mobileNav = document.getElementById('navMobile');
+        const mainNav   = document.querySelector('.nav');
         if (hamburger && mobileNav) {
-            hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+            hamburger.addEventListener('click', () => {
+                const isOpen = mobileNav.classList.toggle('open');
+                mainNav?.classList.toggle('menu-open', isOpen);
+            });
             mobileNav.querySelectorAll('a').forEach(a => {
-                a.addEventListener('click', () => mobileNav.classList.remove('open'));
+                a.addEventListener('click', () => {
+                    mobileNav.classList.remove('open');
+                    mainNav?.classList.remove('menu-open');
+                });
             });
         }
     </script>

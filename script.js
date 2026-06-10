@@ -65,13 +65,18 @@ function setupNavScroll() {
 /* Mobile nav */
 function setupNav() {
     const hamburger = document.getElementById('navHamburger');
-    const mobile = document.getElementById('navMobile');
+    const mobile    = document.getElementById('navMobile');
+    const nav       = document.querySelector('.nav');
     if (!hamburger || !mobile) return;
     hamburger.addEventListener('click', () => {
-        mobile.classList.toggle('open');
+        const isOpen = mobile.classList.toggle('open');
+        nav?.classList.toggle('menu-open', isOpen);
     });
     mobile.querySelectorAll('a').forEach(a => {
-        a.addEventListener('click', () => mobile.classList.remove('open'));
+        a.addEventListener('click', () => {
+            mobile.classList.remove('open');
+            nav?.classList.remove('menu-open');
+        });
     });
 }
 

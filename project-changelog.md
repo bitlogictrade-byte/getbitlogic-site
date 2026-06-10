@@ -2,6 +2,41 @@
 
 ---
 
+## 2026-06-10 (55차)
+
+### 모바일 nav 버그 2건 수정
+
+**수정 파일:** `style.css`, `script.js`, `index.html`(script.js 통해 처리), `login.html`, `mypage.html`, `checkout.html`, `success.html`, `register.html`, `onboarding.html`, `privacy-policy.html`, `refund-policy.html`, `terms-of-service.html`
+
+#### 1. 햄버거 메뉴 열릴 때 nav 불투명 처리
+
+**원인:** 기존 hamburger 핸들러가 `nav-mobile`에만 `open` class를 토글하고, `.nav` 자체에는 아무 클래스도 추가하지 않음 → index.html 최상단에서 `nav.at-top`(투명)이 유지된 채로 메뉴가 열려 배경이 보임
+
+**수정:**
+- `style.css`: `.nav.menu-open` 규칙 추가 — `!important`로 `.nav.at-top` 투명 상태 오버라이드
+  ```css
+  .nav.menu-open {
+      background: rgba(0, 0, 0, 0.95) !important;
+      backdrop-filter: blur(20px) !important;
+      border-color: var(--border) !important;
+  }
+  ```
+- `script.js` `setupNav()`: 햄버거 클릭 시 `.nav`에 `menu-open` class 토글, 링크 클릭 시 제거
+- 전체 HTML 10개 파일의 인라인 hamburger 핸들러 동일하게 수정
+  - `const mainNav = document.querySelector('.nav')` 추가
+  - `mainNav?.classList.toggle('menu-open', isOpen)` / `mainNav?.classList.remove('menu-open')` 추가
+
+#### 2. 모바일 상단 safe area (노치) 배경 불일치 수정
+
+**원인:** `html::before` (z-index:9999, `background: var(--black)` = 순수 `#000000`)가 nav 위에 덮여 notch 영역을 순수 검정으로 채움 → nav의 `rgba(0,0,0,0.88)` + `backdrop-filter:blur` 배경과 색상/효과가 달라 notch 경계에서 시각적 불일치 발생
+
+**수정:** `html::before` pseudo-element 제거  
+- `.nav`는 이미 `position:fixed; top:0; padding-top:env(safe-area-inset-top)` 구조이므로 nav 배경이 notch 영역까지 자연스럽게 채워짐
+- nav 투명 상태(at-top): hero 그라디언트가 notch까지 seamless하게 보임
+- nav 불투명 상태(스크롤 or 메뉴 오픈): nav 배경이 notch까지 seamless하게 채워짐
+
+---
+
 ## 2026-06-10 (54차)
 
 ### Resend 이메일 연동 추가
