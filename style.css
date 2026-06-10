@@ -703,7 +703,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .faq-q {
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     padding: 1.15rem 1.4rem;
@@ -724,6 +724,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     flex-shrink: 0;
     transition: transform 0.25s;
     line-height: 1;
+    margin-top: 0.1rem;
 }
 
 .faq-q[aria-expanded="true"] .faq-icon {
@@ -742,7 +743,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .faq-a.open {
-    max-height: 200px;
+    max-height: 1000px;
     padding: 0.75rem 1.4rem 1.25rem;
 }
 
@@ -1104,6 +1105,21 @@ body {
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
+}
+
+/* 상태바 영역 오버레이: nav 배경색과 동기화
+   - index.html: script.js의 setupNavScroll()이 --status-bar-bg/filter 변수 제어
+   - 기타 페이지: transparent(기본값) → nav 불투명 배경이 그대로 보임 */
+html::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--status-bar-bg, transparent);
+    backdrop-filter: var(--status-bar-filter, none);
+    -webkit-backdrop-filter: var(--status-bar-filter, none);
+    z-index: 101;
+    pointer-events: none;
 }
 
 /* 푸터: 홈 인디케이터 영역 */

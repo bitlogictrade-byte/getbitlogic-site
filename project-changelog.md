@@ -2,6 +2,58 @@
 
 ---
 
+## 2026-06-10 (57차)
+
+### 모바일 상태바 ↔ nav 배경색 경계 제거
+
+**수정 파일:** `style.css`, `script.js`, 전체 HTML 10개
+
+#### 원인
+- index.html 최상단(`at-top`) 상태에서 nav는 투명 → hero 이미지(다크 네이비)가 비침
+- OS/브라우저 상태바 영역은 `theme-color` 미설정으로 검정(#000000) 고정
+- → 상태바(검정) vs nav(네이비) 경계선 시각적으로 노출
+
+#### 수정 내용
+
+**1. `style.css` — `html::before` 재추가 (CSS 변수 기반)**
+- `position:fixed;top:0;height:env(safe-area-inset-top)` 오버레이
+- `--status-bar-bg` / `--status-bar-filter` CSS 변수로 제어
+- 기본값: `transparent` (non-index 페이지에서 nav 배경이 그대로 노출)
+- z-index: 101 (nav z-index: 100 위)
+
+**2. `script.js` — `setupNavScroll()` 확장**
+- `at-top` 전환 시 `--status-bar-bg` / `--status-bar-filter` 동기화
+  - at-top: `transparent` / `none` → hero 이미지가 safe area까지 비침
+  - 스크롤 후: `rgba(0,0,0,0.88)` / `blur(20px)` → nav 불투명 배경과 일치
+- `meta[name="theme-color"]` 동적 업데이트
+  - at-top: `#060a14` (다크 네이비, hero 색 매칭)
+  - 스크롤 후: `#000000`
+
+**3. 전체 HTML 10개 — `<meta name="theme-color" content="#060a14">` 추가**
+- Android Chrome 상태바 색상 고정 기본값 설정
+- index.html은 JS가 스크롤 상태에 따라 동적으로 덮어씀
+
+---
+
+## 2026-06-10 (56차)
+
+### FAQ 모바일 텍스트 잘림 수정
+
+**수정 파일:** `style.css`
+
+#### 원인 및 수정
+
+**1. 답변 텍스트 잘림 — `.faq-a.open { max-height: 200px → 1000px }`**
+- 긴 답변(여러 줄 `<br>` 포함)이 200px에서 overflow:hidden으로 잘려 보이던 문제
+- `max-height: 1000px`으로 확장 (CSS 높이 애니메이션 방식 유지)
+
+**2. 질문 텍스트 + 아이콘 레이아웃 — `.faq-q { align-items: center → flex-start }`**
+- 모바일에서 질문 텍스트가 줄바꿈될 때 `+` 아이콘이 세로 중앙에 고정되어 텍스트가 어색하게 보이던 문제
+- `flex-start`로 변경하여 아이콘이 텍스트 첫 줄에 정렬
+- `.faq-icon { margin-top: 0.1rem }` 추가로 첫 줄 텍스트와 시각적 정렬 맞춤
+
+---
+
 ## 2026-06-10 (55차)
 
 ### 모바일 nav 버그 2건 수정
