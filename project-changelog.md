@@ -2,6 +2,25 @@
 
 ---
 
+## 2026-06-10 (60차)
+
+### 모바일 상태바 영역 배경색 nav와 통일
+
+**수정 파일:** `style.css`
+
+#### 원인
+- `html { background-color: #000 }`, `body { background: #000 }` — 순수 검정
+- nav 배경색은 `rgba(0, 0, 0, 0.88)` — 미세하게 다른 값
+- `.nav.at-top::before`도 `#000`으로 고정되어 있어 nav 색상과 불일치
+- 모바일 상태바(safe area) 영역에 `#000`이 노출되어 nav 영역과 시각적 단절 발생
+
+#### 수정 내용
+- `html { background-color }`: `#000` → `rgba(0, 0, 0, 0.88)` (nav 배경색과 동일)
+- `body { background }`: `var(--black)` (= `#000`) → `rgba(0, 0, 0, 0.88)` (nav 배경색과 동일)
+- `.nav.at-top::before { background }`: `#000` → `rgba(0, 0, 0, 0.88)` (nav 배경색과 동일)
+
+---
+
 ## 2026-06-10 (59차)
 
 ### Dynamic Island safe area nav 배경 끊김 수정

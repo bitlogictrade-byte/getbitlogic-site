@@ -17,11 +17,11 @@
 
 html {
     scroll-behavior: smooth;
-    background-color: #000; /* iOS safe area 뒤 배경색 */
+    background-color: rgba(0, 0, 0, 0.88); /* nav 배경색과 통일 — 상태바 safe area 색상 일치 */
 }
 
 body {
-    background: var(--black);
+    background: rgba(0, 0, 0, 0.88); /* nav 배경색과 통일 */
     color: var(--text);
     font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -1121,7 +1121,7 @@ body {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top, 0px);
-    background: #000;
+    background: rgba(0, 0, 0, 0.88); /* nav 배경색과 통일 */
     pointer-events: none;
 }
 
