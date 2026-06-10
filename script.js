@@ -57,16 +57,8 @@ function setupFaq() {
 function setupNavScroll() {
     const nav = document.querySelector('.nav');
     if (!nav) return;
-    const themeMeta = document.querySelector('meta[name="theme-color"]');
-    const root = document.documentElement;
     const update = () => {
-        const isAtTop = window.scrollY <= 10;
-        nav.classList.toggle('at-top', isAtTop);
-        // html::before CSS 변수로 상태바 오버레이를 nav와 동기화
-        root.style.setProperty('--status-bar-bg', 'rgba(0, 0, 0, 0.88)');
-        root.style.setProperty('--status-bar-filter', 'blur(20px)');
-        // Android Chrome 상태바 색상 동기화
-        if (themeMeta) themeMeta.content = '#000000';
+        nav.classList.toggle('at-top', window.scrollY <= 10);
     };
     update();
     window.addEventListener('scroll', update, { passive: true });

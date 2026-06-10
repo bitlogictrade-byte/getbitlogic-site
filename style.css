@@ -15,7 +15,10 @@
     --grad-btn: linear-gradient(90deg, #5b47fb 0%, #3b6fff 100%);
 }
 
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+    background-color: #000; /* iOS safe area 뒤 배경색 */
+}
 
 body {
     background: var(--black);
@@ -23,6 +26,8 @@ body {
     font-family: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari 뷰포트 높이 보정 */
 }
 
 img { display: block; max-width: 100%; }
@@ -1107,17 +1112,15 @@ body {
     padding-right: env(safe-area-inset-right);
 }
 
-/* 상태바 영역 오버레이: nav 배경색과 동기화
-   - index.html: script.js의 setupNavScroll()이 --status-bar-bg/filter 변수 제어
-   - 기타 페이지: transparent(기본값) → nav 불투명 배경이 그대로 보임 */
+/* 상태바(safe area top) 오버레이: nav 배경색으로 채움
+   - backdrop-filter는 safe area에서 신뢰도 낮음 → solid 색상으로 단순화
+   - html { background-color: #000 } 과 함께 iOS Safari에서 동작 보장 */
 html::before {
     content: '';
     position: fixed;
     top: 0; left: 0; right: 0;
     height: env(safe-area-inset-top, 0px);
-    background: var(--status-bar-bg, rgba(0, 0, 0, 0.88));
-    backdrop-filter: var(--status-bar-filter, blur(20px));
-    -webkit-backdrop-filter: var(--status-bar-filter, blur(20px));
+    background: #000;
     z-index: 101;
     pointer-events: none;
 }

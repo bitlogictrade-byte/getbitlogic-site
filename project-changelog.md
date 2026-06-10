@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-06-10 (58차)
+
+### iOS Safari safe area 배경색 미적용 수정
+
+**수정 파일:** `style.css`, `script.js`
+
+#### 원인
+- `html::before`에서 `backdrop-filter: var()` 방식은 iOS Safari safe area에서 신뢰도 낮음
+- `html` 요소에 `background-color` 미설정 → iOS가 safe area 뒤를 OS 기본색으로 렌더링
+- CSS 변수 기반 동적 제어 복잡도가 불필요
+
+#### 수정 내용
+
+**1. `style.css`**
+- `html { background-color: #000 }` 추가 — iOS가 safe area 뒤 렌더링 시 참조
+- `body { min-height: -webkit-fill-available }` 추가 — iOS Safari 뷰포트 높이 보정
+- `html::before` 단순화: CSS 변수·`backdrop-filter` 제거 → `background: #000` 고정 solid 색상
+
+**2. `script.js`**
+- `--status-bar-bg` / `--status-bar-filter` CSS 변수 설정 코드 제거 (더 이상 불필요)
+- `themeMeta.content` 동적 업데이트 제거 (HTML `<meta name="theme-color">` 고정값으로 충분)
+- `setupNavScroll()` 원래 역할(at-top 토글)만 수행하도록 복원
+
+---
+
 ## 2026-06-10 (57차)
 
 ### 모바일 상태바 ↔ nav 배경색 경계 제거
