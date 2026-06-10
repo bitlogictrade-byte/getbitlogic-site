@@ -1,0 +1,652 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <title>추가 정보 입력 | BitLogic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 24px 60px;
+        }
+        .auth-card {
+            background: #0d0d0d;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-header { margin-bottom: 28px; text-align: center; }
+        .auth-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .auth-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.05em;
+        }
+        .auth-desc {
+            font-size: 0.875rem;
+            color: #6a8aaa;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .auth-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 0.8rem; color: #a0b8cc; font-weight: 500; }
+        .form-input-wrap { position: relative; }
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #fff;
+            font-family: 'Noto Sans KR', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .form-input::placeholder { color: #4a6070; }
+        .form-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.12);
+        }
+        .form-error { font-size: 0.78rem; color: #fa5757; display: none; }
+        .form-error.show { display: block; }
+        .auth-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00b4cc, #0099aa);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            margin-top: 4px;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .auth-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+        .auth-submit:active { transform: translateY(0); }
+        .auth-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-back {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: #a0b8cc;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-back:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+            background: rgba(255,255,255,0.04);
+        }
+
+        /* 전화번호 중복 박스 */
+        .phone-dup-box {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 18px;
+            background: rgba(250,87,87,0.06);
+            border: 1px solid rgba(250,87,87,0.25);
+            border-radius: 12px;
+        }
+        .phone-dup-box.show { display: flex; }
+        .phone-dup-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fa9090;
+        }
+        .phone-dup-desc {
+            font-size: 0.8rem;
+            color: #c08080;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .phone-dup-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+        .btn-dup-retry {
+            width: 100%;
+            padding: 11px;
+            background: transparent;
+            border: 1px solid rgba(250,87,87,0.4);
+            border-radius: 9px;
+            color: #fa9090;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-dup-retry:hover { background: rgba(250,87,87,0.1); border-color: rgba(250,87,87,0.6); }
+        .btn-dup-login {
+            width: 100%;
+            padding: 11px;
+            background: rgba(250,87,87,0.12);
+            border: 1px solid rgba(250,87,87,0.3);
+            border-radius: 9px;
+            color: #fff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-dup-login:hover { background: rgba(250,87,87,0.2); }
+
+        /* 로딩 상태 */
+        .ob-loading {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ob-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0,229,255,0.15);
+            border-top-color: var(--cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* 취소 확인 오버레이 */
+        .cancel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .cancel-overlay.show { display: flex; }
+        .cancel-card {
+            background: #0d0d0d;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 36px 32px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            animation: cardIn 0.22s ease;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .cancel-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(250,87,87,0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .cancel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .cancel-desc {
+            font-size: 0.85rem;
+            color: #6a8aaa;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .cancel-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-cancel-yes {
+            width: 100%;
+            padding: 13px;
+            background: rgba(250,87,87,0.15);
+            border: 1px solid rgba(250,87,87,0.35);
+            border-radius: 10px;
+            color: #fa9090;
+            font-size: 0.92rem;
+            font-weight: 700;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-cancel-yes:hover { background: rgba(250,87,87,0.25); }
+        .btn-cancel-no {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: #a0b8cc;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .btn-cancel-no:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+        /* 토스트 */
+        .toast-wrap {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            z-index: 9998; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .toast {
+            background: #1e0808; border: 1px solid rgba(250,87,87,0.4); color: #fa9090;
+            padding: 11px 22px; border-radius: 10px; font-size: 0.875rem; font-weight: 600;
+            pointer-events: auto; white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            animation: toastIn 0.26s ease;
+        }
+        .toast.ok { background: #071a0e; border-color: rgba(0,229,180,0.4); color: #00e5b4; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0); }
+            to   { opacity: 0; transform: translateY(-10px); }
+        }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 36px 24px; }
+            .auth-title { font-size: 1.7rem; }
+            .toast { white-space: normal; text-align: center; max-width: calc(100vw - 48px); }
+            .cancel-card { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo-link">
+                <svg class="nav-logo-svg" width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="navGlow" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <circle cx="60" cy="60" r="58" fill="#010d1a"/>
+                    <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.9" filter="url(#navGlow)"/>
+                    <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2" filter="url(#navGlow)"/>
+                    <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.45"/>
+                    <path d="M17 86 Q40 108 60 112 Q80 108 103 86" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.7" filter="url(#navGlow)"/>
+                    <line x1="49" y1="23" x2="49" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" filter="url(#navGlow)"/>
+                    <line x1="60" y1="18" x2="60" y2="35" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" filter="url(#navGlow)"/>
+                    <line x1="71" y1="23" x2="71" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round" filter="url(#navGlow)"/>
+                    <circle cx="46" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8" filter="url(#navGlow)"/>
+                    <circle cx="60" cy="46" r="5.5" fill="none" stroke="#00e5ff" stroke-width="1.8" filter="url(#navGlow)"/>
+                    <circle cx="74" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8" filter="url(#navGlow)"/>
+                    <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5" filter="url(#navGlow)">BITLOGIC</text>
+                </svg>
+                <span class="nav-logo-text">BitLogic</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#pricing">플랜 안내</a>
+                <a href="index.html#features">서비스 소개</a>
+                <a href="index.html#faq">FAQ</a>
+                <a href="index.html" class="nav-btn">홈으로</a>
+            </div>
+            <button class="nav-hamburger" id="navHamburger" aria-label="메뉴 열기">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+        <div class="nav-mobile" id="navMobile">
+            <a href="index.html#pricing">플랜 안내</a>
+            <a href="index.html#features">서비스 소개</a>
+            <a href="index.html#faq">FAQ</a>
+            <a href="index.html">홈으로</a>
+        </div>
+    </nav>
+
+    <!-- 토스트 -->
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <!-- 로딩 -->
+    <div class="ob-loading" id="loadingState">
+        <div class="ob-loading-spinner"></div>
+    </div>
+
+    <!-- 온보딩 폼 (초기엔 숨김) -->
+    <main class="auth-page" id="formWrap" style="display:none;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <p class="auth-sub">Almost There</p>
+                <h1 class="auth-title">추가 정보</h1>
+                <p class="auth-desc">서비스 이용을 위해<br>이름과 전화번호를 입력해 주세요.</p>
+            </div>
+
+            <form class="auth-form" id="onboardingForm" novalidate>
+                <div class="form-group">
+                    <label class="form-label" for="obName">이름</label>
+                    <div class="form-input-wrap">
+                        <input class="form-input" type="text" id="obName"
+                            placeholder="홍길동" autocomplete="name" required maxlength="50">
+                    </div>
+                    <span class="form-error" id="nameErr">이름을 입력해 주세요.</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="obPhone">전화번호</label>
+                    <div class="form-input-wrap">
+                        <input class="form-input" type="tel" id="obPhone"
+                            placeholder="'-' 없이 숫자만 입력 (예: 01012345678)"
+                            autocomplete="tel" maxlength="11" inputmode="numeric" required>
+                    </div>
+                    <span class="form-error" id="phoneErr">올바른 휴대폰 번호를 입력해 주세요.</span>
+                </div>
+
+                <!-- 전화번호 중복 박스 (기본 숨김) -->
+                <div class="phone-dup-box" id="phoneDupBox">
+                    <p class="phone-dup-title">이미 가입된 번호예요</p>
+                    <p class="phone-dup-desc">입력하신 전화번호로 이미 가입된 계정이 있어요.<br>다른 번호를 입력하거나 기존 계정으로 로그인해 주세요.</p>
+                    <div class="phone-dup-actions">
+                        <button type="button" class="btn-dup-retry" id="retryPhoneBtn">다시 입력하기</button>
+                        <button type="button" class="btn-dup-login" id="goLoginBtn">로그인 페이지로 이동</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-submit" id="submitBtn">시작하기</button>
+                <button type="button" class="btn-back" id="backBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                    가입 취소
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- 취소 확인 오버레이 -->
+    <div class="cancel-overlay" id="cancelOverlay">
+        <div class="cancel-card">
+            <div class="cancel-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fa9090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+            </div>
+            <p class="cancel-title">가입을 취소하시겠어요?</p>
+            <p class="cancel-desc">가입을 취소하고 처음으로 돌아가시겠어요?<br>로그아웃 후 로그인 페이지로 이동합니다.</p>
+            <div class="cancel-actions">
+                <button class="btn-cancel-yes" id="cancelYes">나가기</button>
+                <button class="btn-cancel-no" id="cancelNo">계속하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <div class="footer-brand-wrap">
+                    <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-logo-svg">
+                        <circle cx="60" cy="60" r="58" fill="#010d1a"/>
+                        <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.8"/>
+                        <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2"/>
+                        <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.4"/>
+                        <path d="M17 86 Q40 108 60 112 Q80 108 103 86" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.65"/>
+                        <line x1="49" y1="23" x2="49" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="60" y1="18" x2="60" y2="35" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="71" y1="23" x2="71" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="46" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <circle cx="60" cy="46" r="5.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <circle cx="74" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
+                        <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5">BITLOGIC</text>
+                    </svg>
+                    <p class="footer-brand">BitLogic</p>
+                </div>
+                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
+                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
+                <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
+                <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
+            </div>
+            <div class="footer-links">
+                <a href="terms-of-service.html">이용약관</a>
+                <a href="privacy-policy.html">개인정보처리방침</a>
+                <a href="refund-policy.html">환불정책</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { supabase, signOut } from './supabase-auth.js';
+
+        /* ── redirect 목적지 (open redirect 방지) ── */
+        function getSafeRedirect() {
+            const raw = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+            try {
+                const url = new URL(raw, window.location.origin);
+                if (url.origin !== window.location.origin) return 'index.html';
+                return url.pathname + url.search + url.hash;
+            } catch {
+                return 'index.html';
+            }
+        }
+        const redirectDest = getSafeRedirect();
+
+        /* ── 토스트 ── */
+        function showToast(msg, type = 'error') {
+            const wrap = document.getElementById('toastWrap');
+            const el = document.createElement('div');
+            el.className = 'toast' + (type === 'ok' ? ' ok' : '');
+            el.textContent = msg;
+            wrap.appendChild(el);
+            setTimeout(() => {
+                el.style.animation = 'toastOut 0.26s ease forwards';
+                setTimeout(() => el.remove(), 260);
+            }, 3500);
+        }
+
+        /* ── 세션 확인 ── */
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html';
+            await new Promise(() => {});
+        }
+        const user = session.user;
+
+        /* ── 프로필 완료 여부 확인 ── */
+        const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('name, phone')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (existingProfile?.name && existingProfile?.phone) {
+            window.location.href = redirectDest;
+            await new Promise(() => {});
+        }
+
+        /* ── 폼 노출 ── */
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('formWrap').style.display = '';
+
+        /* ── 뒤로가기 트랩 ── */
+        history.pushState(null, '', window.location.href);
+        window.addEventListener('popstate', () => {
+            history.pushState(null, '', window.location.href);
+            showCancelOverlay();
+        });
+
+        /* ── 취소 오버레이 ── */
+        function showCancelOverlay() {
+            document.getElementById('cancelOverlay').classList.add('show');
+        }
+        function hideCancelOverlay() {
+            document.getElementById('cancelOverlay').classList.remove('show');
+        }
+
+        document.getElementById('backBtn').addEventListener('click', showCancelOverlay);
+        document.getElementById('cancelNo').addEventListener('click', hideCancelOverlay);
+        document.getElementById('cancelOverlay').addEventListener('click', e => {
+            if (e.target === document.getElementById('cancelOverlay')) hideCancelOverlay();
+        });
+        document.getElementById('cancelYes').addEventListener('click', async () => {
+            document.getElementById('cancelYes').disabled = true;
+            document.getElementById('cancelYes').textContent = '처리 중...';
+            await signOut();
+            window.location.href = 'login.html';
+        });
+
+        /* ── 전화번호 중복 박스 ── */
+        function showPhoneDup() {
+            document.getElementById('phoneDupBox').classList.add('show');
+            document.getElementById('submitBtn').style.display = 'none';
+        }
+        function hidePhoneDup() {
+            document.getElementById('phoneDupBox').classList.remove('show');
+            document.getElementById('submitBtn').style.display = '';
+        }
+
+        document.getElementById('retryPhoneBtn').addEventListener('click', () => {
+            hidePhoneDup();
+            const phoneInput = document.getElementById('obPhone');
+            phoneInput.value = '';
+            phoneInput.focus();
+        });
+        document.getElementById('goLoginBtn').addEventListener('click', async () => {
+            document.getElementById('goLoginBtn').disabled = true;
+            document.getElementById('goLoginBtn').textContent = '처리 중...';
+            await signOut();
+            window.location.href = 'login.html';
+        });
+
+        /* ── 전화번호 숫자만 ── */
+        document.getElementById('obPhone').addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        /* ── 입력값 sanitize ── */
+        function sanitize(str) {
+            return String(str || '').trim().replace(/[<>"'&`]/g, '');
+        }
+
+        /* ── 폼 제출 ── */
+        document.getElementById('onboardingForm').addEventListener('submit', async e => {
+            e.preventDefault();
+
+            const name  = sanitize(document.getElementById('obName').value);
+            const phone = document.getElementById('obPhone').value.trim();
+
+            /* 에러 초기화 */
+            document.getElementById('nameErr').classList.remove('show');
+            document.getElementById('phoneErr').classList.remove('show');
+            hidePhoneDup();
+
+            let valid = true;
+            if (!name)                             { document.getElementById('nameErr').classList.add('show');  valid = false; }
+            if (!/^01[0-9]{8,9}$/.test(phone))     { document.getElementById('phoneErr').classList.add('show'); valid = false; }
+            if (!valid) return;
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '확인 중...';
+
+            try {
+                /* 전화번호 중복 체크 */
+                const { data: phoneTaken, error: rpcErr } = await supabase
+                    .rpc('is_phone_taken', { p_phone: phone });
+
+                if (!rpcErr && phoneTaken) {
+                    showPhoneDup();
+                    btn.disabled = false;
+                    btn.textContent = '시작하기';
+                    return;
+                }
+
+                btn.textContent = '저장 중...';
+
+                /* 프로필 저장 */
+                const { error: upsertErr } = await supabase.from('profiles').upsert({
+                    id:         user.id,
+                    name,
+                    phone,
+                    email:      user.email || null,
+                    updated_at: new Date().toISOString(),
+                });
+
+                if (upsertErr) {
+                    const msg = (upsertErr.message || '').toLowerCase();
+                    if (upsertErr.code === '23505' && (msg.includes('phone') || msg.includes('profiles_phone_unique'))) {
+                        showPhoneDup();
+                        btn.disabled = false;
+                        btn.textContent = '시작하기';
+                        return;
+                    }
+                    throw upsertErr;
+                }
+
+                /* 완료 → 목적지로 이동 */
+                window.location.href = redirectDest;
+
+            } catch (err) {
+                showToast('오류가 발생했습니다. 다시 시도해 주세요.');
+                btn.disabled = false;
+                btn.textContent = '시작하기';
+            }
+        });
+
+        /* ── Mobile nav ── */
+        const hamburger = document.getElementById('navHamburger');
+        const mobileNav = document.getElementById('navMobile');
+        if (hamburger && mobileNav) {
+            hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+            mobileNav.querySelectorAll('a').forEach(a =>
+                a.addEventListener('click', () => mobileNav.classList.remove('open'))
+            );
+        }
+
+        /* ── Nav scroll ── */
+        (() => {
+            const nav = document.querySelector('.nav');
+            if (!nav) return;
+            const update = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+            update();
+            window.addEventListener('scroll', update, { passive: true });
+        })();
+    </script>
+</body>
+</html>

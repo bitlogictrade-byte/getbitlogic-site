@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <title>백테스팅을 거쳐 검증된 비트로직 알고리즘 (Algorithm)
     더 이상 흔들리지 않는 본인만의 매매 기준을 만들어보세요.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +16,7 @@
 <body>
 
     <!-- NAV -->
-    <nav class="nav">
+    <nav class="nav at-top">
         <div class="nav-inner">
             <a href="#" class="nav-logo-link">
                 <img src="btlogocl.png" alt="BitLogic" class="nav-logo-img">
@@ -162,22 +165,38 @@
             <h2 class="section-title">비트로직이 다른 이유</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/>
+                        </svg>
+                    </div>
                     <h4>검증된 알고리즘</h4>
                     <p>수백 회 백테스팅으로 검증된 신호만 제공합니다. 감이 아닌 데이터로 매매하세요.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔇</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                        </svg>
+                    </div>
                     <h4>노이즈 필터</h4>
                     <p>시장 노이즈와 가짜 신호를 걷어내고, 핵심 매매 타이밍에만 집중합니다.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
                     <h4>즉시 활성화</h4>
                     <p>결제 완료 후 TradingView 초대 링크가 즉시 발송됩니다. 5분이면 충분합니다.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔓</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                        </svg>
+                    </div>
                     <h4>약정 없는 구독</h4>
                     <p>위약금·약정 없이 언제든 구독을 시작하고, 원할 때 자유롭게 해지할 수 있습니다.</p>
                 </div>
@@ -206,9 +225,9 @@
                         <span>트레이딩뷰를 한 번도 사용해보지 않은 초보자도 쓸 수 있나요?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-a"> 네, 가능합니다. 본 서비스는 알고리즘이 산출한 데이터를 차트 위에 직관적으로 시각화해 주는 매매 보조 소프트웨어입니다.<br>
-                                        복잡한 차트 분석이 익숙하지 않으시더라도 쉽게 활용하실 수 있도록 만들었습니다<br>
-                                        결제 즉시 발송되는 고유 라이선스 링크를 통해, 고객님의 트레이딩뷰(TradingView) 계정에 바로 등록하여 사용하실 수 있습니다."</div>
+                    <div class="faq-a">네, 가능합니다. 본 서비스는 알고리즘이 산출한 데이터를 차트 위에 직관적으로 시각화해 주는 매매 보조 소프트웨어입니다.<br>
+                                        복잡한 차트 분석이 익숙하지 않으시더라도 쉽게 활용하실 수 있도록 만들었습니다.<br>
+                                        결제 즉시 발송되는 고유 라이선스 링크를 통해, 고객님의 트레이딩뷰(TradingView) 계정에 바로 등록하여 사용하실 수 있습니다.</div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-q" aria-expanded="false">
@@ -222,7 +241,7 @@
                         <span>유료 지표를 쓰면 무조건 수익이 나나요?</span>
                         <span class="faq-icon">+</span>
                     </button>
-                    <div class="faq-a"> 절대로 아닙니다.<br>
+                    <div class="faq-a">절대로 아닙니다.<br>
                                         시장을 100% 확실한 정확도로 예측할 수 있게 해주는 지표, 알고리즘, 시스템, 전략은 세상에 존재하지 않습니다.<br>  
                                         저희는 유료 지표를 제공하는 업체이지만, 저희 도구를 맹목적으로 따라 하기만 한다고 해서 수익을 보장해 드릴 수는 없습니다.<br>
                                         그 어떤 도구도 맹목적으로 추종하는 것은 권장하지 않습니다. 거래(트레이딩) 자체에는 위험이 따르며, 과거의 성과가 미래의 결과를 보장하지는 않습니다.</div>
@@ -251,36 +270,40 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="footer-left">
-                <div class="footer-brand-wrap">
-                    <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="footer-logo-svg">
-                        <circle cx="60" cy="60" r="58" fill="#010d1a"/>
-                        <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.8"/>
-                        <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2"/>
-                        <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.4"/>
-                        <path d="M17 86 Q40 108 60 112 Q80 108 103 86" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.6"/>
-                        <line x1="49" y1="23" x2="49" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="60" y1="18" x2="60" y2="35" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="71" y1="23" x2="71" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <circle cx="46" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <circle cx="60" cy="46" r="5.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <circle cx="74" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5">BITLOGIC</text>
-                    </svg>
-                    <p class="footer-brand">BitLogic</p>
-                </div>
-                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
-                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
-                <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
-                <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
-            </div>
-            <div class="footer-links">
+            <!-- 상단: 링크 -->
+            <nav class="footer-links">
                 <a href="terms-of-service.html">이용약관</a>
+                <span class="footer-sep">|</span>
                 <a href="privacy-policy.html">개인정보처리방침</a>
+                <span class="footer-sep">|</span>
                 <a href="refund-policy.html">환불정책</a>
+            </nav>
+
+            <!-- 중단: 사업자 정보 -->
+            <div class="footer-biz">
+                <p class="footer-biz-row">
+                    <span><span class="footer-biz-label">상호명</span><span class="footer-biz-value">비트로직(BitLogic)</span></span>
+                    <span class="footer-biz-sep">|</span>
+                    <span><span class="footer-biz-label">대표자</span><span class="footer-biz-value">김서진</span></span>
+                    <span class="footer-biz-sep">|</span>
+                    <span><span class="footer-biz-label">사업자등록번호</span><span class="footer-biz-value">472-13-03084</span></span>
+                </p>
+                <p class="footer-biz-row">
+                    <span><span class="footer-biz-label">통신판매업신고번호</span><span class="footer-biz-value">신고 예정</span></span>
+                    <span class="footer-biz-sep">|</span>
+                    <span><span class="footer-biz-label">주소</span><span class="footer-biz-value">인천 남동구 논고개로 188번길 2</span></span>
+                </p>
+                <p class="footer-biz-row">
+                    <span><span class="footer-biz-label">고객센터</span><span class="footer-biz-value">070-8018-8505</span></span>
+                    <span class="footer-biz-sep">|</span>
+                    <span><span class="footer-biz-label">이메일</span><span class="footer-biz-value">bitlogictrade@gmail.com</span></span>
+                </p>
             </div>
-        </div>
-        <div class="footer-bottom">
+
+            <!-- 하단: copyright -->
+            <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
+
+            <!-- 맨 아래: 투자 면책 문구 -->
             <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
         </div>
     </footer>
@@ -438,6 +461,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="ui.js"></script>
     <script type="module">
         import {
             supabase,
@@ -445,6 +469,36 @@
             signInWithGoogle, signInWithKakao,
             resetPassword, onAuthStateChange
         } from './supabase-auth.js';
+
+        /* ── OAuth 콜백 처리 (소셜 로그인 완료 후 hash 감지) ── */
+        if (window.location.hash.includes('access_token')) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+            const { data: { subscription: oauthSub } } = supabase.auth.onAuthStateChange(async (event, session) => {
+                if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+                    oauthSub.unsubscribe();
+                    try {
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('name, phone')
+                            .eq('id', session.user.id)
+                            .maybeSingle();
+                        const rawRedirect = sessionStorage.getItem('ob_redirect') || 'index.html';
+                        sessionStorage.removeItem('ob_redirect');
+                        if (!profile?.name || !profile?.phone) {
+                            window.location.href = `onboarding.html?redirect=${encodeURIComponent(rawRedirect)}`;
+                        } else if (rawRedirect !== 'index.html') {
+                            window.location.href = rawRedirect;
+                        }
+                    } catch (err) {
+                        console.error('OAuth callback error:', err);
+                        /* 프로필 조회 실패 시 온보딩으로 폴백 — 유저가 페이지에 갇히는 것 방지 */
+                        const rawRedirect = sessionStorage.getItem('ob_redirect') || 'index.html';
+                        sessionStorage.removeItem('ob_redirect');
+                        window.location.href = `onboarding.html?redirect=${encodeURIComponent(rawRedirect)}`;
+                    }
+                }
+            });
+        }
 
         /* ── 유틸 ── */
         function openModal(modal) {
@@ -518,7 +572,7 @@
                 await signIn(email, pw);
                 closeAll();
             } catch (err) {
-                alert('로그인 실패: ' + (err.message || '이메일 또는 비밀번호를 확인해 주세요.'));
+                showToast('로그인 실패: ' + (err.message || '이메일 또는 비밀번호를 확인해 주세요.'), 'error');
                 if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
             }
         });
@@ -529,7 +583,7 @@
             const email = document.getElementById('signupEmail')?.value.trim();
             const pw    = document.getElementById('signupPassword')?.value;
             const btn   = e.target.querySelector('[type="submit"]');
-            if (pw.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+            if (pw.length < 8) { showToast('비밀번호는 8자 이상이어야 합니다.', 'error'); return; }
             if (btn) { btn.disabled = true; btn.textContent = '가입 중...'; }
             try {
                 const data = await signUp(email, pw);
@@ -540,9 +594,9 @@
                     });
                 }
                 closeAll();
-                alert('가입 완료! 이메일 인증 링크를 확인해 주세요.');
+                showToast('가입 완료! 이메일 인증 링크를 확인해 주세요.', 'success');
             } catch (err) {
-                alert('회원가입 실패: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('회원가입 실패: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 if (btn) { btn.disabled = false; btn.textContent = '회원가입'; }
             }
         });
@@ -578,37 +632,42 @@
                 btn.textContent = '전송 중...';
                 await resetPassword(email);
                 closeAll();
-                alert('재설정 링크를 이메일로 보냈습니다. 메일함을 확인해 주세요.');
+                showToast('재설정 링크를 이메일로 보냈습니다. 메일함을 확인해 주세요.', 'success');
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 btn.disabled = false; btn.textContent = '재설정 링크 보내기';
             }
         });
 
         /* ── 소셜 로그인 버튼 ── */
         document.getElementById('kakaoLogin')?.addEventListener('click', async () => {
+            sessionStorage.setItem('ob_redirect', 'index.html');
             try { await signInWithKakao(); }
-            catch (err) { alert('카카오 로그인 실패: ' + err.message); }
+            catch (err) { showToast('카카오 로그인 실패: ' + err.message, 'error'); }
         });
         document.getElementById('googleLogin')?.addEventListener('click', async () => {
+            sessionStorage.setItem('ob_redirect', 'index.html');
             try { await signInWithGoogle(); }
-            catch (err) { alert('Google 로그인 실패: ' + err.message); }
+            catch (err) { showToast('Google 로그인 실패: ' + err.message, 'error'); }
         });
         document.querySelectorAll('#signupModal .social-btn.kakao').forEach(el => {
             el.addEventListener('click', async () => {
+                sessionStorage.setItem('ob_redirect', 'index.html');
                 try { await signInWithKakao(); }
-                catch (err) { alert('카카오 로그인 실패: ' + err.message); }
+                catch (err) { showToast('카카오 로그인 실패: ' + err.message, 'error'); }
             });
         });
         document.querySelectorAll('#signupModal .social-btn.google').forEach(el => {
             el.addEventListener('click', async () => {
+                sessionStorage.setItem('ob_redirect', 'index.html');
                 try { await signInWithGoogle(); }
-                catch (err) { alert('Google 로그인 실패: ' + err.message); }
+                catch (err) { showToast('Google 로그인 실패: ' + err.message, 'error'); }
             });
         });
 
         /* ── 로그아웃 ── */
         async function handleLogout() {
+            if (!await showConfirm('로그아웃 하시겠어요?', { title: '로그아웃', confirmText: '로그아웃', cancelText: '취소' })) return;
             try {
                 await signOut();
             } catch (err) {

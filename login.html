@@ -1,9 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <title>로그인 | BitLogic</title>
+    <meta name="description" content="BitLogic 알고리즘 서비스에 로그인하세요.">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -271,8 +276,9 @@
         </div>
     </footer>
 
+    <script src="ui.js"></script>
     <script type="module">
-        import { supabase, signIn, signInWithGoogle, signInWithKakao, resetPassword, getUser } from './supabase-auth.js';
+        import { supabase, signIn, signInWithGoogle, signInWithKakao, getUser } from './supabase-auth.js';
 
         /* 이미 로그인 된 경우 mypage로 */
         getUser().then(user => { if (user) window.location.href = 'mypage.html'; });
@@ -322,28 +328,26 @@
                 errEl.classList.add('show');
                 return;
             }
-            btn.disabled = true; btn.textContent = '확인 중...';
+            btn.disabled = true; btn.textContent = '전송 중...';
             try {
-                /* profiles 테이블에서 이메일 존재 확인 */
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('email', email)
-                    .maybeSingle();
+                const r = await fetch('/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'reset-password', email }),
+                });
+                const d = await r.json();
 
-                if (!profile) {
+                if (d.notFound) {
                     errEl.textContent = '가입된 계정 정보가 없습니다.';
                     errEl.classList.add('show');
                     btn.disabled = false; btn.textContent = '재설정 링크 보내기';
                     return;
                 }
 
-                btn.textContent = '전송 중...';
-                await resetPassword(email);
                 resetModal.classList.remove('active');
-                alert('재설정 링크를 이메일로 보냈습니다.\n메일함을 확인해 주세요.');
+                showToast('재설정 링크를 이메일로 보냈습니다. 메일함을 확인해 주세요.', 'success');
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
             } finally {
                 btn.disabled = false; btn.textContent = '재설정 링크 보내기';
             }
@@ -372,14 +376,16 @@
 
         /* 카카오 */
         document.getElementById('kakaoLoginBtn')?.addEventListener('click', async () => {
+            sessionStorage.setItem('ob_redirect', 'index.html');
             try { await signInWithKakao(); }
-            catch (err) { alert('카카오 로그인 실패: ' + err.message); }
+            catch (err) { showToast('카카오 로그인 실패: ' + err.message, 'error'); }
         });
 
         /* Google */
         document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
+            sessionStorage.setItem('ob_redirect', 'index.html');
             try { await signInWithGoogle(); }
-            catch (err) { alert('Google 로그인 실패: ' + err.message); }
+            catch (err) { showToast('Google 로그인 실패: ' + err.message, 'error'); }
         });
 
         // Nav scroll: transparent at top → dark when scrolled

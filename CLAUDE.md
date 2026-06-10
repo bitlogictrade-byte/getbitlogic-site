@@ -18,6 +18,12 @@
 | `SUPABASE_URL` | Supabase 프로젝트 URL (`api/` 서버사이드에서 사용) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase 서버 키 (`api/` 서버사이드에서만 사용) |
 | `PORTONE_SECRET_KEY` | 포트원 결제 시크릿 키 |
+| `RESEND_API_KEY` | Resend 이메일 발송 API 키 (`api/_email.js`, `api/charge.js`에서 사용) |
+| `TV_SESSION_COOKIE` | TradingView sessionid 쿠키값 (미설정 시 invite-tv 스킵 모드) |
+| `TV_SCRIPT_ID_BASIC` | Basic 플랜용 Pine Script ID |
+| `TV_SCRIPT_ID_PRO` | Pro 플랜용 Pine Script ID |
+| `CRON_SECRET` | `invite-tv` sync 엔드포인트 보호용 시크릿 (선택) |
+| `ADMIN_NOTIFY_WEBHOOK` | 실패 알림 웹훅 URL — Slack/Discord 등 (선택) |
 
 > **참고:** Supabase anon key는 설계상 공개 키(Supabase RLS가 보안 담당)로, `supabase-auth.js`에 하드코딩됨.
 > 이 프로젝트는 빌드 과정 없는 순수 정적 사이트라 Vercel 환경변수를 프론트엔드 JS에 주입할 수 없음.
@@ -34,6 +40,7 @@
 | `checkout.html` | 결제 페이지. `?plan=basic` or `?plan=pro` 쿼리로 플랜 구분 |
 | `success.html` | 결제 완료 페이지 |
 | `mypage.html` | 마이페이지. 로그인 유저만 접근 가능 |
+| `onboarding.html` | 소셜 로그인 후 이름/전화번호 미입력 유저 온보딩 페이지. `?redirect=<url>` 쿼리로 완료 후 이동 목적지 지정 |
 | `privacy-policy.html` | 개인정보처리방침 |
 | `refund-policy.html` | 환불정책 |
 | `terms-of-service.html` | 이용약관 |
@@ -42,6 +49,9 @@
 | `style.css` | 공통 스타일 |
 | `api/charge.js` | 포트원 결제 Vercel Serverless Function |
 | `api/delete-account.js` | 회원탈퇴 Vercel Serverless Function |
+| `api/invite-tv.js` | TradingView 스크립트 권한 초대/해제/만료동기화 Vercel Serverless Function |
+| `api/send-email.js` | Resend 이메일 발송 Vercel Serverless Function (클라이언트 호출용) |
+| `api/_email.js` | 이메일 템플릿 + sendEmail 공유 헬퍼 (Vercel 라우트 아님) |
 
 ## 플랜 정보
 
@@ -79,6 +89,7 @@
 | `next_billing_at` | `timestamptz` | Nullable - 다음 결제일 |
 | `started_at` | `timestamptz` | Nullable - 구독 시작일 |
 | `cancelled_at` | `timestamptz` | Nullable - 해지일 |
+| `pending_plan` | `text` | Nullable - 다음 갱신 시 적용할 플랜 (현재는 `basic`만 사용) |
 | `created_at` | `timestamptz` | Nullable |
 
 ---

@@ -34,18 +34,19 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-bottom: 1px solid transparent;
-    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
-}
-
-.nav.scrolled {
     background: rgba(0, 0, 0, 0.88);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
+    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+/* index.html hero 최상단에서만 투명 */
+.nav.at-top {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-color: transparent;
 }
 
 .nav-inner {
@@ -359,7 +360,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .hero-desc {
     margin: 1.8rem auto 0;
     max-width: 600px;
-    font-size: 1rem;
+    font-size: clamp(0.92rem, 1.2vw, 1.1rem);
     line-height: 1.9;
     color: rgba(255,255,255,0.55);
 }
@@ -642,8 +643,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .feature-icon {
-    font-size: 1.6rem;
+    width: 30px;
+    height: 30px;
     margin-bottom: 1rem;
+    color: var(--cyan);
+}
+.feature-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .feature-card h4 {
@@ -738,55 +745,68 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 .footer-inner {
-    max-width: 1200px;
+    max-width: 860px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: center;
 }
 
-.footer-brand-wrap {
+.footer-links {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
 }
 
-.footer-logo-svg {
-    flex-shrink: 0;
-    filter: drop-shadow(0 0 5px rgba(0,229,255,0.4));
+.footer-links a {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.55);
+    transition: color 0.2s;
 }
 
-.footer-brand {
-    font-size: 1.1rem;
-    font-weight: 800;
-    background: linear-gradient(90deg, var(--cyan), var(--cyan2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 0;
-}
+.footer-links a:hover { color: #fff; }
 
-.footer-info {
+.footer-sep {
+    color: rgba(255,255,255,0.2);
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.38);
-    line-height: 1.9;
+}
+
+.footer-biz {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.footer-biz-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem 0.6rem;
+    font-size: 0.78rem;
+    line-height: 1.7;
+}
+
+.footer-biz-sep {
+    color: rgba(255,255,255,0.18);
+}
+
+.footer-biz-label {
+    color: rgba(255,255,255,0.28);
+    margin-right: 0.25rem;
+}
+
+.footer-biz-value {
+    color: rgba(255,255,255,0.5);
 }
 
 .footer-copy {
     font-size: 0.78rem;
     color: rgba(255,255,255,0.25);
-    margin-top: 0.75rem;
-}
-
-.footer-bottom {
-    max-width: 1200px;
-    margin: 1.5rem auto 0;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    text-align: center;
 }
 
 .footer-disclaimer {
@@ -794,22 +814,10 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     color: rgba(255,255,255,0.22);
     font-style: italic;
     line-height: 1.6;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    width: 100%;
 }
-
-.footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    align-items: center;
-}
-
-.footer-links a {
-    font-size: 0.82rem;
-    color: #555;
-    transition: color 0.2s;
-}
-
-.footer-links a:hover { color: #aaa; }
 
 /* 데스크탑: 카드 안 이미지 숨김 (왼쪽 큰 이미지 사용) */
 .plan-card-img { display: none; }
@@ -1113,4 +1121,239 @@ body {
              calc(1.5rem + env(safe-area-inset-right))
              calc(1.5rem + env(safe-area-inset-bottom))
              calc(1.5rem + env(safe-area-inset-left));
+}
+
+/* ───────────────────────────────────────────
+   TOAST & CONFIRM — 색상 변수 (퍼플 테마 전환 시 이 블록만 수정)
+─────────────────────────────────────────── */
+:root {
+    /* Toast */
+    --toast-success-bg:     rgba(16, 185, 129, 0.12);
+    --toast-success-border: rgba(16, 185, 129, 0.35);
+    --toast-success-icon:   #10b981;
+    --toast-success-text:   #d1fae5;
+
+    --toast-error-bg:       rgba(239, 68, 68, 0.12);
+    --toast-error-border:   rgba(239, 68, 68, 0.35);
+    --toast-error-icon:     #ef4444;
+    --toast-error-text:     #fee2e2;
+
+    --toast-info-bg:        rgba(0, 229, 255, 0.10);
+    --toast-info-border:    rgba(0, 229, 255, 0.30);
+    --toast-info-icon:      #00e5ff;
+    --toast-info-text:      #e0f7ff;
+
+    /* Confirm modal */
+    --confirm-bg:           #0d0d0d;
+    --confirm-border:       rgba(255, 255, 255, 0.10);
+    --confirm-ok-bg:        var(--grad-btn);
+    --confirm-danger-bg:    linear-gradient(90deg, #b91c1c 0%, #ef4444 100%);
+}
+
+/* ── Toast Container ── */
+#bl-toast-container {
+    position: fixed;
+    top: calc(1.2rem + env(safe-area-inset-top, 0px));
+    right: 1.2rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    pointer-events: none;
+    max-width: calc(100vw - 2.4rem);
+}
+
+/* 모바일: 오른쪽 하단 */
+@media (max-width: 768px) {
+    #bl-toast-container {
+        top: auto;
+        bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
+        right: 1rem;
+        left: 1rem;
+        max-width: 100%;
+    }
+}
+
+/* ── Toast Item ── */
+.bl-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.85rem 0.9rem 0.85rem 1rem;
+    border-radius: 12px;
+    border: 1px solid;
+    font-size: 0.875rem;
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    line-height: 1.5;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    pointer-events: all;
+    max-width: 360px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transform: translateX(16px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.bl-toast.bl-toast-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.bl-toast.bl-toast-hide {
+    opacity: 0;
+    transform: translateX(16px);
+}
+
+.bl-toast-success {
+    background:   var(--toast-success-bg);
+    border-color: var(--toast-success-border);
+    color:        var(--toast-success-text);
+}
+
+.bl-toast-error {
+    background:   var(--toast-error-bg);
+    border-color: var(--toast-error-border);
+    color:        var(--toast-error-text);
+}
+
+.bl-toast-info {
+    background:   var(--toast-info-bg);
+    border-color: var(--toast-info-border);
+    color:        var(--toast-info-text);
+}
+
+.bl-toast-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 900;
+    margin-top: 1px;
+    color: #fff;
+}
+
+.bl-toast-success .bl-toast-icon { background: var(--toast-success-icon); }
+.bl-toast-error   .bl-toast-icon { background: var(--toast-error-icon); }
+.bl-toast-info    .bl-toast-icon { background: var(--toast-info-icon); color: #000; }
+
+.bl-toast-msg { flex: 1; }
+
+.bl-toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.30);
+    font-size: 0.72rem;
+    cursor: pointer;
+    padding: 2px;
+    margin-top: 1px;
+    line-height: 1;
+    font-family: inherit;
+    transition: color 0.15s;
+}
+.bl-toast-close:hover { color: rgba(255, 255, 255, 0.65); }
+
+/* ── Confirm Modal ── */
+.bl-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+        calc(1.5rem + env(safe-area-inset-top,    0px))
+        calc(1.5rem + env(safe-area-inset-right,  0px))
+        calc(1.5rem + env(safe-area-inset-bottom, 0px))
+        calc(1.5rem + env(safe-area-inset-left,   0px));
+    opacity: 0;
+    transition: opacity 0.22s ease;
+}
+
+.bl-confirm-overlay.active { opacity: 1; }
+
+.bl-confirm-box {
+    background: var(--confirm-bg);
+    border: 1px solid var(--confirm-border);
+    border-radius: 18px;
+    padding: 2rem 2rem 1.6rem;
+    width: 100%;
+    max-width: 380px;
+    transform: translateY(14px) scale(0.97);
+    transition: transform 0.25s ease;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), 0 0 40px rgba(0, 229, 255, 0.04);
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+}
+
+.bl-confirm-overlay.active .bl-confirm-box {
+    transform: translateY(0) scale(1);
+}
+
+.bl-confirm-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.7rem;
+    color: #fff;
+}
+
+.bl-confirm-msg {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.58);
+    line-height: 1.75;
+    margin-bottom: 1.75rem;
+}
+
+.bl-confirm-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+.bl-confirm-cancel {
+    padding: 0.58rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #999;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+}
+.bl-confirm-cancel:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+
+.bl-confirm-ok {
+    padding: 0.58rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: var(--confirm-ok-bg);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s, transform 0.15s;
+}
+.bl-confirm-ok:hover { opacity: 0.88; transform: translateY(-1px); }
+.bl-confirm-ok:active { transform: translateY(0); }
+
+.bl-confirm-ok.danger {
+    background: var(--confirm-danger-bg);
+}
+
+@media (max-width: 480px) {
+    .bl-confirm-actions { flex-direction: column-reverse; }
+    .bl-confirm-cancel,
+    .bl-confirm-ok { width: 100%; text-align: center; }
+    .bl-toast { max-width: 100%; }
 }

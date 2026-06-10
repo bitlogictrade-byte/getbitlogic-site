@@ -2,5 +2,9 @@
     "framework": null,
     "outputDirectory": ".",
     "buildCommand": null,
-    "cleanUrls": true
+    "cleanUrls": true,
+    "crons": [{
+        "path": "/api/invite-tv?action=sync",
+        "schedule": "0 15 * * *"
+    }]
 }

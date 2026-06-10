@@ -1,9 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <title>마이페이지 | BitLogic</title>
+    <meta name="description" content="BitLogic 마이페이지 — 구독 상태와 계정 정보를 확인하세요.">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -205,9 +210,93 @@
             color: #6a8aaa;
             font-size: 0.9rem;
         }
+        .tv-notice-banner {
+            background: rgba(240, 165, 0, 0.08);
+            border: 1px solid rgba(240, 165, 0, 0.35);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .tv-notice-banner.show { display: flex; }
+        .tv-notice-inner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+        .tv-notice-icon { flex-shrink: 0; color: #f0a500; }
+        .tv-notice-text {
+            font-size: 0.875rem;
+            color: #f0c060;
+            line-height: 1.5;
+        }
+        .tv-notice-link {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #f0a500;
+            text-decoration: underline;
+            cursor: pointer;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 0;
+        }
+        .tv-notice-link:hover { color: #ffbe40; }
+        .tv-notice-close {
+            background: none;
+            border: none;
+            color: #f0a500;
+            font-size: 1.3rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 2px;
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+        .tv-notice-close:hover { opacity: 1; }
+        .expiry-warn-banner {
+            background: rgba(250, 87, 87, 0.08);
+            border: 1px solid rgba(250, 87, 87, 0.35);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .expiry-warn-banner.show { display: flex; }
+        .expiry-warn-icon { flex-shrink: 0; color: #fa5757; }
+        .expiry-warn-text { font-size: 0.875rem; color: #f08080; line-height: 1.5; flex: 1; }
+        .expiry-warn-text strong { color: #fa7070; font-weight: 700; }
+        /* 마스킹 토글 */
+        .info-value-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-reveal-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #4a6a88;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            transition: color 0.15s;
+        }
+        .info-reveal-btn:hover { color: #c0d4e4; }
+
         @media (max-width: 480px) {
             .mypage-section { padding: 20px 18px; }
             .mypage-title { font-size: 1.7rem; }
+            .tv-notice-text { font-size: 0.82rem; }
         }
     </style>
 </head>
@@ -278,6 +367,27 @@
 
         <!-- 로그인한 유저에게만 보임 -->
         <div id="mypageContent" style="display:none;">
+
+            <!-- TradingView ID 미입력 안내 배너 -->
+            <div class="tv-notice-banner" id="tvNoticeBanner" role="alert">
+                <div class="tv-notice-inner">
+                    <svg class="tv-notice-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span class="tv-notice-text">TradingView ID를 아직 입력하지 않으셨어요. 지표 권한 부여를 위해 아래에서 입력해 주세요.</span>
+                </div>
+                <button class="tv-notice-link" id="tvNoticeScrollBtn">입력하러 가기</button>
+                <button class="tv-notice-close" id="tvNoticeClose" aria-label="닫기">×</button>
+            </div>
+
+            <!-- 구독 만료 임박 경고 배너 -->
+            <div class="expiry-warn-banner" id="expiryWarnBanner" role="alert">
+                <svg class="expiry-warn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span class="expiry-warn-text" id="expiryWarnText"></span>
+            </div>
+
             <div class="mypage-header">
                 <p class="mypage-sub">My Account</p>
                 <h1 class="mypage-title">안녕하세요, <span id="displayName">회원</span>님</h1>
@@ -286,17 +396,35 @@
             <!-- 계정 정보 -->
             <div class="mypage-section">
                 <p class="section-title">계정 정보</p>
+                <!-- 이름 (프로필에 있을 때만 표시) -->
+                <div class="info-row" id="userNameRow" style="display:none;">
+                    <span class="info-label">이름</span>
+                    <span class="info-value" id="userNameDisplay">—</span>
+                </div>
+                <!-- 이메일 (마스킹) -->
                 <div class="info-row">
                     <span class="info-label">이메일</span>
-                    <span class="info-value" id="userEmailDisplay">—</span>
+                    <span class="info-value-wrap">
+                        <span class="info-value" id="userEmailDisplay">—</span>
+                        <button class="info-reveal-btn" id="emailRevealBtn" aria-label="이메일 전체 보기" style="display:none;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">가입일</span>
-                    <span class="info-value" id="userCreatedAt">—</span>
+                <!-- 연락처 (프로필에 있을 때만 표시, 마스킹) -->
+                <div class="info-row" id="userPhoneRow" style="display:none;">
+                    <span class="info-label">연락처</span>
+                    <span class="info-value-wrap" id="userPhoneWrap"></span>
                 </div>
+                <!-- 로그인 방식 -->
                 <div class="info-row">
                     <span class="info-label">로그인 방식</span>
                     <span class="info-value" id="userProvider">—</span>
+                </div>
+                <!-- 가입일 -->
+                <div class="info-row">
+                    <span class="info-label">가입일</span>
+                    <span class="info-value" id="userCreatedAt">—</span>
                 </div>
             </div>
 
@@ -414,6 +542,7 @@
         </div>
     </footer>
 
+    <script src="ui.js"></script>
     <script type="module">
         import { supabase, getUser, signOut, updatePassword, onAuthStateChange, getSession } from './supabase-auth.js';
 
@@ -441,6 +570,18 @@
             }
         });
 
+        /* TV ID 미입력 배너 */
+        if (new URLSearchParams(location.search).get('tv_banner') === '1') {
+            const banner = document.getElementById('tvNoticeBanner');
+            if (banner) banner.classList.add('show');
+        }
+        document.getElementById('tvNoticeClose')?.addEventListener('click', () => {
+            document.getElementById('tvNoticeBanner')?.classList.remove('show');
+        });
+        document.getElementById('tvNoticeScrollBtn')?.addEventListener('click', () => {
+            document.getElementById('tvIdSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
         /* 비밀번호 토글 */
         document.querySelectorAll('.pw-toggle').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -452,6 +593,7 @@
 
         /* 로그아웃 핸들러 */
         async function handleLogout() {
+            if (!await showConfirm('로그아웃 하시겠어요?', { title: '로그아웃', confirmText: '로그아웃', cancelText: '취소' })) return;
             try {
                 await signOut();
                 window.location.href = 'index.html';
@@ -489,10 +631,27 @@
 
         /* 유저 정보 렌더링 */
         function renderUserInfo(user, profile) {
-            document.getElementById('displayName').textContent     = getDisplayName(user, profile);
-            document.getElementById('userEmailDisplay').textContent = user.email || '—';
-            document.getElementById('userCreatedAt').textContent    = formatDate(user.created_at);
-            document.getElementById('userProvider').textContent     = getProviderName(user);
+            document.getElementById('displayName').textContent  = getDisplayName(user, profile);
+            document.getElementById('userCreatedAt').textContent = formatDate(user.created_at);
+            document.getElementById('userProvider').textContent  = getProviderName(user);
+
+            /* 이메일 마스킹 */
+            const rawEmail   = user.email || '';
+            const emailEl    = document.getElementById('userEmailDisplay');
+            const emailBtn   = document.getElementById('emailRevealBtn');
+            if (rawEmail) {
+                emailEl.textContent = maskEmail(rawEmail);
+                emailBtn.style.display = 'flex';
+                let emailRevealed = false;
+                emailBtn.addEventListener('click', function() {
+                    emailRevealed = !emailRevealed;
+                    emailEl.textContent = emailRevealed ? rawEmail : maskEmail(rawEmail);
+                    emailBtn.querySelector('svg').innerHTML = emailRevealed ? _SVG_EYE_OFF : _SVG_EYE;
+                    emailBtn.setAttribute('aria-label', emailRevealed ? '이메일 가리기' : '이메일 전체 보기');
+                });
+            } else {
+                emailEl.textContent = '—';
+            }
 
             /* 소셜 로그인 유저는 비밀번호 변경 섹션 숨김 */
             if (getProviderName(user) !== '이메일') {
@@ -510,20 +669,41 @@
                 navEmailEl.textContent = shortEmail;
             }
 
-            /* 프로필 정보 (이름, 전화번호, TV ID) 있으면 추가 표시 */
+            /* 이름 */
+            if (profile?.name) {
+                document.getElementById('userNameDisplay').textContent = profile.name;
+                document.getElementById('userNameRow').style.display = '';
+            }
+
+            /* 연락처 (마스킹) */
+            if (profile?.phone) {
+                const formattedPhone = profile.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+                const masked = maskPhone(formattedPhone);
+                const phoneWrap = document.getElementById('userPhoneWrap');
+                const phoneValueEl = document.createElement('span');
+                phoneValueEl.className = 'info-value';
+                phoneValueEl.textContent = masked;
+                const phoneBtn = makeRevealBtn();
+                let phoneRevealed = false;
+                phoneBtn.addEventListener('click', function() {
+                    phoneRevealed = !phoneRevealed;
+                    phoneValueEl.textContent = phoneRevealed ? formattedPhone : masked;
+                    phoneBtn.querySelector('svg').innerHTML = phoneRevealed ? _SVG_EYE_OFF : _SVG_EYE;
+                    phoneBtn.setAttribute('aria-label', phoneRevealed ? '가리기' : '전체 보기');
+                });
+                phoneWrap.appendChild(phoneValueEl);
+                phoneWrap.appendChild(phoneBtn);
+                document.getElementById('userPhoneRow').style.display = '';
+            }
+
+            /* 동적 추가 항목 (TradingView ID, 약관 동의일) */
             if (profile) {
-                const infoSection = document.querySelector('.mypage-section .info-row:last-child');
+                const infoSection = document.getElementById('userPhoneRow').closest('.mypage-section');
                 if (profile.tradingview_id) {
-                    addInfoRow('TradingView ID', profile.tradingview_id, infoSection?.parentElement);
-                }
-                if (profile.name) {
-                    addInfoRow('이름', profile.name, infoSection?.parentElement);
-                }
-                if (profile.phone) {
-                    addInfoRow('연락처', profile.phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'), infoSection?.parentElement);
+                    addInfoRow('TradingView ID', profile.tradingview_id, infoSection);
                 }
                 if (profile.terms_agreed_at) {
-                    addInfoRow('약관 동의일', formatDate(profile.terms_agreed_at), infoSection?.parentElement);
+                    addInfoRow('약관 동의일', formatDate(profile.terms_agreed_at), infoSection);
                 }
             }
         }
@@ -543,6 +723,62 @@
             container.appendChild(row);
         }
 
+        function addMaskedInfoRow(label, rawValue, maskedValue, container) {
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'info-row';
+            const labelEl = document.createElement('span');
+            labelEl.className = 'info-label';
+            labelEl.textContent = label;
+            const valueEl = document.createElement('span');
+            valueEl.className = 'info-value';
+            row.appendChild(labelEl);
+            row.appendChild(wrapWithReveal(valueEl, rawValue, maskedValue));
+            container.appendChild(row);
+        }
+
+        /* ── 마스킹 유틸 ── */
+        function maskEmail(email) {
+            const at = email.indexOf('@');
+            if (at < 0) return email;
+            const local  = email.substring(0, at);
+            const domain = email.substring(at);
+            const show   = Math.min(2, local.length);
+            return local.substring(0, show) + '****' + domain;
+        }
+
+        function maskPhone(phone) {
+            return phone.replace(/^(\d{2,3})-(\d{3,4})-(\d{4})$/, '$1-****-$3');
+        }
+
+        const _SVG_EYE     = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        const _SVG_EYE_OFF = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+
+        function makeRevealBtn() {
+            const btn = document.createElement('button');
+            btn.className = 'info-reveal-btn';
+            btn.setAttribute('aria-label', '전체 보기');
+            btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + _SVG_EYE + '</svg>';
+            return btn;
+        }
+
+        function wrapWithReveal(valueEl, rawValue, maskedValue) {
+            const wrap = document.createElement('span');
+            wrap.className = 'info-value-wrap';
+            valueEl.textContent = maskedValue;
+            wrap.appendChild(valueEl);
+            const btn = makeRevealBtn();
+            let revealed = false;
+            btn.addEventListener('click', function() {
+                revealed = !revealed;
+                valueEl.textContent = revealed ? rawValue : maskedValue;
+                btn.querySelector('svg').innerHTML = revealed ? _SVG_EYE_OFF : _SVG_EYE;
+                btn.setAttribute('aria-label', revealed ? '가리기' : '전체 보기');
+            });
+            wrap.appendChild(btn);
+            return wrap;
+        }
+
         function sanitizeInput(str) {
             return String(str || '').trim().replace(/[<>"'&`]/g, '');
         }
@@ -552,7 +788,9 @@
         }
 
         /* 구독 정보 렌더링 */
-        let activeSubId = null;
+        let activeSubId      = null;
+        let currentUser      = null;
+        let currentProfile   = null;
 
         function renderSubscription(sub) {
             const planEl      = document.getElementById('currentPlan');
@@ -567,14 +805,77 @@
             }
 
             const planNames = { basic: 'Basic', pro: 'Pro' };
-            planEl.textContent = planNames[sub.plan_type] || sub.plan_type;
-            planEl.className   = 'plan-badge';
+            planEl.className = 'plan-badge';
+
+            /* Pro active 배지 — 다운그레이드 신청 가능 */
+            if (sub.plan_type === 'pro' && sub.status === 'active') {
+                if (sub.pending_plan === 'basic') {
+                    planEl.textContent = 'Pro (다운그레이드 예정)';
+                    planEl.title       = '다음 결제일에 Basic으로 변경됩니다';
+                } else {
+                    planEl.textContent      = '최고 플랜 이용 중 🎉';
+                    planEl.style.cursor     = 'pointer';
+                    planEl.style.background = 'linear-gradient(135deg,rgba(91,45,232,0.18),rgba(91,45,232,0.38))';
+                    planEl.style.borderColor = '#5b2de8';
+                    planEl.style.color       = '#c0a0ff';
+                    planEl.title             = '클릭하여 다운그레이드 신청';
+                    planEl.addEventListener('click', async () => {
+                        if (!activeSubId) return;
+                        const confirmed = await showConfirm(
+                            '다음 결제일에 Basic 플랜(49,000원/월)으로 변경됩니다.\n현재 결제 기간은 Pro로 계속 이용 가능합니다.',
+                            { title: 'Basic으로 다운그레이드', confirmText: '다운그레이드 신청', cancelText: '취소' }
+                        );
+                        if (!confirmed) return;
+                        const { error } = await supabase
+                            .from('subscriptions')
+                            .update({ pending_plan: 'basic' })
+                            .eq('id', activeSubId);
+                        if (error) { showToast('오류: ' + error.message, 'error'); return; }
+                        planEl.textContent      = 'Pro (다운그레이드 예정)';
+                        planEl.style.cursor     = '';
+                        planEl.style.background = '';
+                        planEl.style.borderColor = '';
+                        planEl.style.color       = '';
+                        planEl.title             = '다음 결제일에 Basic으로 변경됩니다';
+                        showToast('다운그레이드 신청 완료! 다음 갱신 시 Basic으로 변경됩니다.', 'success');
+
+                        /* 다운그레이드 예약 안내 이메일 (실패 무시) */
+                        if (currentUser?.email) {
+                            fetch('/api/send-email', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    type:          'downgrade-scheduled',
+                                    email:         currentUser.email,
+                                    name:          currentProfile?.name || currentUser.email,
+                                    nextBillingAt: sub.next_billing_at,
+                                }),
+                            }).catch(() => {});
+                        }
+                    });
+                }
+            } else {
+                planEl.textContent = planNames[sub.plan_type] || sub.plan_type;
+            }
 
             if (sub.status === 'active' && sub.next_billing_at) {
                 expireRow.style.display = 'flex';
                 expireEl.textContent    = formatDate(sub.next_billing_at) + ' 다음 결제';
                 cancelRow.style.display = 'flex';
                 activeSubId = sub.id;
+
+                /* 7일 이내 결제 임박 경고 */
+                const daysLeft = Math.ceil((new Date(sub.next_billing_at) - Date.now()) / 86400000);
+                if (daysLeft <= 7 && daysLeft >= 0) {
+                    const banner = document.getElementById('expiryWarnBanner');
+                    const text   = document.getElementById('expiryWarnText');
+                    if (banner && text) {
+                        text.innerHTML = daysLeft === 0
+                            ? '오늘 구독 결제가 진행됩니다. 카드 정보를 확인해 주세요.'
+                            : `구독 갱신까지 <strong>${daysLeft}일</strong> 남았습니다. 결제 카드를 미리 확인해 주세요.`;
+                        banner.classList.add('show');
+                    }
+                }
             } else if (sub.status === 'pending') {
                 expireRow.style.display = 'flex';
                 expireEl.textContent    = '결제 처리 중';
@@ -595,6 +896,17 @@
                 return;
             }
 
+            /* 온보딩 미완료 가드 */
+            const { data: obProfile } = await supabase
+                .from('profiles')
+                .select('name, phone')
+                .eq('id', user.id)
+                .maybeSingle();
+            if (!obProfile?.name || !obProfile?.phone) {
+                window.location.href = `onboarding.html?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
+
             /* 프로필 + 구독 병렬 조회 */
             const [{ data: profile }, { data: subs }] = await Promise.all([
                 supabase.from('profiles').select('*').eq('id', user.id).single(),
@@ -608,6 +920,8 @@
             document.getElementById('loadingState').style.display  = 'none';
             document.getElementById('mypageContent').style.display = 'block';
 
+            currentUser    = user;
+            currentProfile = profile;
             renderUserInfo(user, profile);
             renderSubscription(subs?.[0] ?? null);
             renderTvId(profile);
@@ -636,9 +950,9 @@
         /* TV ID 수정 저장 */
         document.getElementById('tvIdSaveBtn')?.addEventListener('click', async () => {
             const newId = sanitizeTvId(document.getElementById('tvIdEditInput').value);
-            if (!newId) { alert('아이디를 입력해 주세요.'); return; }
+            if (!newId) { showToast('아이디를 입력해 주세요.', 'error'); return; }
             if (!/^[a-zA-Z0-9._\-]{1,50}$/.test(newId)) {
-                alert('TradingView 아이디는 영문, 숫자, 밑줄(_), 점(.), 하이픈(-)만 사용 가능합니다.');
+                showToast('TradingView 아이디는 영문, 숫자, 밑줄(_), 점(.), 하이픈(-)만 사용 가능합니다.', 'error');
                 return;
             }
 
@@ -655,9 +969,9 @@
                 document.getElementById('tvIdDisplay').textContent = newId;
                 document.getElementById('tvIdEditWrap').style.display = 'none';
                 document.getElementById('tvIdLockedMsg').style.display = 'block';
-                alert('TradingView 아이디가 수정되었습니다.');
+                showToast('TradingView 아이디가 수정되었습니다.', 'success');
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 btn.disabled = false; btn.textContent = '수정 저장';
             }
         });
@@ -679,11 +993,11 @@
             btn.disabled = true; btn.textContent = '저장 중...';
             try {
                 await updatePassword(newPw);
-                alert('비밀번호가 변경되었습니다.');
+                showToast('비밀번호가 변경되었습니다.', 'success');
                 document.getElementById('newPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
             } finally {
                 btn.disabled = false; btn.textContent = '변경 저장';
             }
@@ -692,9 +1006,9 @@
         /* 구독 해지 */
         document.getElementById('cancelSubBtn')?.addEventListener('click', async () => {
             if (!activeSubId) return;
-            const confirmed = confirm(
-                '구독을 해지하시겠습니까?\n\n' +
-                '해지 후에도 현재 결제 기간이 끝날 때까지 서비스를 이용할 수 있습니다.'
+            const confirmed = await showConfirm(
+                '해지 후에도 현재 결제 기간이 끝날 때까지 서비스를 이용할 수 있습니다.',
+                { title: '구독을 해지하시겠습니까?', confirmText: '해지하기', cancelText: '취소', danger: true }
             );
             if (!confirmed) return;
 
@@ -708,23 +1022,22 @@
                     .eq('id', activeSubId);
                 if (error) throw error;
 
-                alert('구독이 해지되었습니다.');
+                showToast('구독이 해지되었습니다.', 'success');
                 document.getElementById('cancelSubRow').style.display = 'none';
                 document.getElementById('currentPlan').className = 'plan-badge none';
                 const expireEl = document.getElementById('planExpireDate');
                 if (expireEl) expireEl.textContent = '해지됨';
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 btn.disabled = false; btn.textContent = '구독 해지';
             }
         });
 
         /* 회원 탈퇴 */
         document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
-            const confirmed = confirm(
-                '정말 탈퇴하시겠습니까?\n\n' +
-                '탈퇴 시 구독이 해지되고 모든 데이터가 삭제됩니다.\n' +
-                '이 작업은 되돌릴 수 없습니다.'
+            const confirmed = await showConfirm(
+                '탈퇴 시 구독이 해지되고 모든 데이터가 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
+                { title: '정말 탈퇴하시겠습니까?', confirmText: '탈퇴하기', cancelText: '취소', danger: true }
             );
             if (!confirmed) return;
 
@@ -745,10 +1058,10 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
 
-                alert('탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+                showToast('탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.', 'success');
                 window.location.href = 'index.html';
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 btn.disabled = false; btn.textContent = '회원 탈퇴';
             }
         });

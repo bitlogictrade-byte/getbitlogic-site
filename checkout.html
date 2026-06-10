@@ -1,9 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <title>결제 | BitLogic</title>
+    <meta name="description" content="BitLogic 구독 플랜을 결제하는 페이지입니다.">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -130,7 +135,6 @@
             font-weight: 700;
             color: #fff;
         }
-
         .co-agree-items {
             display: flex;
             flex-direction: column;
@@ -188,12 +192,36 @@
             position: sticky;
             top: 100px;
         }
+
+        /* 플랜 카드 (overflow:hidden 으로 그라디언트 헤더 코너 클립) */
         .co-plan-card {
-            background: #0d0d0d;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 20px;
-            padding: 28px 28px 32px;
+            overflow: hidden;
+            transition: border-color 0.35s, box-shadow 0.35s;
         }
+        .co-plan-card.is-pro {
+            border-color: rgba(91,45,232,0.55);
+            box-shadow: 0 0 32px rgba(91,45,232,0.18);
+        }
+
+        /* 그라디언트 헤더 */
+        .co-plan-hdr {
+            background: linear-gradient(135deg, #5b2de8 0%, #00c4e0 100%);
+            padding: 15px 24px;
+            text-align: center;
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.04em;
+        }
+
+        /* 플랜 카드 본문 */
+        .co-plan-body {
+            background: #0d0d0d;
+            padding: 24px 28px 28px;
+        }
+
         .co-plan-badge {
             display: inline-flex;
             align-items: center;
@@ -207,7 +235,7 @@
             color: var(--cyan);
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .co-plan-name {
             font-size: 1.6rem;
@@ -219,13 +247,13 @@
         .co-plan-sub {
             font-size: 0.8rem;
             color: rgba(255,255,255,0.45);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .co-plan-price {
             font-size: 2rem;
             font-weight: 900;
             color: #fff;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .co-plan-price span {
             font-size: 0.9rem;
@@ -235,7 +263,7 @@
         .co-plan-features {
             list-style: none;
             padding: 0;
-            margin: 0 0 24px;
+            margin: 0 0 0;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -291,12 +319,6 @@
             font-weight: 900;
             color: #fff;
         }
-        .co-vat-note {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.35);
-            text-align: right;
-            margin-top: 4px;
-        }
 
         /* ── Pay button ── */
         .co-pay-btn {
@@ -318,36 +340,157 @@
         .co-pay-btn:active { transform: translateY(0); }
         .co-pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .co-pay-logos {
+        /* 안전한 PG 결제 환경 */
+        .co-secure-note {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .co-pay-logos span {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.4);
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 4px 10px;
-            letter-spacing: 0.05em;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 14px;
+            font-size: 0.74rem;
+            color: rgba(255,255,255,0.35);
         }
 
-        .co-change-plan {
-            text-align: center;
-            margin-top: 14px;
+        /* ── 아코디언 (카드 내부) ── */
+        .co-accordion-toggle {
+            width: 100%;
+            margin-top: 16px;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.55);
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0;
+            /* 닫힐 때: radius 복원을 패널 닫힘(0.4s) 이후로 지연 */
+            transition: color 0.2s, border-color 0.2s, background 0.2s,
+                        border-bottom-left-radius 0s 0.4s,
+                        border-bottom-right-radius 0s 0.4s;
         }
-        .co-change-plan a {
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.4);
-            text-decoration: underline;
-            text-underline-offset: 3px;
+        .co-accordion-toggle:hover {
+            color: rgba(255,255,255,0.85);
+            border-color: rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.08);
         }
-        .co-change-plan a:hover { color: rgba(255,255,255,0.7); }
+        .co-accordion-toggle.open {
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            /* 열릴 때: radius 즉시 제거 */
+            transition: color 0.2s, border-color 0.2s, background 0.2s,
+                        border-bottom-left-radius 0s,
+                        border-bottom-right-radius 0s;
+        }
+        .co-accordion-chevron {
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        .co-accordion-toggle.open .co-accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* 아코디언 패널 */
+        .co-accordion-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            margin-top: 0;
+        }
+        .co-accordion-panel.open {
+            max-height: 700px;
+        }
+        .co-alt-plan {
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 14px 14px 16px;
+            margin-bottom: 4px;
+        }
+        .co-alt-plan.is-pro {
+            border-color: rgba(91,45,232,0.35);
+        }
+        /* 플랜명 + 가격 세로 배치 */
+        .co-alt-plan-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .co-alt-plan-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.04em;
+        }
+        .co-alt-plan-price {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .co-alt-plan-price span {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.55);
+        }
+        .co-alt-features {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        .co-alt-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .co-alt-features li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--cyan);
+            flex-shrink: 0;
+        }
+        .co-switch-btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            background: transparent;
+            border: 1.5px solid var(--cyan);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, border-color 0.2s, color 0.2s;
+        }
+        .co-switch-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .co-switch-btn:active { transform: translateY(0); }
+        /* 업그레이드 (Basic → Pro): 청록 아웃라인 강조 */
+        .co-switch-btn.upgrade {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        .co-switch-btn.upgrade:hover { background: rgba(0,229,255,0.07); }
+        /* 다운그레이드 (Pro → Basic): 청록 테두리, 텍스트만 흐리게 */
+        .co-switch-btn.downgrade {
+            color: rgba(255,255,255,0.45);
+        }
+        .co-switch-btn.downgrade:hover { color: rgba(255,255,255,0.65); }
 
         /* ── 로그인 모달 ── */
         .login-modal-overlay {
@@ -469,9 +612,7 @@
         .lm-footer-text a:hover { text-decoration: underline; }
 
         /* ── Page heading ── */
-        .co-page-header {
-            margin-bottom: 8px;
-        }
+        .co-page-header { margin-bottom: 8px; }
         .co-page-eyebrow {
             font-size: 0.72rem;
             font-weight: 700;
@@ -487,6 +628,92 @@
             letter-spacing: 0.04em;
             margin-bottom: 32px;
         }
+
+        /* ── Order info display (수정 가능 필드) ── */
+        .co-info-section { display: flex; flex-direction: column; }
+        .co-info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+        }
+        .co-thin-div {
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+        .co-info-lbl {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.38);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            min-width: 58px;
+            flex-shrink: 0;
+        }
+        .co-req { color: var(--cyan); margin-left: 2px; }
+        .co-info-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .co-info-val {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #fff;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .co-info-val.empty { color: rgba(255,255,255,0.25); font-style: italic; font-size: 0.88rem; }
+        .co-edit-input {
+            display: none;
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 10px 13px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: #fff;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .co-edit-input:focus { outline: none; border-color: var(--cyan); }
+        .co-edit-input.error { border-color: #ff5c5c; }
+        .co-edit-btn {
+            padding: 6px 11px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.74rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .co-edit-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+        .co-confirm-btn {
+            display: none;
+            padding: 6px 11px;
+            background: var(--cyan);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-size: 0.74rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .co-confirm-btn:hover { opacity: 0.85; }
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
@@ -558,30 +785,57 @@
                 </div>
 
                 <div class="co-card">
-                    <p class="co-section-title">주문자 정보</p>
+                    <p class="co-section-title">주문 확인</p>
                     <form class="co-form" id="checkoutForm" novalidate>
 
-                        <!-- Name -->
-                        <div>
-                            <label class="co-label" for="coName">주문자명 <span>*</span></label>
-                            <input class="co-input" type="text" id="coName"
-                                placeholder="예) 홍길동" autocomplete="name" required maxlength="50">
-                            <p class="co-error" id="nameErr">이름을 입력해 주세요.</p>
-                        </div>
+                        <!-- 주문자 정보 display section -->
+                        <div class="co-info-section">
 
-                        <!-- Phone -->
-                        <div>
-                            <label class="co-label" for="coPhone">결제 및 상담 연락처 <span>*</span></label>
-                            <input class="co-input" type="tel" id="coPhone"
-                                placeholder="'-' 없이 숫자만 입력" autocomplete="tel" required
-                                maxlength="11" inputmode="numeric">
-                            <p class="co-input-hint">예) 01012345678</p>
-                            <p class="co-error" id="phoneErr">올바른 휴대폰 번호를 입력해 주세요.</p>
+                            <!-- 이메일 (읽기 전용) -->
+                            <div class="co-info-item">
+                                <span class="co-info-lbl">이메일</span>
+                                <div class="co-info-right">
+                                    <span class="co-info-val" id="displayEmail">-</span>
+                                </div>
+                            </div>
+
+                            <div class="co-thin-div"></div>
+
+                            <!-- 이름 -->
+                            <div class="co-info-item">
+                                <span class="co-info-lbl">이름 <span class="co-req">*</span></span>
+                                <div class="co-info-right">
+                                    <span class="co-info-val" id="nameVal">-</span>
+                                    <input class="co-edit-input" type="text" id="coName"
+                                        placeholder="예) 홍길동" autocomplete="name" maxlength="50">
+                                    <button type="button" class="co-edit-btn" id="nameEditBtn">수정</button>
+                                    <button type="button" class="co-confirm-btn" id="nameConfirmBtn">확인</button>
+                                </div>
+                            </div>
+                            <p class="co-error" id="nameErr" style="margin-top:-6px;margin-bottom:6px">이름을 입력해 주세요.</p>
+
+                            <div class="co-thin-div"></div>
+
+                            <!-- 연락처 -->
+                            <div class="co-info-item">
+                                <span class="co-info-lbl">연락처 <span class="co-req">*</span></span>
+                                <div class="co-info-right">
+                                    <span class="co-info-val" id="phoneVal">-</span>
+                                    <input class="co-edit-input" type="tel" id="coPhone"
+                                        placeholder="01012345678" autocomplete="tel"
+                                        maxlength="11" inputmode="numeric">
+                                    <button type="button" class="co-edit-btn" id="phoneEditBtn">수정</button>
+                                    <button type="button" class="co-confirm-btn" id="phoneConfirmBtn">확인</button>
+                                </div>
+                            </div>
+                            <p class="co-input-hint" style="margin-top:-6px;margin-bottom:2px">예) 01012345678</p>
+                            <p class="co-error" id="phoneErr" style="margin-bottom:6px">올바른 휴대폰 번호를 입력해 주세요.</p>
+
                         </div>
 
                         <div class="co-divider"></div>
 
-                        <!-- Agreement: All -->
+                        <!-- Agreement -->
                         <p class="co-section-title" style="margin-bottom:12px">약관 동의</p>
 
                         <label class="co-agree-all" id="agreeAllLabel" for="agreeAll">
@@ -596,7 +850,32 @@
                         </label>
 
                         <div class="co-agree-items">
-                            <!-- Terms + Privacy -->
+                            <label class="co-agree-item" for="agreeAuto">
+                                <input type="checkbox" id="agreeAuto" class="co-sub-check">
+                                <span class="co-check-sm">
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                        <path d="M1 4l2.5 2.5L9 1" stroke="#000" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <span class="co-agree-text">
+                                    <span class="tag-req">[필수]</span>
+                                    본 서비스는 매월 자동 갱신되며, 권한 부여 후 환불이 불가한 디지털 콘텐츠입니다.
+                                </span>
+                            </label>
+                            <label class="co-agree-item" for="agreeRisk">
+                                <input type="checkbox" id="agreeRisk" class="co-sub-check">
+                                <span class="co-check-sm">
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                        <path d="M1 4l2.5 2.5L9 1" stroke="#000" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <span class="co-agree-text">
+                                    <span class="tag-req">[필수]</span>
+                                    본 서비스는 수익을 보장하지 않으며, 투자로 인한 손실의 책임은 본인에게 있음을 확인했습니다.
+                                </span>
+                            </label>
                             <label class="co-agree-item" for="agreeTerms">
                                 <input type="checkbox" id="agreeTerms" class="co-sub-check">
                                 <span class="co-check-sm">
@@ -607,10 +886,9 @@
                                 </span>
                                 <span class="co-agree-text">
                                     <span class="tag-req">[필수]</span>
-                                    <a href="privacy-policy.html" target="_blank">서비스 이용약관 및 개인정보처리방침</a>에 동의합니다.
+                                    <a href="terms-of-service.html" target="_blank">이용약관</a> · <a href="privacy-policy.html" target="_blank">개인정보처리방침</a>에 동의합니다.
                                 </span>
                             </label>
-
                         </div>
                         <p class="co-agree-err" id="agreeErr">필수 약관에 모두 동의해 주세요.</p>
 
@@ -620,51 +898,79 @@
 
             <!-- ── RIGHT: Plan Summary + Pay ── -->
             <aside class="co-summary">
-                <p class="co-section-title" style="margin-bottom:16px">선택한 플랜</p>
 
-                <div class="co-plan-card">
-                    <div class="co-plan-badge">
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                            <circle cx="5" cy="5" r="4" stroke="#00e5ff" stroke-width="1.5"/>
-                        </svg>
-                        <span id="planBadgeText">Monthly</span>
-                    </div>
-                    <h2 class="co-plan-name" id="planName">Basic</h2>
-                    <p class="co-plan-sub" id="planSub">처음 시작하는 분께 추천</p>
-                    <p class="co-plan-price">
-                        <span id="planPriceNum">49,000</span>
-                        <span>원 / 월</span>
-                    </p>
+                <!-- 플랜 카드 (그라디언트 헤더 + 본문) -->
+                <div class="co-plan-card" id="planCard">
+                    <div class="co-plan-hdr" id="planHdr">선택하신 플랜 확인</div>
+                    <div class="co-plan-body">
+                        <div class="co-plan-badge">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                <circle cx="5" cy="5" r="4" stroke="#00e5ff" stroke-width="1.5"/>
+                            </svg>
+                            <span id="planBadgeText">Monthly</span>
+                        </div>
+                        <h2 class="co-plan-name" id="planName">Basic</h2>
+                        <p class="co-plan-sub" id="planSub">처음 시작하는 분께 추천</p>
+                        <p class="co-plan-price">
+                            <span id="planPriceNum">49,000</span><span>원 / 월</span>
+                        </p>
+                        <ul class="co-plan-features" id="planFeatureList">
+                            <!-- JS로 채워짐 -->
+                        </ul>
+                        <div class="co-divider-thin" style="margin-top:18px"></div>
 
-                    <ul class="co-plan-features" id="planFeatureList">
-                        <!-- JS로 채워짐 -->
-                    </ul>
+                        <!-- 업그레이드 차액 내역 (Basic→Pro 시에만 표시) -->
+                        <div id="upgradeBreakdown" style="display:none; margin-bottom:4px;">
+                            <div class="co-price-row">
+                                <span class="co-price-row-label">Pro 정가</span>
+                                <span class="co-price-row-value">119,000원</span>
+                            </div>
+                            <div class="co-price-row">
+                                <span class="co-price-row-label">Basic 잔여 (<span id="upgradeUsedDays">-</span>일 사용)</span>
+                                <span class="co-price-row-value" id="upgradeRemainingAmt" style="color:var(--cyan)">-</span>
+                            </div>
+                        </div>
 
-                    <div class="co-divider-thin"></div>
+                        <div class="co-total-row">
+                            <span class="co-total-label">총 결제금액</span>
+                            <span class="co-total-value" id="totalPrice">49,000원</span>
+                        </div>
 
-                    <div class="co-price-row">
-                        <span class="co-price-row-label">플랜 금액</span>
-                        <span class="co-price-row-value" id="summaryPrice">49,000원</span>
-                    </div>
+                        <!-- 아코디언 토글 버튼 (결제하기 버튼 위) -->
+                        <button type="button" class="co-accordion-toggle" id="changePlanBtn">
+                            <span id="changePlanBtnText">Pro 플랜으로 변경하기</span>
+                            <svg class="co-accordion-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
 
-                    <div class="co-total-row">
-                        <span class="co-total-label">이 결제금액</span>
-                        <span class="co-total-value" id="totalPrice">49,000원</span>
-                    </div>
+                        <!-- 아코디언 패널 (다른 플랜 - 간략) -->
+                        <div class="co-accordion-panel" id="accordionPanel">
+                            <div class="co-alt-plan" id="altPlanCard">
+                                <div class="co-alt-plan-row">
+                                    <h3 class="co-alt-plan-name" id="altPlanName">Pro</h3>
+                                    <p class="co-alt-plan-price">
+                                        <span id="altPriceNum">119,000</span><span>원 / 월</span>
+                                    </p>
+                                </div>
+                                <ul class="co-alt-features" id="altFeatureList"></ul>
+                                <div class="co-divider-thin" style="margin-top:12px;margin-bottom:0"></div>
+                                <button type="button" class="co-switch-btn" id="switchPlanBtn">이 플랜으로 변경하기</button>
+                            </div>
+                        </div>
 
-                    <button class="co-pay-btn" id="payBtn" type="button">결제하기</button>
-
-                    <div class="co-pay-logos">
-                        <span>TossPay</span>
-                        <span>Stripe</span>
-                        <span>VISA</span>
-                        <span>Mastercard</span>
-                    </div>
-
-                    <div class="co-change-plan">
-                        <a href="index.html#pricing">다른 플랜으로 변경하기</a>
+                        <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);text-align:center;margin-top:20px;margin-bottom:0;line-height:1.5;">구매 버튼 클릭 시 매월 자동 결제에 동의하는 것으로 간주됩니다.</p>
+                        <button class="co-pay-btn" id="payBtn" type="button" style="margin-top:8px;">결제하기</button>
+                        <p class="co-secure-note">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            안전한 PG 결제 환경
+                        </p>
                     </div>
                 </div>
+
             </aside>
 
         </div>
@@ -769,6 +1075,7 @@
         </div>
     </footer>
 
+    <script src="ui.js"></script>
     <script type="module">
         import { supabase, getUser, signIn } from './supabase-auth.js';
 
@@ -812,13 +1119,11 @@
             const overlay = document.getElementById('loginModalOverlay');
             overlay.classList.add('active');
 
-            /* 비밀번호 토글 */
             document.getElementById('modalPwToggle').addEventListener('click', () => {
                 const input = document.getElementById('modalPassword');
                 input.type = input.type === 'password' ? 'text' : 'password';
             });
 
-            /* X버튼 / 뒤로가기 → 이전 페이지(또는 홈)으로 이동 */
             const goBack = () => {
                 if (history.length > 1) history.back();
                 else window.location.href = 'index.html';
@@ -826,7 +1131,6 @@
             document.getElementById('loginModalCloseBtn').addEventListener('click', goBack);
             document.getElementById('loginModalBackBtn').addEventListener('click', goBack);
 
-            /* 로그인 완료까지 대기 */
             currentUser = await new Promise(resolve => {
                 const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
                     if (session?.user) {
@@ -835,7 +1139,6 @@
                     }
                 });
 
-                /* 이메일 로그인 */
                 document.getElementById('modalLoginForm').addEventListener('submit', async e => {
                     e.preventDefault();
                     const email  = document.getElementById('modalEmail').value.trim();
@@ -847,14 +1150,12 @@
                     btn.disabled = true; btn.textContent = '로그인 중...';
                     try {
                         await signIn(email, pw);
-                        /* onAuthStateChange 에서 resolve 됨 */
                     } catch {
                         errEl.classList.add('show');
                         btn.disabled = false; btn.textContent = '로그인';
                     }
                 });
 
-                /* 카카오 로그인 (현재 페이지로 redirect) */
                 document.getElementById('modalKakaoBtn').addEventListener('click', async () => {
                     await supabase.auth.signInWithOAuth({
                         provider: 'kakao',
@@ -862,7 +1163,6 @@
                     });
                 });
 
-                /* Google 로그인 (현재 페이지로 redirect) */
                 document.getElementById('modalGoogleBtn').addEventListener('click', async () => {
                     await supabase.auth.signInWithOAuth({
                         provider: 'google',
@@ -874,34 +1174,241 @@
             overlay.classList.remove('active');
         }
 
+        /* ── 온보딩 미완료 가드 ── */
+        {
+            const { data: obProfile } = await supabase
+                .from('profiles')
+                .select('name, phone')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+            if (!obProfile?.name || !obProfile?.phone) {
+                window.location.href = `onboarding.html?redirect=${encodeURIComponent(window.location.href)}`;
+                await new Promise(() => {});
+            }
+        }
+
         /* ── 프로필 자동입력 ── */
         const { data: profile } = await supabase
             .from('profiles')
             .select('name, phone')
             .eq('id', currentUser.id)
             .single();
-        if (profile?.name)  document.getElementById('coName').value  = profile.name;
-        if (profile?.phone) document.getElementById('coPhone').value = profile.phone;
 
-        /* ── URL 파라미터에서 플랜 읽기 ── */
-        const params  = new URLSearchParams(location.search);
-        const planKey = PLANS[params.get('plan')] ? params.get('plan') : 'basic';
-        const plan    = PLANS[planKey];
+        /* 이메일 표시 */
+        document.getElementById('displayEmail').textContent = currentUser.email || '-';
+
+        /* 이름 */
+        const savedName = profile?.name || '';
+        document.getElementById('coName').value = savedName;
+        const nameValEl = document.getElementById('nameVal');
+        if (savedName) {
+            nameValEl.textContent = savedName;
+        } else {
+            nameValEl.textContent = '미입력';
+            nameValEl.classList.add('empty');
+        }
+
+        /* 연락처 */
+        const savedPhone = profile?.phone || '';
+        document.getElementById('coPhone').value = savedPhone;
+        const phoneValEl = document.getElementById('phoneVal');
+        if (savedPhone) {
+            phoneValEl.textContent = savedPhone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        } else {
+            phoneValEl.textContent = '미입력';
+            phoneValEl.classList.add('empty');
+        }
+
+        /* ── 수정 버튼 로직 ── */
+        function setupEditField({ valEl, inputEl, editBtn, confirmBtn, onExit, formatVal }) {
+            function enterEdit() {
+                valEl.style.display = 'none';
+                editBtn.style.display = 'none';
+                inputEl.style.display = 'block';
+                confirmBtn.style.display = 'inline-block';
+                inputEl.focus();
+                inputEl.select();
+            }
+
+            function exitEdit() {
+                const val = inputEl.value.trim();
+                if (onExit && !onExit(val)) return;
+                if (val) {
+                    valEl.textContent = formatVal ? formatVal(val) : val;
+                    valEl.classList.remove('empty');
+                } else {
+                    valEl.textContent = '미입력';
+                    valEl.classList.add('empty');
+                }
+                valEl.style.display = '';
+                editBtn.style.display = '';
+                inputEl.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                inputEl.classList.remove('error');
+            }
+
+            editBtn.addEventListener('click', enterEdit);
+            confirmBtn.addEventListener('click', exitEdit);
+            inputEl.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault(); exitEdit(); }
+                if (e.key === 'Escape') {
+                    inputEl.value = valEl.textContent !== '미입력' ? valEl.textContent : '';
+                    valEl.style.display = '';
+                    editBtn.style.display = '';
+                    inputEl.style.display = 'none';
+                    confirmBtn.style.display = 'none';
+                    inputEl.classList.remove('error');
+                }
+            });
+        }
+
+        setupEditField({
+            valEl:      document.getElementById('nameVal'),
+            inputEl:    document.getElementById('coName'),
+            editBtn:    document.getElementById('nameEditBtn'),
+            confirmBtn: document.getElementById('nameConfirmBtn'),
+        });
+
+        setupEditField({
+            valEl:      document.getElementById('phoneVal'),
+            inputEl:    document.getElementById('coPhone'),
+            editBtn:    document.getElementById('phoneEditBtn'),
+            confirmBtn: document.getElementById('phoneConfirmBtn'),
+            formatVal:  v => v.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'),
+        });
+
+        /* ── 현재 활성 구독 확인 ── */
+        const { data: subRows } = await supabase
+            .from('subscriptions')
+            .select('id, plan_type, started_at, created_at')
+            .eq('user_id', currentUser.id)
+            .eq('status', 'active')
+            .limit(1);
+        const activeSub     = subRows?.[0] ?? null;
+        const activeSubPlan = activeSub?.plan_type ?? null; // 'basic' | 'pro' | null
+
+        /* ── 헤더 텍스트 ── */
+        document.getElementById('planHdr').textContent =
+            activeSubPlan ? '현재 구독 플랜' : '선택하신 플랜 확인';
+
+        /* 구독 중일 때 플랜 설명 문구 숨김 */
+        if (activeSubPlan) {
+            document.getElementById('planSub').style.display = 'none';
+        }
+
+        /* ── 초기 플랜 키 결정 ── */
+        const params = new URLSearchParams(location.search);
+        let planKey = activeSubPlan ?? (PLANS[params.get('plan')] ? params.get('plan') : 'basic');
+        let plan    = PLANS[planKey];
+
+        /* ── 업그레이드 모드 ── */
+        let isUpgradeMode       = false;
+        let upgradeChargeAmount = 0;
+
+        function calcUpgradeAmount(startedAt) {
+            const now      = new Date();
+            const start    = new Date(startedAt);
+            const daysUsed = Math.max(1, Math.floor((now - start) / 86400000) + 1);
+            const remaining = Math.max(0, Math.round(49000 - (49000 / 30 * daysUsed)));
+            return { daysUsed, remaining, charge: 119000 - remaining };
+        }
+
+        function checkUpgradeMode() {
+            isUpgradeMode = activeSubPlan === 'basic' && planKey === 'pro';
+            const breakdownEl = document.getElementById('upgradeBreakdown');
+            const payBtn = document.getElementById('payBtn');
+            if (isUpgradeMode && activeSub) {
+                const baseDate = activeSub.started_at || activeSub.created_at;
+                const { daysUsed, remaining, charge } = calcUpgradeAmount(baseDate);
+                upgradeChargeAmount = charge;
+                document.getElementById('upgradeUsedDays').textContent    = daysUsed;
+                document.getElementById('upgradeRemainingAmt').textContent = `-${remaining.toLocaleString('ko-KR')}원`;
+                document.getElementById('totalPrice').textContent          = fmt(charge);
+                breakdownEl.style.display = 'block';
+                if (payBtn && !payBtn.disabled) payBtn.textContent = '업그레이드 결제하기';
+            } else {
+                upgradeChargeAmount = 0;
+                breakdownEl.style.display = 'none';
+                document.getElementById('totalPrice').textContent = fmt(plan.price);
+                if (payBtn && !payBtn.disabled) payBtn.textContent = '결제하기';
+            }
+        }
 
         /* ── 플랜 카드 렌더 ── */
         function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
 
-        document.getElementById('planBadgeText').textContent = plan.badge;
-        document.getElementById('planName').textContent      = plan.name;
-        document.getElementById('planSub').textContent       = plan.sub;
-        document.getElementById('planPriceNum').textContent  = plan.price.toLocaleString('ko-KR');
-        document.getElementById('summaryPrice').textContent  = fmt(plan.price);
-        document.getElementById('totalPrice').textContent    = fmt(plan.price);
+        function makeFeatList(listEl, features) {
+            listEl.innerHTML = '';
+            features.forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                listEl.appendChild(li);
+            });
+        }
 
-        plan.features.forEach(f => {
-            const li = document.createElement('li');
-            li.textContent = f;
-            document.getElementById('planFeatureList').appendChild(li);
+        function renderPlan(key) {
+            planKey = key;
+            plan    = PLANS[key];
+            const altKey  = key === 'basic' ? 'pro' : 'basic';
+            const altPlan = PLANS[altKey];
+
+            /* 현재 플랜 */
+            document.getElementById('planBadgeText').textContent = plan.badge;
+            document.getElementById('planName').textContent      = plan.name;
+            document.getElementById('planSub').textContent       = plan.sub;
+            document.getElementById('planPriceNum').textContent  = plan.price.toLocaleString('ko-KR');
+            document.getElementById('totalPrice').textContent    = fmt(plan.price);
+            makeFeatList(document.getElementById('planFeatureList'), plan.features);
+            document.getElementById('planCard').classList.toggle('is-pro', key === 'pro');
+
+            /* 아코디언 대체 플랜 */
+            document.getElementById('altPlanName').textContent = altPlan.name;
+            document.getElementById('altPriceNum').textContent = altPlan.price.toLocaleString('ko-KR');
+            document.getElementById('altPlanCard').classList.toggle('is-pro', altKey === 'pro');
+            makeFeatList(document.getElementById('altFeatureList'), altPlan.features.slice(0, 3));
+
+            /* 변경 버튼 업그레이드/다운그레이드 스타일 */
+            const switchBtn = document.getElementById('switchPlanBtn');
+            const isUpgrade = altKey === 'pro'; // Basic→Pro = 업그레이드
+            switchBtn.classList.toggle('upgrade', isUpgrade);
+            switchBtn.classList.toggle('downgrade', !isUpgrade);
+
+            /* 토글 버튼 텍스트: 구독 여부에 따라 방향 고정 */
+            let btnText;
+            if (activeSubPlan === 'basic') {
+                btnText = 'Pro 플랜으로 업그레이드';
+            } else if (activeSubPlan === 'pro') {
+                btnText = 'Basic 플랜으로 변경';
+            } else {
+                btnText = `${altPlan.name} 플랜으로 변경하기`;
+            }
+            document.getElementById('changePlanBtnText').textContent = btnText;
+
+            history.replaceState(null, '', `?plan=${key}`);
+            checkUpgradeMode();
+        }
+
+        renderPlan(planKey);
+
+        /* ── 아코디언 토글 ── */
+        const accordionToggle = document.getElementById('changePlanBtn');
+        const accordionPanel  = document.getElementById('accordionPanel');
+
+        accordionToggle.addEventListener('click', () => {
+            const isOpen = accordionPanel.classList.toggle('open');
+            accordionToggle.classList.toggle('open', isOpen);
+        });
+
+        /* ── 플랜 전환 (아코디언 내 버튼) ── */
+        document.getElementById('switchPlanBtn').addEventListener('click', () => {
+            const newKey = planKey === 'basic' ? 'pro' : 'basic';
+            renderPlan(newKey);
+            accordionPanel.classList.remove('open');
+            accordionToggle.classList.remove('open');
+            /* 구독 중: 방향이 고정돼 있으므로 선택 완료 후 토글 숨김 */
+            if (activeSubPlan) {
+                accordionToggle.style.display = 'none';
+            }
         });
 
         /* ── Mobile nav ── */
@@ -962,7 +1469,9 @@
                 document.getElementById('coPhone').classList.add('error');
                 ok = false;
             }
-            if (!document.getElementById('agreeTerms').checked) {
+            if (!document.getElementById('agreeAuto').checked ||
+                !document.getElementById('agreeRisk').checked ||
+                !document.getElementById('agreeTerms').checked) {
                 document.getElementById('agreeErr').classList.add('show');
                 ok = false;
             }
@@ -971,25 +1480,25 @@
 
         /* ── 결제하기 (빌링키 발급 방식) ── */
         document.getElementById('payBtn').addEventListener('click', async () => {
+            const payBtn = document.getElementById('payBtn');
+            if (payBtn.disabled) return;  /* 중복 클릭 방지 */
             if (!validateForm()) return;
 
-            const name   = sanitizeInput(document.getElementById('coName').value);
-            const phone  = document.getElementById('coPhone').value.trim();
-            const payBtn = document.getElementById('payBtn');
+            const name  = sanitizeInput(document.getElementById('coName').value);
+            const phone = document.getElementById('coPhone').value.trim();
             const termsAgreedAt = new Date().toISOString();
 
             payBtn.disabled    = true;
             payBtn.textContent = '카드 등록 중...';
 
             try {
-                /* 1. 빌링키 발급 (정기결제용 카드 등록) */
                 const issueId = `bitlogic-${planKey}-${Date.now()}`;
                 const response = await PortOne.requestIssueBillingKey({
-                    storeId:         PORTONE_STORE_ID,
-                    channelKey:      PORTONE_CHANNEL_KEY,
+                    storeId:          PORTONE_STORE_ID,
+                    channelKey:       PORTONE_CHANNEL_KEY,
                     billingKeyMethod: 'EASY_PAY',
                     issueId,
-                    issueName:       `BitLogic ${plan.name} 정기결제`,
+                    issueName:        `BitLogic ${plan.name} 정기결제`,
                     customer: {
                         customerId:  currentUser.id,
                         fullName:    name,
@@ -1004,7 +1513,6 @@
 
                 const billingKey = response.billingKey;
 
-                /* 2. 프로필 저장 */
                 const { error: profileErr } = await supabase
                     .from('profiles')
                     .upsert({
@@ -1015,49 +1523,59 @@
                     });
                 if (profileErr && profileErr.code !== '23505') throw profileErr;
 
-                /* 3. 구독 레코드 생성 (status: pending) */
-                const { data: subData, error: subErr } = await supabase
-                    .from('subscriptions')
-                    .insert({
-                        user_id:     currentUser.id,
-                        plan_type:   planKey,
-                        billing_key: billingKey,
-                        amount:      plan.price,
-                        status:      'pending',
-                    })
-                    .select('id')
-                    .single();
-                if (subErr) throw subErr;
+                /* 업그레이드: 기존 구독 ID 재사용 / 일반: 새 구독 행 생성 */
+                let subId;
+                if (isUpgradeMode) {
+                    subId = activeSub.id;
+                } else {
+                    const { data: subData, error: subErr } = await supabase
+                        .from('subscriptions')
+                        .insert({
+                            user_id:     currentUser.id,
+                            plan_type:   planKey,
+                            billing_key: billingKey,
+                            amount:      plan.price,
+                            status:      'pending',
+                        })
+                        .select('id')
+                        .single();
+                    if (subErr) throw subErr;
+                    subId = subData.id;
+                }
 
-                /* 4. 서버(/api/charge)로 실제 결제 요청 */
                 payBtn.textContent = '결제 처리 중...';
+                const chargeBody = {
+                    storeId:        PORTONE_STORE_ID,
+                    billingKey,
+                    subscriptionId: subId,
+                    userId:         currentUser.id,
+                    planType:       planKey,
+                    customerName:   name,
+                    customerEmail:  currentUser.email,
+                };
+                if (isUpgradeMode) {
+                    chargeBody.isUpgrade     = true;
+                    chargeBody.planStartedAt = activeSub.started_at || activeSub.created_at;
+                }
                 const chargeRes = await fetch('/api/charge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        billingKey,
-                        subscriptionId: subData.id,
-                        userId:         currentUser.id,
-                        planType:       planKey,
-                        amount:         plan.price,
-                        customerName:   name,
-                        customerEmail:  currentUser.email,
-                    }),
+                    body: JSON.stringify(chargeBody),
                 });
 
                 const chargeData = await chargeRes.json();
                 if (!chargeRes.ok) throw new Error(chargeData.error || '결제 실패');
 
-                window.location.href = `success.html?plan=${planKey}&sub=${subData.id}`;
+                window.location.href = `success.html?plan=${planKey}&sub=${subId}`;
 
             } catch (err) {
-                alert('오류: ' + (err.message || '다시 시도해 주세요.'));
+                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 payBtn.disabled    = false;
                 payBtn.textContent = '결제하기';
             }
         });
 
-        // Nav scroll: transparent at top → dark when scrolled
+        /* ── Nav scroll ── */
         (() => {
             const nav = document.querySelector('.nav');
             if (!nav) return;

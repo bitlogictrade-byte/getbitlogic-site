@@ -53,11 +53,11 @@ function setupFaq() {
     });
 }
 
-/* Nav scroll: transparent at top → dark when scrolled (Netflix style) */
+/* Nav scroll: transparent at top (hero only) → dark when scrolled */
 function setupNavScroll() {
     const nav = document.querySelector('.nav');
     if (!nav) return;
-    const update = () => nav.classList.toggle('scrolled', window.scrollY > 10);
+    const update = () => nav.classList.toggle('at-top', window.scrollY <= 10);
     update();
     window.addEventListener('scroll', update, { passive: true });
 }
