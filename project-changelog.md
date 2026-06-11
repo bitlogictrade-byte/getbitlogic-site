@@ -2,6 +2,278 @@
 
 ---
 
+## 2026-06-11 (87차)
+
+### mypage.html UI/UX 개편
+
+**수정 파일:** `mypage.html`
+
+**1. 비밀번호 변경 → 아코디언**
+- "비밀번호 변경" 섹션을 클릭 시 펼쳐지는 아코디언으로 변경
+- 기본 상태: 접힘 / 클릭 시 chevron 회전 + 폼 표시
+
+**2. 계정 관리 섹션 로그아웃 버튼 제거**
+- 계정 관리 섹션에서 로그아웃 버튼 삭제
+- nav 드롭다운 및 모바일 nav 로그아웃 버튼은 그대로 유지
+
+**3. 회원탈퇴 → 아코디언**
+- "계정 관리" 섹션 내 회원탈퇴를 아코디언으로 변경
+- 열면 안내 문구 + 탈퇴하기 버튼 표시
+
+**4. 구독 상태별 플랜 버튼 분기**
+- 미구독/해지: '플랜 구매하기' → `checkout.html`
+- Basic 구독 중: '플랜 업그레이드' → `checkout.html?plan=pro`
+- Pro 구독 중: 'Pro 구독 중 ✦' → 클릭 시 Basic 다운그레이드 모달
+- Pro 다운그레이드 예약 중: 'Basic으로 변경 예정' (disabled)
+- 구독 해지 시 planActionBtn도 즉시 '플랜 구매하기'로 업데이트
+
+**5. TradingView ID 섹션 개편 (3회 수정 제한)**
+- 최초 입력 전: 중앙 안내문 표시 + 경고 없이 바로 입력 가능
+  > "처음 입력하는 TradingView ID는 신중하게 입력해주세요. 이후 최대 3회만 수정 가능합니다."
+- 설정 후 수정 시: "⚠ TradingView ID를 변경합니다. 남은 수정 횟수: N회" 경고 표시
+- 3회 초과 시: 수정 폼 숨김, "수정 불가" 메시지 표시
+- 최초 저장은 `tv_change_count` 미증가, 이후 수정마다 +1
+
+> **DB 마이그레이션 필요 (Supabase SQL):**
+> ```sql
+> ALTER TABLE profiles ADD COLUMN IF NOT EXISTS tv_change_count integer DEFAULT 0;
+> UPDATE profiles SET tv_change_count = 1 WHERE tv_id_changed = true;
+> ```
+
+---
+
+## 2026-06-11 (86차)
+
+### 4가지 버그 수정 및 개선
+
+**수정 파일:** `admin.html`, `checkout.html`
+
+**1. admin.html — 어드민 페이지 로딩 시 튕기는 문제 수정**
+- `init()` 함수에서 `getUser()` (서버 네트워크 콜) 대신 `getSession()` (localStorage 기반, 토큰 자동 갱신) 사용
+- 이전: `getUser()` 응답 지연/실패 시 로그인 유저도 login.html로 튕겨나감
+- 이후: 세션 없을 때만 login으로, 어드민 권한 없을 때만 index로, 기타 오류는 안내 문구 표시
+
+**2. checkout.html — subscriptions status pending 제거**
+- 결제 시 구독 행 생성 시 `status: 'pending'` → `status: 'active'`로 변경
+- 결제 API(/api/charge) 성공 후 `started_at`, `next_billing_at`이 업데이트됨
+- 결제 실패 시 생성된 orphan 구독 행 자동 삭제 추가
+- 향후 무통장입금 등 수동 확인 결제 추가를 위한 TODO 주석 추가
+
+**3. localhost URL 교체 — 변경 없음**
+- 전체 코드베이스 검색 결과 `127.0.0.1:5500` / `localhost` URL 미발견, 이미 정리된 상태
+
+**4. checkout.html — 모바일 주문정보 위치 변경**
+- 모바일에서만: 플랜카드 → 주문정보(폼) → 결제 버튼 순서로 변경
+- 데스크탑: 기존 2컬럼 레이아웃(좌: 주문정보, 우: 플랜카드+결제버튼) 유지
+- 구현: pay 버튼/안전결제/TV안내 영역을 plan card 밖 `co-pay-section`으로 분리
+- `co-summary`에 `display: contents` 적용(모바일만) + CSS `order` 속성으로 순서 제어
+
+---
+
+## 2026-06-11 (85차)
+
+### admin.html — 테스트 결제 탭 추가
+
+**수정 파일:** `admin.html`
+
+**변경 내용:**
+- `<head>`에 포트원 v2 브라우저 SDK (`cdn.portone.io/v2/browser-sdk.js`) 로드 추가
+- 탭 네비게이션에 "테스트 결제" 탭 버튼 추가
+- 테스트 결제 탭 패널 추가:
+  - 채널키 선택 라디오 그리드 (KAKAO, KG, KPN, KG_AUTH 4개 채널)
+  - 119,000원 고정 금액 표시 박스
+  - "결제 실행" 버튼 (채널 미선택 시 비활성)
+  - 타임스탬프 + 성공/실패/취소/정보 배지를 포함한 결제 로그 영역
+  - 로그 지우기 버튼
+- `allChannelKeys` 전역 변수 추가 — `loadChannelKeys`에서 저장하여 탭 간 데이터 공유
+- `renderTestChannelGrid()` 함수 — `allChannelKeys`에서 4개 채널만 필터링하여 렌더링
+- `addLog()` 함수 — success/error/cancel/info 타입별 로그 엔트리 추가
+- 테스트 결제 버튼 핸들러 — `PortOne.requestPayment()` 호출, 응답 코드로 성공/취소/실패 구분
+- `setupTabs`에서 테스트 결제 탭 전환 시 `renderTestChannelGrid()` 자동 호출
+- 테스트 결제 관련 CSS 스타일 추가 (amount-box, test-pay-btn, test-pay-log, log-entry 등)
+
+---
+
+## 2026-06-11 (84차)
+
+### index.html — FAQ 문구 삭제 / Pro footer-note 삭제 / OG 태그 추가
+
+**수정 파일:** `index.html`
+
+**변경 내용:**
+- FAQ "어떤 코인, 어떤 타임프레임" 답변에서 `Pro 플랜에서는 멀티 타임프레임 분석 도구가 추가 제공됩니다.` 문장 삭제
+- Pro 플랜 카드 하단 `<p class="plan-footer-note">` 태그 삭제
+- `<head>` 내 OG 메타 태그 6개 추가 (og:type, og:url, og:title, og:description, og:image, twitter:card)
+
+---
+
+## 2026-06-11 (83차)
+
+### style.css — .copy-bridge 상하 여백 추가 확대
+
+**수정 파일:** `style.css`
+
+**변경 내용:**
+- `.copy-bridge` padding: `96px 24px` → `140px 24px` (상하 140px으로 확대)
+
+---
+
+## 2026-06-11 (82차)
+
+### style.css — .copy-bridge 상하 여백 확대
+
+**수정 파일:** `style.css`
+
+**변경 내용:**
+- `.copy-bridge` padding: `48px 24px 32px` → `96px 24px` (상하 96px으로 통일)
+
+---
+
+## 2026-06-11 (81차)
+
+### index.html / style.css — TRUST 섹션 신규 추가
+
+**수정 파일:** `index.html`, `style.css`
+
+**변경 내용:**
+- COPY BRIDGE와 PRICING 사이에 `<!-- TRUST -->` 섹션 삽입 (PF 3.4+, 수백 회, 즉시 활성화 3개 통계)
+- style.css에 `.trust-section` 관련 스타일 전체 추가 (`.trust-eyebrow`, `.trust-title`, `.trust-stats`, `.trust-stat`, `.trust-stat-num`, `.trust-stat-label`, 모바일 미디어쿼리 포함)
+
+---
+
+## 2026-06-11 (80차)
+
+### index.html / style.css — pricing 섹션 배지·popular-badge·plan-footer-note 추가
+
+**수정 파일:** `index.html`, `style.css`
+
+**변경 내용:**
+- Pro 탭 버튼에 `plan-tab-badge` ("추천") 스팬 추가
+- Pro plan-info-top에 `popular-badge` ("Most Popular") 추가
+- Pro 결제하기 버튼 아래 `plan-footer-note` 문구 추가
+- style.css: `.plan-tab`에 `position: relative` 추가
+- style.css: `.plan-tab-badge`, `.popular-badge`, `.plan-footer-note` 신규 추가
+- style.css: `.plan-desc` — `margin-bottom` 제거 후 `padding`·`border-top/bottom` 방식으로 교체
+
+---
+
+## 2026-06-11 (79차)
+
+### index.html / style.css — pricing 섹션 plan-sub 문구 수정 및 plan-desc 추가
+
+**수정 파일:** `index.html`, `style.css`
+
+**변경 내용:**
+- Basic plan-sub: "처음 시작하는 분께 추천" → "추세 흐름을 읽고 싶은 분께"
+- Basic plan-price 아래 `.plan-desc` 설명 문구 삽입
+- Pro plan-sub: "적극적인 트레이더를 위한 플랜" → "흔들리는 구간, 직접 확인하고 싶은 분께"
+- Pro plan-price 아래 `.plan-desc` 설명 문구 삽입
+- style.css에 `.plan-desc` 스타일 추가 (0.85rem, line-height 1.75, rgba(255,255,255,0.5))
+
+---
+
+## 2026-06-11 (78차)
+
+### index.html — pricing/features 섹션 문구 수정
+
+**수정 파일:** `index.html`
+
+**변경 내용:**
+- Basic 플랜 기능 리스트 3개 항목 교체 (비트로직 알고리즘 인디케이터 → 추세 흐름 시각화, 신호→노이즈 표현 통일, 차트 레이아웃 → 단일 차트 구성)
+- Pro 플랜 기능 리스트 4개 항목 교체 (노이즈 필터 제거 후 "Basic 플랜 전체 포함" 추가, 거래 시간대 분석 → 세션별 가격 구간, 프리미엄 알고리즘 → PF 3.4 이상 검증 전략 기반 알고리즘)
+- features 섹션 "느낌이 아닌 수치로 판단하세요." → "느낌이 아닌 수치로 확인하세요."
+
+---
+
+## 2026-06-11 (77차)
+
+### index.html — FAQ 섹션 전면 교체
+
+**수정 파일:** `index.html`
+
+**변경 내용:**
+- 기존 6개 FAQ 항목을 새 내용으로 전면 교체
+- 질문 재구성: "비트로직은 어떤 서비스인가요?", "초보자도 괜찮나요?", "언제부터 사용할 수 있나요?", "어떤 코인/타임프레임?", "소프트웨어 활용법", "환불 규정"
+- 문구 전반 간결화 및 서비스 성격(소프트웨어 라이선스) 명확화
+- 환불 항목에 환불정책 페이지 링크 추가
+
+---
+
+## 2026-06-11 (76차)
+
+### refund-policy.html — 환불 정책 본문 전면 교체
+
+**수정 파일:** `refund-policy.html`
+
+- `<main class="policy-wrap">` 본문 전체를 새 내용으로 교체
+- 각 섹션 제목 및 문구 간결화 (법적 효력 유지, 불필요한 중복 표현 제거)
+- NAV, FOOTER, `<style>` 태그 유지
+
+---
+
+## 2026-06-11 (75차)
+
+### style.css / index.html — hero-desc 모바일 폰트 및 줄바꿈 개선
+
+**수정 파일:** `style.css`, `index.html`
+
+- `@media (max-width: 560px)`에 `.hero-desc { font-size: 0.82rem; }` 추가
+- `index.html` hero-desc 문구의 하드코딩 `<br>` 제거 → CSS 자연 줄바꿈으로 변경
+
+---
+
+## 2026-06-11 (74차)
+
+### style.css — hero-title font-size 및 hero-cta 버튼 원복
+
+**수정 파일:** `style.css`
+
+- `.hero-title` font-size `clamp(2rem, 5vw, 64px)` → `clamp(2rem, 9vw, 96px)` 원복 (롤링 텍스트 너무 작아짐)
+- `.hero-cta .btn-primary` 커스텀 패딩 규칙 제거 (버튼 너무 작아짐)
+
+---
+
+## 2026-06-11 (73차)
+
+### style.css — hero-cta .btn-primary 사이즈 보강
+
+**수정 파일:** `style.css`
+
+- `.hero-cta .btn-primary` 규칙 추가: `min-width: 220px; padding: 0 48px` (CTA 버튼 최소 너비 및 좌우 패딩 확보)
+
+---
+
+## 2026-06-11 (72차)
+
+### style.css / index.html — hero 섹션 타이틀 사이즈 조정 및 CTA 구조 변경
+
+**수정 파일:** `style.css`, `index.html`
+
+- `.hero-title` font-size를 `clamp(2rem, 9vw, 96px)` → `clamp(2rem, 5vw, 64px)` 로 변경 (모바일 최소값 유지, 데스크탑 과도한 확대 방지)
+- `.hero-cta` flex 방향을 column으로 변경 (버튼 + 텍스트 링크 수직 배치)
+- `.btn-ghost` "서비스 알아보기" 버튼 제거
+- `#features` 앵커 텍스트 링크(`.hero-text-link`) 추가: "서비스 더 알아보기" + 화살표 아이콘
+- `.hero-text-link` 스타일 신규 추가 (반투명 흰색, hover 시 밝아짐)
+
+---
+
+## 2026-06-11 (71차)
+
+### index.html / mypage.html — 어드민 계정 nav 드롭다운에 어드민 링크 추가
+
+**수정 파일:** `index.html`, `mypage.html`
+
+- nav 드롭다운에 `#navAdminLink` 항목 추가 (기본 `display:none`)
+- 로그인 사용자 이메일이 `admin@getbitlogic.com`일 때만 자동 표시 (자물쇠 아이콘 + 시안 컬러)
+- `/admin` 직접 입력 없이 드롭다운에서 바로 이동 가능
+
+---
+
+## 2026-06-11 (70차)
+- **style.css** `.hero-title` font-size를 `clamp(1.6rem, 6.5vw, 80px)` → `clamp(2rem, 9vw, 96px)` 로 변경
+
+---
+
 ## 2026-06-11 (69차)
 
 ### admin.html / api/admin.js / 404.html — 어드민 대시보드 및 404 페이지 신규 추가

@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
     <style>
         /* ── 어드민 레이아웃 ── */
         .admin-wrap {
@@ -417,6 +418,86 @@
             color: var(--muted);
         }
 
+        /* ── 테스트 결제 ── */
+        .test-amount-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            background: rgba(0,229,255,0.05);
+            border: 1px solid rgba(0,229,255,0.15);
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        .test-amount-label {
+            font-size: 0.78rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .test-amount-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+            flex: 1;
+        }
+        .test-amount-note {
+            font-size: 0.7rem;
+            color: #555;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 3px 9px;
+        }
+        .test-pay-btn {
+            padding: 12px 36px;
+            background: var(--grad-btn);
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .test-pay-btn:hover { opacity: 0.85; }
+        .test-pay-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .test-pay-log {
+            background: #070707;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            min-height: 120px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 14px 16px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .log-empty { color: #444; font-style: italic; font-family: inherit; }
+        .log-entry {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        .log-time { color: #555; flex-shrink: 0; }
+        .log-badge {
+            flex-shrink: 0;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .log-badge.success { background: rgba(52,199,89,0.2); color: #34c759; }
+        .log-badge.error   { background: rgba(250,87,87,0.2);  color: #fa5757; }
+        .log-badge.info    { background: rgba(255,255,255,0.08); color: #999; }
+        .log-badge.cancel  { background: rgba(255,200,0,0.15); color: #ffc800; }
+        .log-msg { color: #ccc; }
+
         /* ── 반응형 ── */
         @media (max-width: 640px) {
             .admin-main { padding: 20px 16px; }
@@ -461,6 +542,7 @@
         <button class="admin-tab" data-tab="subscribers">구독자 목록</button>
         <button class="admin-tab" data-tab="tv-invite">TV 수동 초대</button>
         <button class="admin-tab" data-tab="payments">결제 내역</button>
+        <button class="admin-tab" data-tab="test-payment">테스트 결제</button>
     </nav>
 
     <!-- 메인 콘텐츠 -->
@@ -574,6 +656,39 @@
             </div>
         </div>
 
+        <!-- ── 탭 5: 테스트 결제 ── -->
+        <div id="tab-test-payment" class="tab-panel">
+            <p class="panel-title">테스트 결제</p>
+            <p class="panel-desc">포트원 테스트 모드로 결제 채널 동작을 확인합니다. 테스트 채널키가 설정된 경우 실제 결제가 발생하지 않습니다.</p>
+
+            <div class="admin-card">
+                <p class="admin-card-title">채널 선택</p>
+                <div class="channel-key-grid" id="testChannelGrid">
+                    <div style="color:#555;font-size:0.82rem;">채널키를 불러오는 중...</div>
+                </div>
+            </div>
+
+            <div class="admin-card" style="margin-top:0;">
+                <p class="admin-card-title">결제 정보</p>
+                <div class="test-amount-box">
+                    <span class="test-amount-label">결제 금액</span>
+                    <span class="test-amount-value">119,000원</span>
+                    <span class="test-amount-note">테스트 고정금액</span>
+                </div>
+                <button class="test-pay-btn" id="testPayBtn" disabled>결제 실행</button>
+            </div>
+
+            <div class="admin-card" style="margin-top:0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <p class="admin-card-title" style="margin-bottom:0;">결제 로그</p>
+                    <button class="refresh-btn" id="clearLogBtn" style="font-size:0.75rem;">로그 지우기</button>
+                </div>
+                <div id="testPayLog" class="test-pay-log">
+                    <p class="log-empty">결제 실행 후 결과가 여기에 표시됩니다.</p>
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
 
@@ -581,9 +696,11 @@
 <script type="module">
 import { supabase, getUser, signOut } from './supabase-auth.js';
 
+const PORTONE_STORE_ID = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
 let authToken = '';
 let allSubscribers = [];
 let allPayments = [];
+let allChannelKeys = {};
 
 /* ── 날짜 포맷 ── */
 function fmtDate(iso) {
@@ -618,25 +735,32 @@ async function adminApi(action, body = null) {
 
 /* ── 인증 및 초기화 ── */
 async function init() {
-    const user = await getUser();
-    if (!user) {
+    // getSession()은 localStorage 기반으로 즉시 응답 + 만료 시 자동 갱신
+    // getUser()는 서버 네트워크 콜이라 느리고, 응답 지연 시 무조건 login으로 튕기는 문제 있음
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
         window.location.href = 'login.html?redirect=admin.html';
         return;
     }
 
-    const { data: { session } } = await supabase.auth.getSession();
-    authToken = session?.access_token || '';
+    authToken = session.access_token;
 
     try {
         await adminApi('verify');
-    } catch {
-        window.location.href = 'index.html';
+    } catch (err) {
+        // 403: 어드민 권한 없음 → 홈으로. 그 외 네트워크 오류 등은 재시도 유도
+        if (err.message?.includes('403') || err.message?.includes('권한')) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('pageLoading').querySelector('p').textContent =
+                '인증 확인 실패. 페이지를 새로고침 해주세요.';
+        }
         return;
     }
 
     document.getElementById('pageLoading').style.display = 'none';
     document.getElementById('adminApp').style.display = 'flex';
-    document.getElementById('adminEmail').textContent = user.email;
+    document.getElementById('adminEmail').textContent = session.user.email;
 
     setupTabs();
     setupLogout();
@@ -655,6 +779,7 @@ function setupTabs() {
             document.getElementById(`tab-${tabId}`).classList.add('active');
 
             if (tabId === 'payments' && allPayments.length === 0) loadPayments();
+            if (tabId === 'test-payment') renderTestChannelGrid();
         });
     });
 }
@@ -676,6 +801,7 @@ let selectedChannelKey = '';
 async function loadChannelKeys() {
     try {
         const { keys, activeKey } = await adminApi('get-channel-keys');
+        allChannelKeys = keys;
         selectedChannelKey = activeKey;
         renderChannelKeys(keys, activeKey);
     } catch (e) {
@@ -965,6 +1091,121 @@ function setTableError(tbodyId, cols, msg) {
     document.getElementById(tbodyId).innerHTML =
         `<tr class="empty-row"><td colspan="${cols}" style="color:#fa5757;">오류: ${escHtml(msg)}</td></tr>`;
 }
+
+/* ────────────────────────────
+   테스트 결제 탭
+──────────────────────────── */
+const TEST_CHANNEL_IDS = ['KAKAO', 'KG', 'KPN', 'KG_AUTH'];
+let testSelectedChannelKey = '';
+let testSelectedChannelId = '';
+
+function renderTestChannelGrid() {
+    const grid = document.getElementById('testChannelGrid');
+    const payBtn = document.getElementById('testPayBtn');
+
+    if (!Object.keys(allChannelKeys).length) {
+        grid.innerHTML = '<div style="color:#555;font-size:0.82rem;">채널키 정보를 먼저 불러오세요. (채널키 탭 방문 후 다시 시도)</div>';
+        return;
+    }
+
+    const entries = Object.entries(allChannelKeys).filter(([id]) => TEST_CHANNEL_IDS.includes(id));
+
+    grid.innerHTML = entries.map(([id, { label, value }]) => {
+        const isConfigured = !!value;
+        const displayVal = value ? value.slice(0, 20) + '...' : '환경변수 미설정';
+        const isSelected = value && value === testSelectedChannelKey;
+        return `
+            <div class="channel-key-option">
+                <input type="radio" name="testChannelKey" id="tck-${id}" value="${escHtml(value)}"
+                    data-id="${id}" ${isSelected ? 'checked' : ''} ${!isConfigured ? 'disabled' : ''}>
+                <label for="tck-${id}" class="channel-key-label">
+                    <span class="channel-key-name">
+                        <span class="dot"></span>${escHtml(label)}
+                    </span>
+                    <span class="channel-key-val ${isConfigured ? 'configured' : 'not-configured'}">${escHtml(displayVal)}</span>
+                </label>
+            </div>`;
+    }).join('');
+
+    grid.querySelectorAll('input[name="testChannelKey"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            testSelectedChannelKey = radio.value;
+            testSelectedChannelId  = radio.dataset.id;
+            payBtn.disabled = !testSelectedChannelKey;
+        });
+    });
+
+    payBtn.disabled = !testSelectedChannelKey;
+}
+
+function addLog(type, message) {
+    const logEl = document.getElementById('testPayLog');
+    const empty = logEl.querySelector('.log-empty');
+    if (empty) empty.remove();
+
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 8);
+    const labelMap = { success: '성공', error: '실패', info: '정보', cancel: '취소' };
+
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `<span class="log-time">${time}</span><span class="log-badge ${type}">${labelMap[type] || type}</span><span class="log-msg">${escHtml(message)}</span>`;
+    logEl.appendChild(entry);
+    logEl.scrollTop = logEl.scrollHeight;
+}
+
+document.getElementById('testPayBtn').addEventListener('click', async () => {
+    if (!testSelectedChannelKey) return;
+
+    const btn = document.getElementById('testPayBtn');
+    btn.disabled = true;
+    btn.textContent = '결제 창 열리는 중...';
+
+    const paymentId = `test-admin-${Date.now()}`;
+    const channelLabel = allChannelKeys[testSelectedChannelId]?.label || testSelectedChannelId;
+
+    addLog('info', `결제 요청 시작 — 채널: ${channelLabel}, paymentId: ${paymentId}`);
+
+    const payOptions = {
+        storeId:     PORTONE_STORE_ID,
+        channelKey:  testSelectedChannelKey,
+        paymentId,
+        orderName:   'BitLogic 테스트 결제 (관리자)',
+        totalAmount: 119000,
+        currency:    'KRW',
+        customer: { fullName: '어드민 테스트' },
+    };
+
+    if (testSelectedChannelId === 'KAKAO') {
+        payOptions.payMethod = 'EASY_PAY';
+        payOptions.easyPay   = { easyPayProvider: 'KAKAOPAY' };
+    } else {
+        payOptions.payMethod = 'EASY_PAY';
+    }
+
+    try {
+        const resp = await PortOne.requestPayment(payOptions);
+
+        if (resp?.code) {
+            if (resp.code === 'USER_CANCEL') {
+                addLog('cancel', `결제 취소 — ${resp.message || '사용자가 결제를 취소했습니다.'}`);
+            } else {
+                addLog('error', `결제 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
+            }
+        } else {
+            addLog('success', `결제 성공 — paymentId: ${resp?.paymentId || paymentId}, txId: ${resp?.txId || '—'}`);
+        }
+    } catch (err) {
+        addLog('error', `오류 발생 — ${err.message || String(err)}`);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '결제 실행';
+});
+
+document.getElementById('clearLogBtn').addEventListener('click', () => {
+    document.getElementById('testPayLog').innerHTML = '<p class="log-empty">결제 실행 후 결과가 여기에 표시됩니다.</p>';
+});
 
 init();
 </script>

@@ -299,6 +299,59 @@
             .mypage-title { font-size: 1.7rem; }
             .tv-notice-text { font-size: 0.82rem; }
         }
+        /* Accordion */
+        .accordion-header {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .accordion-header .section-title { margin-bottom: 0; }
+        .accordion-chevron {
+            color: #4a8aaa;
+            transition: transform 0.25s;
+            flex-shrink: 0;
+        }
+        .accordion-header[aria-expanded="true"] .accordion-chevron { transform: rotate(180deg); }
+        .accordion-body { display: none; padding-top: 20px; }
+        .accordion-body.open { display: block; }
+        /* TV ID first-input notice */
+        .tv-first-notice {
+            padding: 18px 0 4px;
+            font-size: 0.83rem;
+            color: #a0b8cc;
+            line-height: 1.65;
+            text-align: center;
+        }
+        /* Plan action button */
+        .plan-action-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.2s;
+            border: none;
+        }
+        .plan-action-btn.buy, .plan-action-btn.upgrade {
+            background: linear-gradient(135deg, #00b4cc, #0099aa);
+            color: #fff;
+        }
+        .plan-action-btn.pro-active {
+            background: linear-gradient(135deg, rgba(91,45,232,0.18), rgba(91,45,232,0.38));
+            border: 1px solid #5b2de8;
+            color: #c0a0ff;
+        }
+        .plan-action-btn:hover { opacity: 0.85; }
+        .plan-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -343,6 +396,10 @@
                         <a href="mypage.html" class="nav-dropdown-item">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                             마이페이지
+                        </a>
+                        <a href="admin.html" class="nav-dropdown-item" id="navAdminLink" style="display:none;color:var(--cyan);">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            어드민
                         </a>
                         <button class="nav-dropdown-item nav-logout-btn" id="navLogoutBtn">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -444,72 +501,90 @@
                     <span class="info-label"></span>
                     <button class="cancel-sub-btn" id="cancelSubBtn">구독 해지</button>
                 </div>
-                <div class="info-row">
+                <div class="info-row" id="planActionRow">
                     <span class="info-label"></span>
-                    <a href="index.html#pricing" class="plan-upgrade-btn">플랜 업그레이드</a>
+                    <button class="plan-action-btn buy" id="planActionBtn">플랜 구매하기</button>
                 </div>
             </div>
 
             <!-- TradingView ID -->
             <div class="mypage-section" id="tvIdSection">
                 <p class="section-title">TradingView 아이디</p>
-                <div class="info-row">
+                <!-- 현재 아이디 (설정된 경우만 표시) -->
+                <div class="info-row" id="tvIdDisplayRow" style="display:none;">
                     <span class="info-label">현재 아이디</span>
                     <span class="info-value" id="tvIdDisplay">—</span>
                 </div>
-                <!-- 수정 가능한 경우에만 표시 -->
+                <!-- 최초 입력 안내 (미설정 시 중앙 표시) -->
+                <p class="tv-first-notice" id="tvFirstNotice" style="display:none;">
+                    처음 입력하는 TradingView ID는 신중하게 입력해주세요.<br>이후 최대 3회만 수정 가능합니다.
+                </p>
+                <!-- 입력 / 수정 폼 -->
                 <div id="tvIdEditWrap" style="display:none; margin-top:16px;">
-                    <p style="font-size:0.78rem;color:#f0a500;margin-bottom:12px;">⚠ 1회 수정 가능합니다. 신중하게 입력해 주세요.</p>
+                    <p id="tvIdEditWarning" style="font-size:0.78rem;color:#f0a500;margin-bottom:12px;display:none;"></p>
                     <div style="display:flex;gap:10px;align-items:flex-start;">
                         <input type="text" id="tvIdEditInput" class="pw-input"
-                            placeholder="새 TradingView 아이디" style="flex:1;" maxlength="50">
-                        <button class="pw-save-btn" id="tvIdSaveBtn" style="white-space:nowrap;">수정 저장</button>
+                            placeholder="TradingView 아이디" style="flex:1;" maxlength="50">
+                        <button class="pw-save-btn" id="tvIdSaveBtn" style="white-space:nowrap;">저장</button>
                     </div>
                     <span style="font-size:0.72rem;color:#4a6070;margin-top:6px;display:block;">대소문자를 정확히 입력해 주세요.</span>
                 </div>
-                <p id="tvIdLockedMsg" style="display:none;font-size:0.78rem;color:#6a8aaa;margin-top:12px;">수정 기회가 사용되었습니다.</p>
+                <!-- 수정 불가 메시지 -->
+                <p id="tvIdLockedMsg" style="display:none;font-size:0.78rem;color:#6a8aaa;margin-top:12px;">수정 불가 (최대 3회 변경을 모두 사용했습니다.)</p>
             </div>
 
             <!-- 비밀번호 변경 (이메일 로그인 시에만 표시) -->
             <div class="mypage-section" id="pwChangeSection">
-                <p class="section-title">비밀번호 변경</p>
-                <form class="pw-section-form" id="pwChangeForm" novalidate>
-                    <div class="pw-form-group">
-                        <label class="pw-label" for="newPassword">새 비밀번호</label>
-                        <div class="pw-input-wrap">
-                            <input type="password" id="newPassword" class="pw-input" placeholder="새 비밀번호 (8자 이상)" autocomplete="new-password">
-                            <button type="button" class="pw-toggle" aria-label="비밀번호 보기">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
+                <button class="accordion-header" id="pwAccordionBtn" aria-expanded="false">
+                    <span class="section-title" style="margin-bottom:0;">비밀번호 변경</span>
+                    <svg class="accordion-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="accordion-body" id="pwAccordionBody">
+                    <form class="pw-section-form" id="pwChangeForm" novalidate>
+                        <div class="pw-form-group">
+                            <label class="pw-label" for="newPassword">새 비밀번호</label>
+                            <div class="pw-input-wrap">
+                                <input type="password" id="newPassword" class="pw-input" placeholder="새 비밀번호 (8자 이상)" autocomplete="new-password">
+                                <button type="button" class="pw-toggle" aria-label="비밀번호 보기">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="pw-form-group">
-                        <label class="pw-label" for="confirmPassword">새 비밀번호 확인</label>
-                        <div class="pw-input-wrap">
-                            <input type="password" id="confirmPassword" class="pw-input" placeholder="비밀번호 확인" autocomplete="new-password">
-                            <button type="button" class="pw-toggle" aria-label="비밀번호 보기">
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
+                        <div class="pw-form-group">
+                            <label class="pw-label" for="confirmPassword">새 비밀번호 확인</label>
+                            <div class="pw-input-wrap">
+                                <input type="password" id="confirmPassword" class="pw-input" placeholder="비밀번호 확인" autocomplete="new-password">
+                                <button type="button" class="pw-toggle" aria-label="비밀번호 보기">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span class="pw-error" id="pwMatchError">비밀번호가 일치하지 않습니다.</span>
+                            <span class="pw-error" id="pwLengthError">비밀번호는 8자 이상이어야 합니다.</span>
                         </div>
-                        <span class="pw-error" id="pwMatchError">비밀번호가 일치하지 않습니다.</span>
-                        <span class="pw-error" id="pwLengthError">비밀번호는 8자 이상이어야 합니다.</span>
-                    </div>
-                    <button type="submit" class="pw-save-btn" id="pwSaveBtn">변경 저장</button>
-                </form>
+                        <button type="submit" class="pw-save-btn" id="pwSaveBtn">변경 저장</button>
+                    </form>
+                </div>
             </div>
 
-            <!-- 로그아웃 + 탈퇴 -->
+            <!-- 계정 관리 -->
             <div class="mypage-section">
                 <p class="section-title">계정 관리</p>
-                <button class="logout-btn" id="logoutBtn">로그아웃</button>
-                <button class="logout-btn" id="deleteAccountBtn"
-                    style="margin-top:12px;border-color:rgba(150,150,150,0.3);color:#6a8aaa;font-size:0.82rem;">
-                    회원 탈퇴
+                <!-- 회원탈퇴 아코디언 -->
+                <button class="accordion-header" id="deleteAccordionBtn" aria-expanded="false" style="padding:4px 0;">
+                    <span style="font-size:0.88rem;color:#6a8aaa;font-weight:600;">회원 탈퇴</span>
+                    <svg class="accordion-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
+                <div class="accordion-body" id="deleteAccordionBody">
+                    <p style="font-size:0.82rem;color:#6a8aaa;margin-bottom:14px;line-height:1.6;">탈퇴 시 구독이 해지되고 모든 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
+                    <button class="logout-btn" id="deleteAccountBtn"
+                        style="border-color:rgba(150,150,150,0.3);color:#6a8aaa;font-size:0.85rem;">
+                        탈퇴하기
+                    </button>
+                </div>
             </div>
         </div>
     </main>
@@ -590,6 +665,18 @@
             document.getElementById('tvIdSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
+        /* 아코디언 토글 */
+        document.getElementById('pwAccordionBtn')?.addEventListener('click', function() {
+            const body = document.getElementById('pwAccordionBody');
+            const isOpen = body.classList.toggle('open');
+            this.setAttribute('aria-expanded', String(isOpen));
+        });
+        document.getElementById('deleteAccordionBtn')?.addEventListener('click', function() {
+            const body = document.getElementById('deleteAccordionBody');
+            const isOpen = body.classList.toggle('open');
+            this.setAttribute('aria-expanded', String(isOpen));
+        });
+
         /* 비밀번호 토글 */
         document.querySelectorAll('.pw-toggle').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -609,7 +696,6 @@
                 console.error(err);
             }
         }
-        document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
         document.getElementById('navLogoutBtn')?.addEventListener('click', handleLogout);
         document.getElementById('mobileLogoutBtn')?.addEventListener('click', handleLogout);
 
@@ -675,6 +761,8 @@
                     ? user.email.substring(0, 18) + '…'
                     : user.email;
                 navEmailEl.textContent = shortEmail;
+                const adminLink = document.getElementById('navAdminLink');
+                if (adminLink && user.email === 'admin@getbitlogic.com') adminLink.style.display = 'flex';
             }
 
             /* 이름 */
@@ -801,69 +889,104 @@
         let currentProfile   = null;
 
         function renderSubscription(sub) {
-            const planEl      = document.getElementById('currentPlan');
-            const expireRow   = document.getElementById('planExpireRow');
-            const expireEl    = document.getElementById('planExpireDate');
-            const cancelRow   = document.getElementById('cancelSubRow');
+            const planEl    = document.getElementById('currentPlan');
+            const expireRow = document.getElementById('planExpireRow');
+            const expireEl  = document.getElementById('planExpireDate');
+            const cancelRow = document.getElementById('cancelSubRow');
+            const actionBtn = document.getElementById('planActionBtn');
 
-            if (!sub) {
+            /* 미구독 또는 해지 상태 */
+            if (!sub || sub.status === 'cancelled') {
                 planEl.textContent = '미구독';
                 planEl.className   = 'plan-badge none';
+                if (actionBtn) {
+                    actionBtn.textContent = '플랜 구매하기';
+                    actionBtn.className   = 'plan-action-btn buy';
+                    actionBtn.disabled    = false;
+                    actionBtn.onclick     = () => { window.location.href = 'checkout.html'; };
+                }
+                if (sub?.status === 'cancelled') {
+                    expireRow.style.display = 'flex';
+                    expireEl.textContent    = formatDate(sub.cancelled_at) + ' 해지';
+                }
                 return;
             }
 
-            const planNames = { basic: 'Basic', pro: 'Pro' };
             planEl.className = 'plan-badge';
 
-            /* Pro active 배지 — 다운그레이드 신청 가능 */
+            if (sub.status === 'pending') {
+                planEl.textContent       = sub.plan_type === 'pro' ? 'Pro' : 'Basic';
+                planEl.style.borderColor = '#f0a500';
+                planEl.style.color       = '#f0a500';
+                expireRow.style.display  = 'flex';
+                expireEl.textContent     = '결제 처리 중';
+                if (actionBtn) actionBtn.style.display = 'none';
+                return;
+            }
+
+            /* Pro active */
             if (sub.plan_type === 'pro' && sub.status === 'active') {
                 if (sub.pending_plan === 'basic') {
                     planEl.textContent = 'Pro (다운그레이드 예정)';
-                    planEl.title       = '다음 결제일에 Basic으로 변경됩니다';
+                    if (actionBtn) {
+                        actionBtn.textContent = 'Basic으로 변경 예정';
+                        actionBtn.className   = 'plan-action-btn';
+                        actionBtn.disabled    = true;
+                        actionBtn.onclick     = null;
+                    }
                 } else {
-                    planEl.textContent      = '최고 플랜 이용 중 🎉';
-                    planEl.style.cursor     = 'pointer';
-                    planEl.style.background = 'linear-gradient(135deg,rgba(91,45,232,0.18),rgba(91,45,232,0.38))';
+                    planEl.textContent       = 'Pro ✦';
+                    planEl.style.background  = 'linear-gradient(135deg,rgba(91,45,232,0.18),rgba(91,45,232,0.38))';
                     planEl.style.borderColor = '#5b2de8';
                     planEl.style.color       = '#c0a0ff';
-                    planEl.title             = '클릭하여 다운그레이드 신청';
-                    planEl.addEventListener('click', async () => {
-                        if (!activeSubId) return;
-                        const confirmed = await showConfirm(
-                            '다음 결제일에 Basic 플랜(49,000원/월)으로 변경됩니다.\n현재 결제 기간은 Pro로 계속 이용 가능합니다.',
-                            { title: 'Basic으로 다운그레이드', confirmText: '다운그레이드 신청', cancelText: '취소' }
-                        );
-                        if (!confirmed) return;
-                        const { error } = await supabase
-                            .from('subscriptions')
-                            .update({ pending_plan: 'basic' })
-                            .eq('id', activeSubId);
-                        if (error) { showToast('오류: ' + error.message, 'error'); return; }
-                        planEl.textContent      = 'Pro (다운그레이드 예정)';
-                        planEl.style.cursor     = '';
-                        planEl.style.background = '';
-                        planEl.style.borderColor = '';
-                        planEl.style.color       = '';
-                        planEl.title             = '다음 결제일에 Basic으로 변경됩니다';
-                        showToast('다운그레이드 신청 완료! 다음 갱신 시 Basic으로 변경됩니다.', 'success');
-
-                        /* 다운그레이드 예약 안내 이메일 (실패 무시) */
-                        if (currentUser?.email) {
-                            fetch('/api/send-email', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    type:          'downgrade-scheduled',
-                                    email:         currentUser.email,
-                                    name:          currentProfile?.name || currentUser.email,
-                                    nextBillingAt: sub.next_billing_at,
-                                }),
-                            }).catch(() => {});
-                        }
-                    });
+                    if (actionBtn) {
+                        actionBtn.textContent = 'Pro 구독 중 ✦';
+                        actionBtn.className   = 'plan-action-btn pro-active';
+                        actionBtn.disabled    = false;
+                        actionBtn.onclick     = async () => {
+                            if (!activeSubId) return;
+                            const confirmed = await showConfirm(
+                                '다음 결제일에 Basic 플랜(49,000원/월)으로 변경됩니다.\n현재 결제 기간은 Pro로 계속 이용 가능합니다.',
+                                { title: 'Basic으로 다운그레이드', confirmText: '다운그레이드 신청', cancelText: '취소' }
+                            );
+                            if (!confirmed) return;
+                            const { error } = await supabase
+                                .from('subscriptions')
+                                .update({ pending_plan: 'basic' })
+                                .eq('id', activeSubId);
+                            if (error) { showToast('오류: ' + error.message, 'error'); return; }
+                            planEl.textContent       = 'Pro (다운그레이드 예정)';
+                            planEl.style.background  = '';
+                            planEl.style.borderColor = '';
+                            planEl.style.color       = '';
+                            actionBtn.textContent    = 'Basic으로 변경 예정';
+                            actionBtn.className      = 'plan-action-btn';
+                            actionBtn.disabled       = true;
+                            actionBtn.onclick        = null;
+                            showToast('다운그레이드 신청 완료! 다음 갱신 시 Basic으로 변경됩니다.', 'success');
+                            if (currentUser?.email) {
+                                fetch('/api/send-email', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        type:          'downgrade-scheduled',
+                                        email:         currentUser.email,
+                                        name:          currentProfile?.name || currentUser.email,
+                                        nextBillingAt: sub.next_billing_at,
+                                    }),
+                                }).catch(() => {});
+                            }
+                        };
+                    }
                 }
-            } else {
-                planEl.textContent = planNames[sub.plan_type] || sub.plan_type;
+            } else if (sub.plan_type === 'basic' && sub.status === 'active') {
+                planEl.textContent = 'Basic';
+                if (actionBtn) {
+                    actionBtn.textContent = '플랜 업그레이드';
+                    actionBtn.className   = 'plan-action-btn upgrade';
+                    actionBtn.disabled    = false;
+                    actionBtn.onclick     = () => { window.location.href = 'checkout.html?plan=pro'; };
+                }
             }
 
             if (sub.status === 'active' && sub.next_billing_at) {
@@ -884,15 +1007,6 @@
                         banner.classList.add('show');
                     }
                 }
-            } else if (sub.status === 'pending') {
-                expireRow.style.display = 'flex';
-                expireEl.textContent    = '결제 처리 중';
-                planEl.style.borderColor = '#f0a500';
-                planEl.style.color       = '#f0a500';
-            } else if (sub.status === 'cancelled') {
-                expireRow.style.display = 'flex';
-                expireEl.textContent    = formatDate(sub.cancelled_at) + ' 해지';
-                planEl.className = 'plan-badge none';
             }
         }
 
@@ -942,20 +1056,48 @@
 
         /* TV ID 렌더링 */
         function renderTvId(profile) {
+            const displayRow  = document.getElementById('tvIdDisplayRow');
             const displayEl   = document.getElementById('tvIdDisplay');
+            const firstNotice = document.getElementById('tvFirstNotice');
             const editWrap    = document.getElementById('tvIdEditWrap');
+            const editWarning = document.getElementById('tvIdEditWarning');
             const lockedMsg   = document.getElementById('tvIdLockedMsg');
+            const saveBtn     = document.getElementById('tvIdSaveBtn');
 
-            displayEl.textContent = profile?.tradingview_id || '미입력';
+            /* 상태 초기화 */
+            displayRow.style.display  = 'none';
+            firstNotice.style.display = 'none';
+            editWrap.style.display    = 'none';
+            lockedMsg.style.display   = 'none';
+            if (editWarning) editWarning.style.display = 'none';
 
-            if (!profile?.tv_id_changed) {
-                editWrap.style.display = 'block';
+            const changeCount = profile?.tv_change_count || 0;
+
+            if (!profile?.tradingview_id) {
+                /* 최초 입력 전: 안내문 + 입력 폼 (경고 없음) */
+                firstNotice.style.display = 'block';
+                editWrap.style.display    = 'block';
+                if (saveBtn) saveBtn.textContent = '저장';
             } else {
-                lockedMsg.style.display = 'block';
+                /* TV ID 설정된 경우 */
+                displayRow.style.display  = 'flex';
+                displayEl.textContent     = profile.tradingview_id;
+
+                if (changeCount < 3) {
+                    const remaining = 3 - changeCount;
+                    editWrap.style.display = 'block';
+                    if (editWarning) {
+                        editWarning.style.display = 'block';
+                        editWarning.textContent   = `⚠ TradingView ID를 변경합니다. 남은 수정 횟수: ${remaining}회`;
+                    }
+                    if (saveBtn) saveBtn.textContent = '수정 저장';
+                } else {
+                    lockedMsg.style.display = 'block';
+                }
             }
         }
 
-        /* TV ID 수정 저장 */
+        /* TV ID 저장/수정 */
         document.getElementById('tvIdSaveBtn')?.addEventListener('click', async () => {
             const newId = sanitizeTvId(document.getElementById('tvIdEditInput').value);
             if (!newId) { showToast('아이디를 입력해 주세요.', 'error'); return; }
@@ -968,19 +1110,29 @@
             btn.disabled = true; btn.textContent = '저장 중...';
 
             try {
-                const user = await getUser();
-                const { error } = await supabase
-                    .from('profiles')
-                    .upsert({ id: user.id, tradingview_id: newId, tv_id_changed: true });
+                const user      = await getUser();
+                const isInitial = !currentProfile?.tradingview_id;
+                const curCount  = currentProfile?.tv_change_count || 0;
+
+                const updateData = { id: user.id, tradingview_id: newId };
+                if (!isInitial) updateData.tv_change_count = curCount + 1;
+
+                const { error } = await supabase.from('profiles').upsert(updateData);
                 if (error) throw error;
 
-                document.getElementById('tvIdDisplay').textContent = newId;
-                document.getElementById('tvIdEditWrap').style.display = 'none';
-                document.getElementById('tvIdLockedMsg').style.display = 'block';
-                showToast('TradingView 아이디가 수정되었습니다.', 'success');
+                if (currentProfile) {
+                    currentProfile.tradingview_id = newId;
+                    if (!isInitial) currentProfile.tv_change_count = curCount + 1;
+                }
+
+                document.getElementById('tvIdEditInput').value = '';
+                document.getElementById('tvNoticeBanner')?.classList.remove('show');
+                showToast('TradingView 아이디가 저장되었습니다.', 'success');
+                renderTvId(currentProfile);
             } catch (err) {
                 showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
-                btn.disabled = false; btn.textContent = '수정 저장';
+                btn.disabled = false;
+                btn.textContent = currentProfile?.tradingview_id ? '수정 저장' : '저장';
             }
         });
 
@@ -1032,9 +1184,21 @@
 
                 showToast('구독이 해지되었습니다.', 'success');
                 document.getElementById('cancelSubRow').style.display = 'none';
-                document.getElementById('currentPlan').className = 'plan-badge none';
+                const planEl = document.getElementById('currentPlan');
+                planEl.className       = 'plan-badge none';
+                planEl.textContent     = '미구독';
+                planEl.style.background  = '';
+                planEl.style.borderColor = '';
+                planEl.style.color       = '';
                 const expireEl = document.getElementById('planExpireDate');
                 if (expireEl) expireEl.textContent = '해지됨';
+                const actionBtn = document.getElementById('planActionBtn');
+                if (actionBtn) {
+                    actionBtn.textContent = '플랜 구매하기';
+                    actionBtn.className   = 'plan-action-btn buy';
+                    actionBtn.disabled    = false;
+                    actionBtn.onclick     = () => { window.location.href = 'checkout.html'; };
+                }
             } catch (err) {
                 showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
                 btn.disabled = false; btn.textContent = '구독 해지';
