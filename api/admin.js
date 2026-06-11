@@ -3,7 +3,7 @@
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 //   ADMIN_EMAIL (기본값: admin@getbitlogic.com)
 //   PORTONE_CHANNEL_KEY_KAKAO, PORTONE_CHANNEL_KEY_KG, PORTONE_CHANNEL_KEY_KPN
-//   PORTONE_CHANNEL_KEY_TOSS, PORTONE_CHANNEL_KEY_KG_AUTH
+//   PORTONE_CHANNEL_KEY_DANAL, PORTONE_CHANNEL_KEY_TOSS, PORTONE_CHANNEL_KEY_KG_AUTH
 
 const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -12,7 +12,8 @@ const ADMIN_EMAIL   = process.env.ADMIN_EMAIL || 'admin@getbitlogic.com';
 const CHANNEL_KEYS = {
     KAKAO:   { label: 'KakaoTalk Pay',    value: process.env.PORTONE_CHANNEL_KEY_KAKAO    || '' },
     KG:      { label: 'KG Inicis',        value: process.env.PORTONE_CHANNEL_KEY_KG       || '' },
-    KPN:     { label: 'KG Inicis (일반)', value: process.env.PORTONE_CHANNEL_KEY_KPN      || '' },
+    KPN:     { label: '한국결제네트웍스', value: process.env.PORTONE_CHANNEL_KEY_KPN      || '' },
+    DANAL:   { label: '다날',             value: process.env.PORTONE_CHANNEL_KEY_DANAL    || '' },
     TOSS:    { label: 'TossPay',          value: process.env.PORTONE_CHANNEL_KEY_TOSS     || '' },
     KG_AUTH: { label: 'KG Auth (인증)',   value: process.env.PORTONE_CHANNEL_KEY_KG_AUTH  || '' },
 };

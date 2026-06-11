@@ -186,20 +186,8 @@
     <!-- NAV -->
     <nav class="nav" id="mainNav">
         <div class="nav-inner">
-            <a href="index.html" class="nav-logo">
-                <svg width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="navGlow" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur stdDeviation="2.5" result="blur"/>
-                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                        </filter>
-                    </defs>
-                    <circle cx="60" cy="60" r="58" fill="#010d1a"/>
-                    <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.9" filter="url(#navGlow)"/>
-                    <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2" filter="url(#navGlow)"/>
-                    <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.45"/>
-                    <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5" filter="url(#navGlow)">BITLOGIC</text>
-                </svg>
+            <a href="index.html" class="nav-logo-link">
+                <img src="btlogocl.png" alt="BitLogic" class="nav-logo-img">
                 <span class="nav-logo-text">BitLogic</span>
             </a>
             <div class="nav-links">
@@ -270,36 +258,29 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-inner">
-            <div class="footer-brand-wrap">
-                <div class="footer-logo-wrap">
-                    <svg width="44" height="44" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="60" cy="60" r="58" fill="#010d1a"/>
-                        <circle cx="60" cy="60" r="57" stroke="#00e5ff" stroke-width="1.8" opacity="0.9"/>
-                        <polygon points="60,9 104,34 104,86 60,111 16,86 16,34" fill="none" stroke="#00e5ff" stroke-width="2.2"/>
-                        <polygon points="60,17 97,39 97,81 60,103 23,81 23,39" fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.45"/>
-                        <path d="M17 86 Q40 108 60 112 Q80 108 103 86" fill="none" stroke="#00e5ff" stroke-width="1.8" opacity="0.7"/>
-                        <line x1="49" y1="23" x2="49" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="60" y1="18" x2="60" y2="35" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <line x1="71" y1="23" x2="71" y2="37" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
-                        <circle cx="46" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <circle cx="60" cy="46" r="5.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <circle cx="74" cy="44" r="6.5" fill="none" stroke="#00e5ff" stroke-width="1.8"/>
-                        <text x="60" y="77" text-anchor="middle" fill="#00e5ff" font-family="Arial,sans-serif" font-size="13.5" font-weight="700" letter-spacing="3.5">BITLOGIC</text>
-                    </svg>
-                    <p class="footer-brand">BitLogic</p>
-                </div>
-                <p class="footer-info">상호명 : 비트로직(BitLogic) | 대표자 : 김서진 | 사업자등록번호 : 472-13-03084</p>
-                <p class="footer-info">통신판매업신고번호 : [ 신고 예정 ] | 주소 : 인천 남동구 논고개로 188번길 2</p>
-                <p class="footer-info">고객센터 : 070-8018-8505 | 이메일 : bitlogictrade@gmail.com</p>
-                <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
-            </div>
-            <div class="footer-links">
+            <nav class="footer-links">
                 <a href="terms-of-service.html">이용약관</a>
+                <span class="footer-sep">|</span>
                 <a href="privacy-policy.html">개인정보처리방침</a>
+                <span class="footer-sep">|</span>
                 <a href="refund-policy.html">환불정책</a>
+            </nav>
+            <div class="footer-biz">
+                <p class="footer-biz-row">
+                    <span class="footer-biz-chunk"><span class="footer-biz-label">상호명</span><span class="footer-biz-value">비트로직(BitLogic)</span></span>
+                    <span class="footer-biz-chunk"><span class="footer-biz-sep">|</span><span class="footer-biz-label">대표자</span><span class="footer-biz-value">김서진</span></span>
+                    <span class="footer-biz-chunk"><span class="footer-biz-sep">|</span><span class="footer-biz-label">사업자등록번호</span><span class="footer-biz-value">472-13-03084</span></span>
+                </p>
+                <p class="footer-biz-row">
+                    <span class="footer-biz-chunk"><span class="footer-biz-label">통신판매업신고번호</span><span class="footer-biz-value">신고 예정</span></span>
+                    <span class="footer-biz-chunk"><span class="footer-biz-sep">|</span><span class="footer-biz-label">주소</span><span class="footer-biz-value">인천 남동구 논고개로 188번길 2</span></span>
+                </p>
+                <p class="footer-biz-row">
+                    <span class="footer-biz-chunk"><span class="footer-biz-label">고객센터</span><span class="footer-biz-value">070-8018-8505</span></span>
+                    <span class="footer-biz-chunk"><span class="footer-biz-sep">|</span><span class="footer-biz-label">이메일</span><span class="footer-biz-value">bitlogictrade@gmail.com</span></span>
+                </p>
             </div>
-        </div>
-        <div class="footer-bottom">
+            <p class="footer-copy">© 2026 BitLogic. All rights reserved.</p>
             <p class="footer-disclaimer">※ 제공되는 모든 지표 및 차트 정보는 투자 판단을 위한 보조 자료일 뿐, 수익을 보장하지 않습니다.</p>
         </div>
     </footer>

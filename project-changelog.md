@@ -2,6 +2,97 @@
 
 ---
 
+## 2026-06-11 (92차)
+
+### checkout.html 연락처 안내 문구 수정
+
+**수정 파일:** `checkout.html`
+
+- 연락처 입력칸 아래 안내 문구: `예) 01012345678` → `예) 010-1234-5678`
+
+---
+
+## 2026-06-11 (91차)
+
+### checkout.html 모바일 플랜 카드 중앙 정렬 및 헤더 너비 통일
+
+**수정 파일:** `checkout.html`
+
+- `@media (max-width: 768px)` 블록 수정
+  - `.checkout-inner`에 `align-items: center` 추가 → 플랜 카드 중앙 정렬
+  - `.co-plan-card`, `.co-form-col`, `.co-pay-section`에 `width: 100%` 명시 (`display:contents`로 co-summary 해체 시 flex 자식 너비 보장)
+  - `.co-page-header`에 `width: 100%` 추가 → 헤더 너비 카드와 일치
+  - `.checkout-page` 모바일 패딩 조정: `100px 24px 80px` → `80px 16px 60px`
+
+---
+
+## 2026-06-11 (90차)
+
+### admin.html 테스트 결제 개선
+
+**수정 파일:** `admin.html`, `api/admin.js`, `CLAUDE.md`
+
+- `paymentId` 하이픈 제거 → `testadmin${Date.now()}` (영숫자만 사용)
+- KG, KPN 채널 결제 시 `customer.email: 'admin@getbitlogic.com'` 자동 포함
+- `CHANNEL_KEYS` 및 `TEST_CHANNEL_IDS`에 다날(`DANAL`) 추가
+- KG Auth(`KG_AUTH`)를 결제 테스트에서 제외 → 별도 본인인증 테스트 섹션으로 분리 (`requestIdentityVerification`)
+- `payMethod` 분리: 카카오페이 → `EASY_PAY` (KAKAOPAY), 토스페이 → `EASY_PAY` (TOSSPAY), 나머지(KG·KPN·DANAL) → `CARD`
+- CLAUDE.md 환경변수 섹션 채널키 설명 상세화
+
+---
+
+## 2026-06-11 (89차)
+
+### index.html 히어로 설명 줄바꿈 추가
+
+**수정 파일:** `index.html`
+
+- `.hero-desc` 두 문장 사이에 `<br>` 추가
+
+---
+
+## 2026-06-11 (88차)
+
+### 모바일/디자인 전체 개선 (7개 항목)
+
+**수정 파일:** `style.css`, `index.html`, `mypage.html`, `checkout.html`, `success.html`, `login.html`, `register.html`, `onboarding.html`, `refund-policy.html`, `privacy-policy.html`, `terms-of-service.html`
+
+**1. 히어로 텍스트 vw 단위 유동적 비율 적용**
+- `.hero-title` font-size: `clamp(2rem, 7vw, 80px)` → `clamp(1.75rem, 9vw, 80px)` (모바일에서 더 빠르게 스케일)
+- `min-height: 2.4em` → `2em` (불필요한 빈 공간 축소)
+- 모바일(560px 이하): `clamp(1.75rem, 10vw, 3rem)` 오버라이드
+
+**2. 롤링 문구 모바일 크기 키움**
+- 히어로 타이틀 vw 계수 상향(9vw)으로 뷰포트 증가 시 더 크게 표시
+
+**3. 푸터 모바일 텍스트 축소 + | 구분자 처리**
+- `.footer-biz-chunk` 클래스 추가: `white-space: nowrap`으로 `|` 분리 방지
+- 모바일(560px): `flex-direction: column`, `.footer-biz-sep` 숨김 → 세로 나열
+- 폰트: `0.72rem`, 링크/카피/디스클레이머도 `0.7–0.8rem`으로 축소
+- index.html 푸터 HTML을 `footer-biz-chunk` 구조로 재작성
+
+**4. Nav 바 전 페이지 통일**
+- SVG 인라인 로고 → `<img src="btlogocl.png" class="nav-logo-img">` 통일
+- 대상: mypage.html, login.html, register.html, onboarding.html
+- `class="nav-logo"` → `class="nav-logo-link"` 수정: checkout.html, success.html
+
+**5. 푸터 로고 제거 + 중앙 배치 통일**
+- 모든 페이지 푸터를 index.html 기준 새 표준 구조로 교체 (로고 없음, 중앙 정렬)
+- 대상 9개 페이지: mypage, checkout, success, login, register, onboarding, refund-policy, privacy-policy, terms-of-service
+
+**6. Basic/Pro 버튼 가시성 개선**
+- 비활성 탭: `color: #666` → `rgba(255,255,255,0.5)` (더 밝은 텍스트)
+- hover 상태 추가: `rgba(255,255,255,0.8)`
+- 활성 탭: `font-weight: 700` + `box-shadow` 추가
+
+**7. FAQ 줄바꿈/여백 개선**
+- `line-height: 1.75` → `1.85`, `padding` 증가
+- `word-break: keep-all` 추가
+- `<br>` 태그 후 `margin-bottom: 0.55rem` CSS 처리
+- 모바일: 폰트 `0.85rem`, 패딩 조정
+
+---
+
 ## 2026-06-11 (87차)
 
 ### mypage.html UI/UX 개편

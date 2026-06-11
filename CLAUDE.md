@@ -72,11 +72,12 @@
 | `CRON_SECRET` | `invite-tv` sync 엔드포인트 보호용 시크릿 (선택) |
 | `ADMIN_NOTIFY_WEBHOOK` | 실패 알림 웹훅 URL — Slack/Discord 등 (선택) |
 | `ADMIN_EMAIL` | 어드민 페이지 접근 허용 이메일 (기본값: `admin@getbitlogic.com`) |
-| `PORTONE_CHANNEL_KEY_KAKAO` | KakaoTalk Pay 채널키 |
-| `PORTONE_CHANNEL_KEY_KG` | KG Inicis 채널키 |
-| `PORTONE_CHANNEL_KEY_KPN` | KG Inicis 일반 채널키 |
-| `PORTONE_CHANNEL_KEY_TOSS` | TossPay 채널키 |
-| `PORTONE_CHANNEL_KEY_KG_AUTH` | KG Auth 인증 채널키 |
+| `PORTONE_CHANNEL_KEY_KAKAO` | 카카오페이 채널키 (`EASY_PAY`, easyPayProvider: KAKAOPAY) |
+| `PORTONE_CHANNEL_KEY_KG` | KG이니시스 채널키 (`CARD`) |
+| `PORTONE_CHANNEL_KEY_KPN` | 한국결제네트웍스 채널키 (`CARD`) |
+| `PORTONE_CHANNEL_KEY_DANAL` | 다날 채널키 (`CARD`) |
+| `PORTONE_CHANNEL_KEY_TOSS` | 토스페이 채널키 (`EASY_PAY`, easyPayProvider: TOSSPAY) |
+| `PORTONE_CHANNEL_KEY_KG_AUTH` | KG이니시스 본인인증 채널키 (인증 전용, `requestIdentityVerification`) |
 
 > **참고:** Supabase anon key는 설계상 공개 키(Supabase RLS가 보안 담당)로, `supabase-auth.js`에 하드코딩됨.
 > 이 프로젝트는 빌드 과정 없는 순수 정적 사이트라 Vercel 환경변수를 프론트엔드 JS에 주입할 수 없음.

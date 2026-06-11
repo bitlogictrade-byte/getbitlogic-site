@@ -662,7 +662,7 @@
             <p class="panel-desc">포트원 테스트 모드로 결제 채널 동작을 확인합니다. 테스트 채널키가 설정된 경우 실제 결제가 발생하지 않습니다.</p>
 
             <div class="admin-card">
-                <p class="admin-card-title">채널 선택</p>
+                <p class="admin-card-title">결제 채널 선택</p>
                 <div class="channel-key-grid" id="testChannelGrid">
                     <div style="color:#555;font-size:0.82rem;">채널키를 불러오는 중...</div>
                 </div>
@@ -676,6 +676,16 @@
                     <span class="test-amount-note">테스트 고정금액</span>
                 </div>
                 <button class="test-pay-btn" id="testPayBtn" disabled>결제 실행</button>
+            </div>
+
+            <div class="admin-card">
+                <p class="admin-card-title">본인인증 테스트 (KG Auth)</p>
+                <div class="channel-key-grid" id="testAuthChannelGrid">
+                    <div style="color:#555;font-size:0.82rem;">채널키를 불러오는 중...</div>
+                </div>
+                <div style="margin-top:14px;">
+                    <button class="test-pay-btn" id="testAuthBtn" disabled>본인인증 실행</button>
+                </div>
             </div>
 
             <div class="admin-card" style="margin-top:0;">
@@ -818,13 +828,16 @@ function renderChannelKeys(keys, activeKey) {
         const isConfigured = !!value;
         const isActive = value && value === activeKey;
         const displayVal = value ? value.slice(0, 16) + '...' : '환경변수 미설정';
+        const authBadge = id === 'KG_AUTH'
+            ? ' <span style="font-size:0.65rem;background:rgba(255,160,0,0.15);color:#ffa000;border:1px solid rgba(255,160,0,0.3);border-radius:4px;padding:1px 5px;vertical-align:middle;">인증전용</span>'
+            : '';
         return `
             <div class="channel-key-option">
                 <input type="radio" name="channelKey" id="ck-${id}" value="${escHtml(value)}"
                     ${isActive ? 'checked' : ''} ${!isConfigured ? 'disabled' : ''}>
                 <label for="ck-${id}" class="channel-key-label">
                     <span class="channel-key-name">
-                        <span class="dot"></span>${escHtml(label)}
+                        <span class="dot"></span>${escHtml(label)}${authBadge}
                     </span>
                     <span class="channel-key-val ${isConfigured ? 'configured' : 'not-configured'}">${escHtml(displayVal)}</span>
                 </label>
@@ -1095,30 +1108,22 @@ function setTableError(tbodyId, cols, msg) {
 /* ────────────────────────────
    테스트 결제 탭
 ──────────────────────────── */
-const TEST_CHANNEL_IDS = ['KAKAO', 'KG', 'KPN', 'KG_AUTH'];
+const TEST_CHANNEL_IDS      = ['KAKAO', 'KG', 'KPN', 'DANAL', 'TOSS'];
+const TEST_AUTH_CHANNEL_IDS = ['KG_AUTH'];
 let testSelectedChannelKey = '';
-let testSelectedChannelId = '';
+let testSelectedChannelId  = '';
+let testAuthChannelKey     = '';
+let testAuthChannelId      = '';
 
-function renderTestChannelGrid() {
-    const grid = document.getElementById('testChannelGrid');
-    const payBtn = document.getElementById('testPayBtn');
-
-    if (!Object.keys(allChannelKeys).length) {
-        grid.innerHTML = '<div style="color:#555;font-size:0.82rem;">채널키 정보를 먼저 불러오세요. (채널키 탭 방문 후 다시 시도)</div>';
-        return;
-    }
-
-    const entries = Object.entries(allChannelKeys).filter(([id]) => TEST_CHANNEL_IDS.includes(id));
-
-    grid.innerHTML = entries.map(([id, { label, value }]) => {
+function buildChannelRadios(entries, radioName) {
+    return entries.map(([id, { label, value }]) => {
         const isConfigured = !!value;
-        const displayVal = value ? value.slice(0, 20) + '...' : '환경변수 미설정';
-        const isSelected = value && value === testSelectedChannelKey;
+        const displayVal   = value ? value.slice(0, 20) + '...' : '환경변수 미설정';
         return `
             <div class="channel-key-option">
-                <input type="radio" name="testChannelKey" id="tck-${id}" value="${escHtml(value)}"
-                    data-id="${id}" ${isSelected ? 'checked' : ''} ${!isConfigured ? 'disabled' : ''}>
-                <label for="tck-${id}" class="channel-key-label">
+                <input type="radio" name="${radioName}" id="${radioName}-${id}" value="${escHtml(value)}"
+                    data-id="${id}" ${!isConfigured ? 'disabled' : ''}>
+                <label for="${radioName}-${id}" class="channel-key-label">
                     <span class="channel-key-name">
                         <span class="dot"></span>${escHtml(label)}
                     </span>
@@ -1126,6 +1131,27 @@ function renderTestChannelGrid() {
                 </label>
             </div>`;
     }).join('');
+}
+
+function renderTestChannelGrid() {
+    const grid    = document.getElementById('testChannelGrid');
+    const authGrid = document.getElementById('testAuthChannelGrid');
+    const payBtn  = document.getElementById('testPayBtn');
+    const authBtn = document.getElementById('testAuthBtn');
+
+    const noKeysMsg = '<div style="color:#555;font-size:0.82rem;">채널키 정보를 먼저 불러오세요. (채널키 탭 방문 후 다시 시도)</div>';
+
+    if (!Object.keys(allChannelKeys).length) {
+        grid.innerHTML     = noKeysMsg;
+        authGrid.innerHTML = noKeysMsg;
+        return;
+    }
+
+    const payEntries  = Object.entries(allChannelKeys).filter(([id]) => TEST_CHANNEL_IDS.includes(id));
+    const authEntries = Object.entries(allChannelKeys).filter(([id]) => TEST_AUTH_CHANNEL_IDS.includes(id));
+
+    grid.innerHTML     = buildChannelRadios(payEntries, 'testChannelKey');
+    authGrid.innerHTML = buildChannelRadios(authEntries, 'testAuthChannelKey');
 
     grid.querySelectorAll('input[name="testChannelKey"]').forEach(radio => {
         radio.addEventListener('change', () => {
@@ -1135,7 +1161,16 @@ function renderTestChannelGrid() {
         });
     });
 
-    payBtn.disabled = !testSelectedChannelKey;
+    authGrid.querySelectorAll('input[name="testAuthChannelKey"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            testAuthChannelKey = radio.value;
+            testAuthChannelId  = radio.dataset.id;
+            authBtn.disabled = !testAuthChannelKey;
+        });
+    });
+
+    payBtn.disabled  = !testSelectedChannelKey;
+    authBtn.disabled = !testAuthChannelKey;
 }
 
 function addLog(type, message) {
@@ -1161,7 +1196,7 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
     btn.disabled = true;
     btn.textContent = '결제 창 열리는 중...';
 
-    const paymentId = `test-admin-${Date.now()}`;
+    const paymentId    = `testadmin${Date.now()}`;
     const channelLabel = allChannelKeys[testSelectedChannelId]?.label || testSelectedChannelId;
 
     addLog('info', `결제 요청 시작 — 채널: ${channelLabel}, paymentId: ${paymentId}`);
@@ -1173,14 +1208,21 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
         orderName:   'BitLogic 테스트 결제 (관리자)',
         totalAmount: 119000,
         currency:    'KRW',
-        customer: { fullName: '어드민 테스트' },
+        customer:    { fullName: '어드민 테스트' },
     };
 
     if (testSelectedChannelId === 'KAKAO') {
         payOptions.payMethod = 'EASY_PAY';
         payOptions.easyPay   = { easyPayProvider: 'KAKAOPAY' };
-    } else {
+    } else if (testSelectedChannelId === 'TOSS') {
         payOptions.payMethod = 'EASY_PAY';
+        payOptions.easyPay   = { easyPayProvider: 'TOSSPAY' };
+    } else {
+        payOptions.payMethod = 'CARD';
+    }
+
+    if (['KG', 'KPN'].includes(testSelectedChannelId)) {
+        payOptions.customer.email = 'admin@getbitlogic.com';
     }
 
     try {
@@ -1201,6 +1243,43 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
 
     btn.disabled = false;
     btn.textContent = '결제 실행';
+});
+
+document.getElementById('testAuthBtn').addEventListener('click', async () => {
+    if (!testAuthChannelKey) return;
+
+    const btn = document.getElementById('testAuthBtn');
+    btn.disabled = true;
+    btn.textContent = '본인인증 창 열리는 중...';
+
+    const identityVerificationId = `testauth${Date.now()}`;
+    const channelLabel = allChannelKeys[testAuthChannelId]?.label || testAuthChannelId;
+
+    addLog('info', `본인인증 요청 시작 — 채널: ${channelLabel}, verificationId: ${identityVerificationId}`);
+
+    try {
+        const resp = await PortOne.requestIdentityVerification({
+            storeId:                PORTONE_STORE_ID,
+            channelKey:             testAuthChannelKey,
+            identityVerificationId,
+            customer:               { fullName: '어드민 테스트' },
+        });
+
+        if (resp?.code) {
+            if (resp.code === 'USER_CANCEL') {
+                addLog('cancel', `본인인증 취소 — ${resp.message || '사용자가 인증을 취소했습니다.'}`);
+            } else {
+                addLog('error', `본인인증 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
+            }
+        } else {
+            addLog('success', `본인인증 성공 — verificationId: ${resp?.identityVerificationId || identityVerificationId}`);
+        }
+    } catch (err) {
+        addLog('error', `오류 발생 — ${err.message || String(err)}`);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '본인인증 실행';
 });
 
 document.getElementById('clearLogBtn').addEventListener('click', () => {
