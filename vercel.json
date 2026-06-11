@@ -6,5 +6,9 @@
     "crons": [{
         "path": "/api/invite-tv?action=sync",
         "schedule": "0 15 * * *"
-    }]
+    }],
+    "routes": [
+        { "handle": "filesystem" },
+        { "src": "/(.*)", "dest": "/404.html", "status": 404 }
+    ]
 }

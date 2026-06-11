@@ -24,6 +24,12 @@
 | `TV_SCRIPT_ID_PRO` | Pro 플랜용 Pine Script ID |
 | `CRON_SECRET` | `invite-tv` sync 엔드포인트 보호용 시크릿 (선택) |
 | `ADMIN_NOTIFY_WEBHOOK` | 실패 알림 웹훅 URL — Slack/Discord 등 (선택) |
+| `ADMIN_EMAIL` | 어드민 페이지 접근 허용 이메일 (기본값: `admin@getbitlogic.com`) |
+| `PORTONE_CHANNEL_KEY_KAKAO` | KakaoTalk Pay 채널키 |
+| `PORTONE_CHANNEL_KEY_KG` | KG Inicis 채널키 |
+| `PORTONE_CHANNEL_KEY_KPN` | KG Inicis 일반 채널키 |
+| `PORTONE_CHANNEL_KEY_TOSS` | TossPay 채널키 |
+| `PORTONE_CHANNEL_KEY_KG_AUTH` | KG Auth 인증 채널키 |
 
 > **참고:** Supabase anon key는 설계상 공개 키(Supabase RLS가 보안 담당)로, `supabase-auth.js`에 하드코딩됨.
 > 이 프로젝트는 빌드 과정 없는 순수 정적 사이트라 Vercel 환경변수를 프론트엔드 JS에 주입할 수 없음.
@@ -51,6 +57,9 @@
 | `api/delete-account.js` | 회원탈퇴 Vercel Serverless Function |
 | `api/invite-tv.js` | TradingView 스크립트 권한 초대/해제/만료동기화 Vercel Serverless Function |
 | `api/send-email.js` | Resend 이메일 발송 Vercel Serverless Function. 모든 이메일 발송 처리 |
+| `admin.html` | 어드민 대시보드. `ADMIN_EMAIL` 계정만 접근 가능. 채널키 전환, 구독자 목록, TV 수동 초대, 결제 내역, 구독 강제 취소/변경 |
+| `api/admin.js` | 어드민 전용 Vercel Serverless Function. JWT 인증 후 `ADMIN_EMAIL` 검증 |
+| `404.html` | 커스텀 404 페이지 (다크 테마) |
 
 ## 플랜 정보
 
@@ -75,6 +84,19 @@
 | `updated_at` | `timestamptz` | Nullable |
 | `tv_id_changed` | `bool` | Nullable - TradingView ID 변경 여부 (1회만 가능) |
 | `email` | `text` | Nullable - 비밀번호 찾기 & 중복 체크용 (profiles_email_unique 인덱스) |
+
+### Table `app_settings`
+| Column | Type | 비고 |
+|--------|------|------|
+| `key` | `text` | Primary Key |
+| `value` | `text` | 설정 값 |
+| `updated_at` | `timestamptz` | Nullable |
+
+> **초기 설정 SQL:**
+> ```sql
+> CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT, updated_at TIMESTAMPTZ DEFAULT now());
+> INSERT INTO app_settings (key, value) VALUES ('active_channel_key', '<채널키값>') ON CONFLICT (key) DO NOTHING;
+> ```
 
 ### Table `subscriptions`
 | Column | Type | 비고 |

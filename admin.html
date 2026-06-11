@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#060a14">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <title>Admin | BitLogic</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ── 어드민 레이아웃 ── */
+        .admin-wrap {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.09);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .admin-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .admin-logo-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .admin-logo-link img { height: 28px; width: auto; }
+        .admin-logo-text {
+            font-size: 1rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--cyan), var(--cyan2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .admin-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: #000;
+            background: var(--cyan);
+            border-radius: 4px;
+            padding: 2px 7px;
+        }
+        .admin-header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .admin-user-email {
+            font-size: 0.8rem;
+            color: var(--muted);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .admin-logout-btn {
+            font-size: 0.8rem;
+            color: #fa5757;
+            font-family: inherit;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .admin-logout-btn:hover { background: rgba(250,87,87,0.12); }
+
+        /* ── 탭 ── */
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 16px 24px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: #0a0a0a;
+            overflow-x: auto;
+        }
+        .admin-tab {
+            padding: 9px 18px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--muted);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.15s, border-color 0.15s;
+            margin-bottom: -1px;
+        }
+        .admin-tab:hover { color: #ccc; }
+        .admin-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+        /* ── 탭 패널 ── */
+        .admin-main { flex: 1; padding: 28px 24px; max-width: 1200px; width: 100%; margin: 0 auto; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .panel-desc {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        /* ── 카드 ── */
+        .admin-card {
+            background: #0d0d0d;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .admin-card-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 18px;
+        }
+
+        /* ── 채널키 ── */
+        .channel-key-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .channel-key-option {
+            position: relative;
+        }
+        .channel-key-option input[type="radio"] { display: none; }
+        .channel-key-label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 16px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .channel-key-label:hover { border-color: rgba(0,229,255,0.3); }
+        .channel-key-option input:checked + .channel-key-label {
+            border-color: var(--cyan);
+            background: rgba(0,229,255,0.06);
+        }
+        .channel-key-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .channel-key-name .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .channel-key-option input:checked + .channel-key-label .dot {
+            background: var(--cyan);
+            box-shadow: 0 0 6px rgba(0,229,255,0.6);
+        }
+        .channel-key-val {
+            font-size: 0.7rem;
+            color: #555;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .channel-key-val.configured { color: #4a7fa5; }
+        .channel-key-val.not-configured { color: #444; font-style: italic; }
+        .save-channel-btn {
+            margin-top: 18px;
+            padding: 10px 28px;
+            background: var(--grad-btn);
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .save-channel-btn:hover { opacity: 0.85; }
+        .save-channel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── 테이블 ── */
+        .admin-table-wrap {
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .admin-table th {
+            text-align: left;
+            padding: 11px 16px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #666;
+            background: #0a0a0a;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            white-space: nowrap;
+        }
+        .admin-table td {
+            padding: 13px 16px;
+            color: #ccc;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+        .admin-table tr:last-child td { border-bottom: none; }
+        .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .admin-table .actions { display: flex; gap: 6px; flex-wrap: nowrap; }
+
+        .tbl-btn {
+            padding: 5px 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+            transition: opacity 0.15s;
+        }
+        .tbl-btn:hover { opacity: 0.8; }
+        .tbl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .tbl-btn-cyan  { background: rgba(0,229,255,0.15); color: var(--cyan); }
+        .tbl-btn-red   { background: rgba(250,87,87,0.15); color: #fa5757; }
+        .tbl-btn-purple{ background: rgba(124,58,237,0.2); color: #a78bfa; }
+
+        .plan-badge-sm {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .plan-badge-sm.basic { background: rgba(0,229,255,0.12); color: var(--cyan); }
+        .plan-badge-sm.pro   { background: rgba(124,58,237,0.18); color: #a78bfa; }
+        .plan-badge-sm.none  { background: rgba(255,255,255,0.07); color: #555; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .status-badge.active    { background: rgba(52,199,89,0.14); color: #34c759; }
+        .status-badge.cancelled { background: rgba(250,87,87,0.14); color: #fa5757; }
+        .status-badge.other     { background: rgba(255,255,255,0.07); color: #777; }
+
+        /* ── 검색 ── */
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .admin-search {
+            flex: 1;
+            max-width: 320px;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 9px 14px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .admin-search:focus { border-color: rgba(0,229,255,0.4); }
+        .admin-search::placeholder { color: #444; }
+        .refresh-btn {
+            padding: 9px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #aaa;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .refresh-btn:hover { background: rgba(255,255,255,0.09); }
+        .count-text {
+            font-size: 0.78rem;
+            color: #555;
+            margin-left: auto;
+        }
+
+        /* ── TV 초대 폼 ── */
+        .tv-invite-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            max-width: 480px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        .admin-input {
+            width: 100%;
+            background: #111;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 11px 16px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .admin-input:focus { border-color: rgba(0,229,255,0.4); }
+        .admin-input::placeholder { color: #444; }
+        .invite-btn {
+            padding: 12px 32px;
+            background: var(--grad-btn);
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            align-self: flex-start;
+            transition: opacity 0.2s;
+        }
+        .invite-btn:hover { opacity: 0.85; }
+        .invite-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* ── 인라인 플랜 변경 셀렉트 ── */
+        .plan-select {
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: #ccc;
+            font-size: 0.78rem;
+            font-family: inherit;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        /* ── 로딩 / 빈 상태 ── */
+        .loading-row td, .empty-row td {
+            text-align: center;
+            padding: 40px 16px;
+            color: #444;
+            font-size: 0.85rem;
+        }
+
+        /* ── 스크린 로딩 ── */
+        .page-loading {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(0,229,255,0.15);
+            border-top-color: var(--cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-label {
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        /* ── 반응형 ── */
+        @media (max-width: 640px) {
+            .admin-main { padding: 20px 16px; }
+            .channel-key-grid { grid-template-columns: 1fr 1fr; }
+            .admin-table th, .admin-table td { padding: 10px 12px; }
+        }
+        @media (max-width: 420px) {
+            .channel-key-grid { grid-template-columns: 1fr; }
+            .admin-header { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 페이지 로딩 -->
+<div class="page-loading" id="pageLoading">
+    <div class="spinner"></div>
+    <p class="loading-label">인증 확인 중...</p>
+</div>
+
+<!-- 어드민 앱 (인증 후 표시) -->
+<div class="admin-wrap" id="adminApp" style="display:none;">
+
+    <!-- 헤더 -->
+    <header class="admin-header">
+        <div class="admin-header-left">
+            <a href="index.html" class="admin-logo-link">
+                <img src="btlogocl.png" alt="BitLogic">
+                <span class="admin-logo-text">BitLogic</span>
+            </a>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <div class="admin-header-right">
+            <span class="admin-user-email" id="adminEmail"></span>
+            <button class="admin-logout-btn" id="adminLogoutBtn">로그아웃</button>
+        </div>
+    </header>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="admin-tabs">
+        <button class="admin-tab active" data-tab="channel">채널키</button>
+        <button class="admin-tab" data-tab="subscribers">구독자 목록</button>
+        <button class="admin-tab" data-tab="tv-invite">TV 수동 초대</button>
+        <button class="admin-tab" data-tab="payments">결제 내역</button>
+    </nav>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="admin-main">
+
+        <!-- ── 탭 1: 채널키 ── -->
+        <div id="tab-channel" class="tab-panel active">
+            <p class="panel-title">포트원 채널키 설정</p>
+            <p class="panel-desc">결제 시 사용할 포트원 PG 채널을 선택합니다. 저장 즉시 모든 신규 결제에 반영됩니다.</p>
+            <div class="admin-card">
+                <p class="admin-card-title">PG 채널 선택</p>
+                <div class="channel-key-grid" id="channelKeyGrid">
+                    <div style="color:#555;font-size:0.82rem;">채널키 정보를 불러오는 중...</div>
+                </div>
+                <button class="save-channel-btn" id="saveChannelBtn" disabled>변경 저장</button>
+            </div>
+        </div>
+
+        <!-- ── 탭 2: 구독자 목록 ── -->
+        <div id="tab-subscribers" class="tab-panel">
+            <p class="panel-title">구독자 목록</p>
+            <p class="panel-desc">전체 가입자 목록과 구독 상태를 확인합니다. TV 초대, 플랜 변경, 구독 취소를 직접 처리할 수 있습니다.</p>
+            <div class="search-row">
+                <input type="search" class="admin-search" id="subscriberSearch" placeholder="이름, 이메일, TV ID 검색...">
+                <button class="refresh-btn" id="subscriberRefreshBtn">새로고침</button>
+                <span class="count-text" id="subscriberCount"></span>
+            </div>
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>플랜</th>
+                            <th>상태</th>
+                            <th>TV ID</th>
+                            <th>만료일</th>
+                            <th>액션</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subscriberTableBody">
+                        <tr class="loading-row"><td colspan="7">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── 탭 3: TV 수동 초대 ── -->
+        <div id="tab-tv-invite" class="tab-panel">
+            <p class="panel-title">TV ID 수동 초대</p>
+            <p class="panel-desc">유저의 TradingView ID를 직접 설정하고 스크립트 접근 권한을 부여합니다.</p>
+            <div class="admin-card">
+                <p class="admin-card-title">수동 초대</p>
+                <form class="tv-invite-form" id="tvInviteForm">
+                    <div class="form-group">
+                        <label for="inviteUserId">유저 ID (Supabase UUID)</label>
+                        <input type="text" id="inviteUserId" class="admin-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inviteTvId">TradingView ID</label>
+                        <input type="text" id="inviteTvId" class="admin-input" placeholder="tradingview_username" maxlength="50" required>
+                    </div>
+                    <button type="submit" class="invite-btn" id="tvInviteSubmitBtn">권한 부여</button>
+                </form>
+                <p id="inviteResult" style="margin-top:14px;font-size:0.82rem;color:#555;"></p>
+            </div>
+
+            <div class="admin-card" style="margin-top:0;">
+                <p class="admin-card-title">구독자 빠른 선택</p>
+                <p style="font-size:0.8rem;color:#555;margin-bottom:14px;">아래 구독자를 클릭하면 유저 ID가 자동 입력됩니다.</p>
+                <div class="admin-table-wrap">
+                    <table class="admin-table" style="font-size:0.8rem;">
+                        <thead>
+                            <tr><th>이름</th><th>이메일</th><th>현재 TV ID</th><th></th></tr>
+                        </thead>
+                        <tbody id="quickSelectBody">
+                            <tr class="loading-row"><td colspan="4">불러오는 중...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 탭 4: 결제 내역 ── -->
+        <div id="tab-payments" class="tab-panel">
+            <p class="panel-title">결제 내역</p>
+            <p class="panel-desc">전체 구독 및 결제 기록을 확인합니다.</p>
+            <div class="search-row">
+                <input type="search" class="admin-search" id="paymentSearch" placeholder="이름, 이메일 검색...">
+                <button class="refresh-btn" id="paymentRefreshBtn">새로고침</button>
+                <span class="count-text" id="paymentCount"></span>
+            </div>
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>플랜</th>
+                            <th>금액</th>
+                            <th>상태</th>
+                            <th>시작일</th>
+                            <th>만료일</th>
+                            <th>취소일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentTableBody">
+                        <tr class="loading-row"><td colspan="8">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="ui.js"></script>
+<script type="module">
+import { supabase, getUser, signOut } from './supabase-auth.js';
+
+let authToken = '';
+let allSubscribers = [];
+let allPayments = [];
+
+/* ── 날짜 포맷 ── */
+function fmtDate(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+/* ── 금액 포맷 ── */
+function fmtAmt(n) {
+    if (!n && n !== 0) return '—';
+    return Number(n).toLocaleString('ko-KR') + '원';
+}
+
+/* ── API 호출 헬퍼 ── */
+async function adminApi(action, body = null) {
+    const opts = {
+        method: body ? 'POST' : 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+        },
+    };
+    if (body) opts.body = JSON.stringify({ action, ...body });
+    const url = body ? '/api/admin' : `/api/admin?action=${action}`;
+    const res = await fetch(url, opts);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    return res.json();
+}
+
+/* ── 인증 및 초기화 ── */
+async function init() {
+    const user = await getUser();
+    if (!user) {
+        window.location.href = 'login.html?redirect=admin.html';
+        return;
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    authToken = session?.access_token || '';
+
+    try {
+        await adminApi('verify');
+    } catch {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    document.getElementById('pageLoading').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'flex';
+    document.getElementById('adminEmail').textContent = user.email;
+
+    setupTabs();
+    setupLogout();
+    loadChannelKeys();
+    loadSubscribers();
+}
+
+/* ── 탭 전환 ── */
+function setupTabs() {
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+
+            if (tabId === 'payments' && allPayments.length === 0) loadPayments();
+        });
+    });
+}
+
+/* ── 로그아웃 ── */
+function setupLogout() {
+    document.getElementById('adminLogoutBtn').addEventListener('click', async () => {
+        if (!await showConfirm('로그아웃 하시겠어요?', { confirmText: '로그아웃', cancelText: '취소' })) return;
+        await signOut();
+        window.location.href = 'index.html';
+    });
+}
+
+/* ────────────────────────────
+   채널키 탭
+──────────────────────────── */
+let selectedChannelKey = '';
+
+async function loadChannelKeys() {
+    try {
+        const { keys, activeKey } = await adminApi('get-channel-keys');
+        selectedChannelKey = activeKey;
+        renderChannelKeys(keys, activeKey);
+    } catch (e) {
+        document.getElementById('channelKeyGrid').innerHTML =
+            `<p style="color:#fa5757;font-size:0.82rem;">오류: ${e.message}</p>`;
+    }
+}
+
+function renderChannelKeys(keys, activeKey) {
+    const grid = document.getElementById('channelKeyGrid');
+    const saveBtn = document.getElementById('saveChannelBtn');
+
+    grid.innerHTML = Object.entries(keys).map(([id, { label, value }]) => {
+        const isConfigured = !!value;
+        const isActive = value && value === activeKey;
+        const displayVal = value ? value.slice(0, 16) + '...' : '환경변수 미설정';
+        return `
+            <div class="channel-key-option">
+                <input type="radio" name="channelKey" id="ck-${id}" value="${escHtml(value)}"
+                    ${isActive ? 'checked' : ''} ${!isConfigured ? 'disabled' : ''}>
+                <label for="ck-${id}" class="channel-key-label">
+                    <span class="channel-key-name">
+                        <span class="dot"></span>${escHtml(label)}
+                    </span>
+                    <span class="channel-key-val ${isConfigured ? 'configured' : 'not-configured'}">${escHtml(displayVal)}</span>
+                </label>
+            </div>`;
+    }).join('');
+
+    grid.querySelectorAll('input[name="channelKey"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            selectedChannelKey = radio.value;
+            saveBtn.disabled = (selectedChannelKey === activeKey);
+        });
+    });
+
+    saveBtn.disabled = true;
+    saveBtn.onclick = async () => {
+        if (!selectedChannelKey) return;
+        saveBtn.disabled = true;
+        saveBtn.textContent = '저장 중...';
+        try {
+            await adminApi('set-channel-key', { channelKey: selectedChannelKey });
+            showToast('채널키가 저장되었습니다.', 'success');
+            await loadChannelKeys();
+        } catch (e) {
+            showToast('저장 실패: ' + e.message, 'error');
+            saveBtn.disabled = false;
+        }
+        saveBtn.textContent = '변경 저장';
+    };
+}
+
+/* ────────────────────────────
+   구독자 탭
+──────────────────────────── */
+async function loadSubscribers() {
+    setTableLoading('subscriberTableBody', 7);
+    setTableLoading('quickSelectBody', 4);
+    try {
+        const { subscribers } = await adminApi('get-subscribers');
+        allSubscribers = subscribers || [];
+        renderSubscribers(allSubscribers);
+        renderQuickSelect(allSubscribers);
+    } catch (e) {
+        setTableError('subscriberTableBody', 7, e.message);
+    }
+}
+
+function renderSubscribers(list) {
+    const tbody = document.getElementById('subscriberTableBody');
+    document.getElementById('subscriberCount').textContent = `총 ${list.length}명`;
+
+    if (!list.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="7">구독자가 없습니다.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(user => {
+        const sub = Array.isArray(user.subscriptions) ? user.subscriptions[0] : user.subscriptions;
+        const planKey = sub?.plan_type || '';
+        const status  = sub?.status || '';
+        const expire  = sub?.next_billing_at;
+        const hasSub  = !!sub?.id;
+        const hasActiveEmail = (user.email || '').trim();
+
+        return `<tr>
+            <td>${escHtml(user.name || '—')}</td>
+            <td style="font-size:0.78rem;">${escHtml(user.email || '—')}</td>
+            <td>${planKey ? `<span class="plan-badge-sm ${planKey}">${planKey.toUpperCase()}</span>` : '<span class="plan-badge-sm none">없음</span>'}</td>
+            <td>${statusBadge(status)}</td>
+            <td style="font-size:0.78rem;color:${user.tradingview_id ? '#4fd1ff' : '#444'};">${escHtml(user.tradingview_id || '미입력')}</td>
+            <td style="font-size:0.78rem;">${fmtDate(expire)}</td>
+            <td>
+                <div class="actions">
+                    <button class="tbl-btn tbl-btn-cyan" onclick="handleTvInvite('${user.id}','${escHtml(user.tradingview_id || '')}')">TV 초대</button>
+                    ${hasSub ? `
+                    <select class="plan-select" onchange="handlePlanChange('${sub.id}','${user.id}',this.value)">
+                        <option value="">플랜변경</option>
+                        <option value="basic"${planKey==='basic'?' selected':''}>Basic</option>
+                        <option value="pro"${planKey==='pro'?' selected':''}>Pro</option>
+                    </select>
+                    <button class="tbl-btn tbl-btn-red" onclick="handleCancelSub('${sub.id}','${user.id}','${escHtml(user.name||user.email||'')}')" ${status==='cancelled'?'disabled':''}>취소</button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function renderQuickSelect(list) {
+    const tbody = document.getElementById('quickSelectBody');
+    if (!list.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="4">유저 없음</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = list.map(u => `
+        <tr>
+            <td>${escHtml(u.name || '—')}</td>
+            <td style="font-size:0.78rem;">${escHtml(u.email || '—')}</td>
+            <td style="font-size:0.78rem;color:#4a7fa5;">${escHtml(u.tradingview_id || '미입력')}</td>
+            <td><button class="tbl-btn tbl-btn-cyan" onclick="fillInviteForm('${u.id}','${escHtml(u.tradingview_id||'')}')">선택</button></td>
+        </tr>`).join('');
+}
+
+/* 구독자 검색 */
+document.getElementById('subscriberSearch').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    const filtered = allSubscribers.filter(u =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.tradingview_id || '').toLowerCase().includes(q)
+    );
+    renderSubscribers(filtered);
+});
+
+document.getElementById('subscriberRefreshBtn').addEventListener('click', loadSubscribers);
+
+/* ────────────────────────────
+   TV 초대 탭
+──────────────────────────── */
+window.fillInviteForm = (userId, tvId) => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-tab="tv-invite"]').classList.add('active');
+    document.getElementById('tab-tv-invite').classList.add('active');
+    document.getElementById('inviteUserId').value = userId;
+    document.getElementById('inviteTvId').value = tvId;
+    document.getElementById('inviteUserId').scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+window.handleTvInvite = (userId, currentTvId) => {
+    fillInviteForm(userId, currentTvId);
+};
+
+document.getElementById('tvInviteForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const userId = document.getElementById('inviteUserId').value.trim();
+    const tvId   = document.getElementById('inviteTvId').value.trim();
+    const btn    = document.getElementById('tvInviteSubmitBtn');
+    const result = document.getElementById('inviteResult');
+
+    if (!userId || !tvId) return;
+    btn.disabled = true;
+    btn.textContent = '처리 중...';
+    result.textContent = '';
+
+    try {
+        const data = await adminApi('invite-tv', { userId, tradingviewId: tvId });
+        showToast('TV 초대 처리 완료!', 'success');
+        result.style.color = '#34c759';
+        result.textContent = data.tv?.skipped
+            ? '✓ DB 업데이트 완료 (TV API 스킵 모드)'
+            : '✓ TV 스크립트 권한 부여 완료';
+        await loadSubscribers();
+    } catch (err) {
+        showToast('오류: ' + err.message, 'error');
+        result.style.color = '#fa5757';
+        result.textContent = '✕ 오류: ' + err.message;
+    }
+    btn.disabled = false;
+    btn.textContent = '권한 부여';
+});
+
+/* ────────────────────────────
+   구독자 액션
+──────────────────────────── */
+window.handleCancelSub = async (subId, userId, userName) => {
+    if (!await showConfirm(`'${userName}' 의 구독을 강제 취소하시겠어요?\nTV 접근 권한도 함께 해제됩니다.`, {
+        title: '구독 강제 취소', confirmText: '취소 진행', cancelText: '닫기', danger: true
+    })) return;
+
+    try {
+        await adminApi('cancel-subscription', { subscriptionId: subId, userId });
+        showToast('구독이 취소되었습니다.', 'success');
+        await loadSubscribers();
+    } catch (e) {
+        showToast('오류: ' + e.message, 'error');
+    }
+};
+
+window.handlePlanChange = async (subId, userId, newPlan) => {
+    if (!newPlan) return;
+    if (!await showConfirm(`플랜을 '${newPlan.toUpperCase()}'으로 변경하시겠어요?`, {
+        title: '플랜 강제 변경', confirmText: '변경', cancelText: '취소'
+    })) return;
+
+    try {
+        await adminApi('change-plan', { subscriptionId: subId, userId, newPlan });
+        showToast(`플랜이 ${newPlan.toUpperCase()}으로 변경되었습니다.`, 'success');
+        await loadSubscribers();
+    } catch (e) {
+        showToast('오류: ' + e.message, 'error');
+    }
+};
+
+/* ────────────────────────────
+   결제 내역 탭
+──────────────────────────── */
+async function loadPayments() {
+    setTableLoading('paymentTableBody', 8);
+    try {
+        const { payments } = await adminApi('get-payments');
+        allPayments = payments || [];
+        renderPayments(allPayments);
+    } catch (e) {
+        setTableError('paymentTableBody', 8, e.message);
+    }
+}
+
+function renderPayments(list) {
+    const tbody = document.getElementById('paymentTableBody');
+    document.getElementById('paymentCount').textContent = `총 ${list.length}건`;
+
+    if (!list.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">결제 내역이 없습니다.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(p => {
+        const profile = p.profiles || {};
+        return `<tr>
+            <td>${escHtml(profile.name || '—')}</td>
+            <td style="font-size:0.78rem;">${escHtml(profile.email || '—')}</td>
+            <td>${p.plan_type ? `<span class="plan-badge-sm ${p.plan_type}">${p.plan_type.toUpperCase()}</span>` : '—'}</td>
+            <td style="font-weight:600;">${fmtAmt(p.amount)}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td style="font-size:0.78rem;">${fmtDate(p.started_at)}</td>
+            <td style="font-size:0.78rem;">${fmtDate(p.next_billing_at)}</td>
+            <td style="font-size:0.78rem;">${fmtDate(p.cancelled_at)}</td>
+        </tr>`;
+    }).join('');
+}
+
+document.getElementById('paymentSearch').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    const filtered = allPayments.filter(p => {
+        const name = (p.profiles?.name || '').toLowerCase();
+        const email = (p.profiles?.email || '').toLowerCase();
+        return name.includes(q) || email.includes(q);
+    });
+    renderPayments(filtered);
+});
+
+document.getElementById('paymentRefreshBtn').addEventListener('click', loadPayments);
+
+/* ────────────────────────────
+   유틸
+──────────────────────────── */
+function statusBadge(status) {
+    if (!status) return '<span class="status-badge other">없음</span>';
+    if (status === 'active')    return '<span class="status-badge active">활성</span>';
+    if (status === 'cancelled') return '<span class="status-badge cancelled">취소</span>';
+    return `<span class="status-badge other">${escHtml(status)}</span>`;
+}
+
+function escHtml(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setTableLoading(tbodyId, cols) {
+    document.getElementById(tbodyId).innerHTML =
+        `<tr class="loading-row"><td colspan="${cols}">불러오는 중...</td></tr>`;
+}
+
+function setTableError(tbodyId, cols, msg) {
+    document.getElementById(tbodyId).innerHTML =
+        `<tr class="empty-row"><td colspan="${cols}" style="color:#fa5757;">오류: ${escHtml(msg)}</td></tr>`;
+}
+
+init();
+</script>
+</body>
+</html>

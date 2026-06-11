@@ -351,6 +351,20 @@
             font-size: 0.74rem;
             color: rgba(255,255,255,0.35);
         }
+        .co-tv-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 8px;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.28);
+            line-height: 1.5;
+        }
+        .co-tv-note strong {
+            color: rgba(255,255,255,0.42);
+            font-weight: 600;
+        }
 
         /* ── 아코디언 (카드 내부) ── */
         .co-accordion-toggle {
@@ -969,6 +983,12 @@
                             </svg>
                             안전한 PG 결제 환경
                         </p>
+                        <p class="co-tv-note">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            서비스 이용을 위해 <strong>TradingView 계정</strong>이 필요합니다
+                        </p>
                     </div>
                 </div>
 
@@ -1081,8 +1101,15 @@
         import { supabase, getUser, signIn } from './supabase-auth.js';
 
         /* ── PortOne 설정 ── */
-        const PORTONE_STORE_ID    = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
-        const PORTONE_CHANNEL_KEY = 'channel-key-8394e3df-d441-403b-b12a-4e6299f0bfc1';
+        const PORTONE_STORE_ID = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
+        let PORTONE_CHANNEL_KEY = 'channel-key-8394e3df-d441-403b-b12a-4e6299f0bfc1';
+        try {
+            const ckRes = await fetch('/api/admin?action=get-channel-key');
+            if (ckRes.ok) {
+                const { channelKey } = await ckRes.json();
+                if (channelKey) PORTONE_CHANNEL_KEY = channelKey;
+            }
+        } catch { /* 기본값 유지 */ }
 
         /* ── 플랜 데이터 ── */
         const PLANS = {
@@ -1560,6 +1587,7 @@
                     planType:       planKey,
                     customerName:   name,
                     customerEmail:  currentUser.email,
+                    customerPhone:  phone,
                 };
                 if (isUpgradeMode) {
                     chargeBody.isUpgrade     = true;

@@ -2,6 +2,191 @@
 
 ---
 
+## 2026-06-11 (69차)
+
+### admin.html / api/admin.js / 404.html — 어드민 대시보드 및 404 페이지 신규 추가
+
+**신규 파일:** `admin.html`, `api/admin.js`, `404.html`  
+**수정 파일:** `vercel.json`, `checkout.html`, `CLAUDE.md`
+
+> **Supabase 테이블 생성 필요:**
+> ```sql
+> CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT, updated_at TIMESTAMPTZ DEFAULT now());
+> INSERT INTO app_settings (key, value) VALUES ('active_channel_key', '<기존_채널키_값>') ON CONFLICT (key) DO NOTHING;
+> ```
+>
+> **Vercel 환경변수 추가 필요 (선택):**
+> - `ADMIN_EMAIL` — 어드민 접근 허용 이메일 (기본: `admin@getbitlogic.com`)
+> - `PORTONE_CHANNEL_KEY_KAKAO`, `PORTONE_CHANNEL_KEY_KG`, `PORTONE_CHANNEL_KEY_KPN`, `PORTONE_CHANNEL_KEY_TOSS`, `PORTONE_CHANNEL_KEY_KG_AUTH`
+
+#### 1. admin.html (신규)
+- 어드민 전용 대시보드 (`admin@getbitlogic.com` 또는 `ADMIN_EMAIL` 계정만 접근)
+- 페이지 로드 시 Supabase 세션 확인 → `/api/admin?action=verify` 호출 → 미인증/비어드민 시 리다이렉트
+- **탭 1: 채널키** — 5개 포트원 채널키(KAKAO / KG / KPN / TOSS / KG_AUTH) 라디오 선택 + 저장. 활성 채널키는 Supabase `app_settings` 테이블에 저장
+- **탭 2: 구독자 목록** — 이름/이메일/플랜/상태/TV ID/만료일 표. 이름·이메일·TV ID 실시간 검색. 행별 TV 초대 / 플랜 변경(드롭다운) / 구독 취소 액션 버튼
+- **탭 3: TV 수동 초대** — Supabase UUID + TradingView ID 입력 후 권한 부여. 구독자 빠른 선택 테이블(클릭 시 UUID 자동 입력) 포함
+- **탭 4: 결제 내역** — 전체 구독 레코드 테이블(이름/이메일/플랜/금액/상태/시작일/만료일/취소일). 이름·이메일 검색
+
+#### 2. api/admin.js (신규)
+- 어드민 전용 Vercel Serverless Function
+- `GET /api/admin?action=get-channel-key` — 공개 엔드포인트, `checkout.html`에서 활성 채널키 조회용
+- 이하 모든 액션은 Supabase JWT 검증 + `ADMIN_EMAIL` 일치 여부 확인
+  - `verify` — 어드민 인증 확인
+  - `get-channel-keys` — 5개 채널키 + 현재 활성키 반환
+  - `set-channel-key` — `app_settings` 테이블에 활성 채널키 저장
+  - `get-subscribers` — profiles + subscriptions 조인 목록
+  - `get-payments` — subscriptions + profiles 조인 결제 내역
+  - `invite-tv` — profiles.tradingview_id 업데이트 + invite-tv API 호출
+  - `cancel-subscription` — subscriptions.status='cancelled' 업데이트 + TV 권한 해제
+  - `change-plan` — subscriptions.plan_type 업데이트 + TV 권한 재초대
+
+#### 3. 404.html (신규)
+- 현재 다크 테마에 맞는 커스텀 404 페이지
+- 대형 그라디언트 "404" 숫자 + "페이지를 찾을 수 없습니다" 안내
+- "메인으로 돌아가기" 버튼 (그라디언트 스타일)
+- BitLogic 로고 포함
+
+#### 4. vercel.json — 404 라우팅 추가
+- `"routes"` 배열 추가: `{ "handle": "filesystem" }` + `{ "src": "/(.*)", "dest": "/404.html", "status": 404 }`
+- 실제 파일이 없는 모든 경로에서 `404.html` 반환
+
+#### 5. checkout.html — 채널키 동적 fetch
+- 기존 `const PORTONE_CHANNEL_KEY` 하드코딩 → `let`으로 변경
+- 페이지 초기화 시 `GET /api/admin?action=get-channel-key` 호출하여 활성 채널키 반영
+- API 실패 시 기존 하드코딩값 fallback 유지
+
+#### 6. CLAUDE.md
+- 환경변수 테이블에 `ADMIN_EMAIL`, 5개 `PORTONE_CHANNEL_KEY_*` 항목 추가
+- 페이지 구조 테이블에 `admin.html`, `api/admin.js`, `404.html` 추가
+- `app_settings` 테이블 스키마 추가 (초기 설정 SQL 포함)
+
+---
+
+## 2026-06-11 (68차)
+
+### index.html / style.css — 문구 전반 수정 및 copy-bridge 섹션 추가
+
+**수정 파일:** `index.html`, `style.css`
+
+- `<title>` 교체: 긴 서술형 → `BitLogic | TradingView 알고리즘 지표 구독`
+- `<meta description>` 신규 추가
+- hero eyebrow: `프리미엄 매매 지표` → `TradingView 분석 소프트웨어`
+- hero-desc: `알고리즘 지표` → `알고리즘 소프트웨어`, `본질적인 매매 기준` → `데이터 기반의 분석 기준`
+- Features 카드: `데이터 기반 신호` → `데이터 기반 분석`, `가짜 신호 차단` → `노이즈 필터`, 설명 문구 2개 수정
+- pricing 섹션 앞 `.copy-bridge` 블록 신규 삽입 (질문형 문구 + 설명)
+- `style.css` `.copy-bridge` / `.copy-bridge-q` / `.copy-bridge-desc` 스타일 추가
+- FAQ 결제 답변: 초대 링크 방식 → 권한 부여 방식으로 표현 변경
+
+---
+
+## 2026-06-11 (67차)
+
+### index.html / style.css — TradingView STEP 카드 높이 통일 및 텍스트 줄바꿈 수정
+
+**수정 파일:** `index.html`, `style.css`
+
+- `.tv-step` `max-width: 240px → 260px` — 텍스트 여유 공간 확보
+- `.tv-step` `display: flex; flex-direction: column` 추가 — 카드 높이 균등 분배
+- STEP 02 설명 `<br>` 제거 → 자연스러운 한 줄 텍스트
+- STEP 03 설명 단축: `구독 완료 후 TradingView ID 입력하면 즉시 활성화됩니다` → `TradingView ID 입력 즉시 활성화됩니다.`
+
+---
+
+## 2026-06-11 (66차)
+
+### style.css — 플랜 카드 고정 높이 제거 및 Pro 텍스트 줄바꿈 수정
+
+**수정 파일:** `style.css`
+
+- `.pricing-stage` 패널 폭 `340px → 380px`, `align-items: center → start` — 카드가 차트 높이에 맞춰 늘어나던 문제 해결
+- `.plan-info` `height: 100%` 제거 — 기능 리스트에 맞게 자동 높이
+- `.plan-features` `flex: 1` 제거 — 남은 공간 채우던 동작 제거
+- `.plan-features li` `align-items: center → flex-start` — 줄바꿈 시 불릿 상단 정렬
+- `.plan-features li::before` `margin-top: 2px` 추가 — 불릿 아이콘 텍스트 기준선 맞춤
+
+---
+
+## 2026-06-11 (65차)
+
+### index.html — 플랜 카드 서브텍스트 원복
+
+**수정 파일:** `index.html`
+
+- Basic 서브텍스트: `핵심 알고리즘, 군더더기 없이` → `처음 시작하는 분께 추천`
+- Pro 서브텍스트: `풀 스펙 — 실전 트레이더의 선택` → `적극적인 트레이더를 위한 플랜`
+
+---
+
+## 2026-06-11 (64차)
+
+### index.html — 플랜 기능 문구 및 Features 섹션 문구 전면 재작성
+
+**수정 파일:** `index.html`
+
+- Basic 서브텍스트: `처음 시작하는 분께 추천` → `핵심 알고리즘, 군더더기 없이`
+- Pro 서브텍스트: `적극적인 트레이더를 위한 플랜` → `풀 스펙 — 실전 트레이더의 선택`
+- Basic 기능 목록 3개로 정리: 알고리즘 인디케이터 / 노이즈 필터 / 깔끔한 차트 레이아웃
+- Pro 기능 목록 4개로 정리: 노이즈 필터 / 핵심 매물대 분석 / 거래 시간대 분석 / 프리미엄 알고리즘
+- 기술 스택명(HMA, 오더블럭, 세션하이라이트) 비공개 — 결과 중심 문구로 교체
+- Features 카드 4개 문구 재작성: 결과·행동 중심으로 단축
+
+---
+
+## 2026-06-11 (63차)
+
+### index.html / style.css — TradingView 소개 섹션 카드 UX 수정
+
+**수정 파일:** `index.html`, `style.css`
+
+- STEP 01 카드 텍스트 `<br>` 제거 → 자연스러운 줄바꿈으로 수정
+- STEP 03 제목 `지표 활성화 → 바로 사용` → `지표 즉시 활성화`
+- STEP 03 설명 → `구독 완료 후 TradingView ID 입력하면 즉시 활성화됩니다`
+- 카드 3개 높이 통일: `.tv-steps { align-items: stretch }` + `.tv-step-arrow { display: flex; align-items: center }` 적용 → 가장 긴 카드 기준으로 3개 모두 동일 높이
+
+---
+
+## 2026-06-11 (62차)
+
+### index.html — TradingView 소개 섹션 추가 / checkout.html — TradingView 계정 필요 안내 추가
+
+**수정 파일:** `index.html`, `style.css`, `checkout.html`
+
+#### index.html — TradingView 소개 섹션 (`#platform`) 신규 추가
+- 히어로 섹션 바로 아래, 플랜 안내 섹션 위에 삽입
+- TradingView 설명: "전 세계 5천만 명이 사용하는 No.1 차트 분석 플랫폼" 소개
+- 비트로직 사용 3단계 카드: STEP 01 TradingView 무료 가입 → STEP 02 비트로직 구독 → STEP 03 지표 활성화
+- 서비스 이용 시 TradingView 계정 필요하다는 안내 자연스럽게 포함
+- 'TradingView 무료 가입하기' CTA 버튼 (https://tradingview.com, 새 탭)
+
+#### style.css — `.tv-intro` 섹션 스타일 추가
+- `.tv-intro`, `.tv-intro-inner`, `.tv-intro-desc`, `.tv-steps`, `.tv-step`, `.tv-step-arrow` 등 신규 스타일
+- 현재 다크 테마 디자인 시스템에 맞게 설계 (`var(--surface2)`, `var(--cyan)`, `var(--border)` 활용)
+- 모바일 반응형: 3단계 카드 세로 배치, 화살표 90도 회전
+
+#### checkout.html — TradingView 계정 필요 안내 추가
+- 결제 버튼 하단 `안전한 PG 결제 환경` 문구 아래에 소문자 안내 추가
+- "서비스 이용을 위해 **TradingView 계정**이 필요합니다" (ⓘ 아이콘 포함)
+- `.co-tv-note` 스타일 추가 (0.72rem, 매우 흐린 색상으로 비방해적 표시)
+
+---
+
+## 2026-06-11 (61차)
+
+### 포트원 결제 요청 시 고객 전화번호(phoneNumber) 누락 수정
+
+**수정 파일:** `api/charge.js`, `checkout.html`
+
+#### 원인
+- `checkout.html`에서 `/api/charge` 호출 시 `chargeBody`에 `customerPhone`이 포함되지 않음
+- `api/charge.js`에서 포트원 빌링키 결제 요청의 `customer` 객체에 `phoneNumber` 필드 누락
+
+#### 수정 내용
+- `checkout.html`: `chargeBody`에 `customerPhone: phone` 추가
+- `api/charge.js`: `req.body`에서 `customerPhone` 추출 추가
+- `api/charge.js`: 포트원 결제 요청 `customer` 객체에 `phoneNumber: customerPhone` 추가
+
+---
+
 ## 2026-06-10 (60차)
 
 ### 모바일 상태바 영역 배경색 nav와 통일

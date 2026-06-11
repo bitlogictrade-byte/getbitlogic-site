@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
         planType,
         customerName,
         customerEmail,
+        customerPhone,
         isUpgrade,
         planStartedAt,
     } = req.body;
@@ -78,9 +79,10 @@ module.exports = async (req, res) => {
                     amount: { total: amount },
                     currency: 'KRW',
                     customer: {
-                        customerId: userId,
-                        fullName:   customerName || '고객',
-                        email:      customerEmail,
+                        customerId:  userId,
+                        fullName:    customerName || '고객',
+                        email:       customerEmail,
+                        phoneNumber: customerPhone,
                     },
                 }),
             }

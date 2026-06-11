@@ -406,6 +406,135 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     display: block;
 }
 
+/* ── TRADINGVIEW INTRO ── */
+.tv-intro {
+    padding: 100px 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.tv-intro-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tv-intro .section-title {
+    margin-bottom: 1.2rem;
+}
+
+.tv-intro .section-title .cyan {
+    background: linear-gradient(90deg, var(--cyan), var(--cyan2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tv-intro-desc {
+    font-size: clamp(0.92rem, 1.3vw, 1.05rem);
+    color: rgba(255,255,255,0.55);
+    line-height: 1.85;
+    margin-bottom: 3.5rem;
+}
+
+.tv-intro-desc strong {
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+}
+
+.tv-steps {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    margin-bottom: 3rem;
+}
+
+.tv-step {
+    flex: 1;
+    max-width: 260px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.tv-step:hover {
+    border-color: rgba(0,229,255,0.3);
+    transform: translateY(-3px);
+}
+
+.tv-step-num {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--cyan);
+    margin-bottom: 1rem;
+    opacity: 0.85;
+}
+
+.tv-step-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.01em;
+}
+
+.tv-step-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.tv-step-arrow {
+    color: rgba(255,255,255,0.18);
+    padding: 0 1.5rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.tv-intro-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.92rem;
+}
+
+@media (max-width: 768px) {
+    .tv-steps {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .tv-step { max-width: 100%; width: 100%; }
+    .tv-step-arrow {
+        padding: 0;
+        transform: rotate(90deg);
+    }
+}
+
+/* ── COPY BRIDGE ── */
+.copy-bridge {
+    text-align: center;
+    padding: 48px 24px 32px;
+}
+
+.copy-bridge-q {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+.copy-bridge-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.8;
+}
+
 /* ── PRICING ── */
 .pricing {
     padding: 100px 2rem;
@@ -472,9 +601,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Stage */
 .pricing-stage {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 380px;
     gap: 1.5rem;
-    align-items: center;
+    align-items: start;
 }
 
 .stage-chart {
@@ -511,7 +640,6 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .plan-info {
     display: flex;
     flex-direction: column;
-    height: 100%;
     gap: 1.5rem;
 }
 
@@ -574,12 +702,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
-    flex: 1;
 }
 
 .plan-features li {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
     font-size: 0.88rem;
     color: rgba(255,255,255,0.78);
@@ -589,6 +716,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .plan-features li::before {
     content: '';
     flex-shrink: 0;
+    margin-top: 2px;
     width: 18px;
     height: 18px;
     border-radius: 50%;
