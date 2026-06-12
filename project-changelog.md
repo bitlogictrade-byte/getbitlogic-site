@@ -2,6 +2,26 @@
 
 ---
 
+## 2026-06-12 (113차)
+
+### admin.html 테스트 결제 — V2 공식 문서 기준 전면 재작성
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 테스트 채널을 KAKAO / KG / KPN / TOSS 4개로 재정의 (DANAL 제거)
+- KG이니시스: `requestIssueBillingKey` — `billingKeyMethod: 'CARD'`, `issueId`, `issueName: 'BitLogic 정기결제'`, `customer` (adminProfile)
+- KAKAO: `requestPayment` — `payMethod: 'EASY_PAY'`, `easyPayProvider: 'KAKAOPAY'`
+- TOSS: `requestPayment` — `payMethod: 'EASY_PAY'`, `easyPayProvider: 'TOSSPAY'`
+- KPN: `requestPayment` — `payMethod: 'CARD'`
+- KG_AUTH: `requestIdentityVerification` — `customer` (adminProfile)
+- 모든 `customer`에 `adminProfile.name / email / phoneNumber` 적용 (Supabase profiles에서 조회)
+- `adminProfile`에 `name` 필드 추가, init()에서 `profiles.name` 함께 로드
+- KG 채널 선택 시 버튼 레이블 "빌링키 발급 실행"으로 자동 변경
+- 다날 V1 카드 UI / `loadV1ImpKey` / `testDanalV1Btn` 핸들러 / `v1ImpKey` 전역변수 제거
+
+---
+
 ## 2026-06-12 (112차)
 
 ### mypage.html — 이용 플랜 섹션 UI 재구성

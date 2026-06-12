@@ -689,14 +689,7 @@
                 </div>
             </div>
 
-            <div class="admin-card">
-                <p class="admin-card-title">다날 V1 결제 테스트</p>
-                <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">포트원 V1 IMP — <code style="font-size:0.78rem;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;">IMP.request_pay()</code> / pg: danal / pay_method: phone</p>
-                <div id="v1ImpKeyStatus" style="font-size:0.8rem;color:#555;margin-bottom:14px;">IMP 키 로딩 중...</div>
-                <button class="test-pay-btn" id="testDanalV1Btn" disabled>다날 V1 결제 실행</button>
-            </div>
-
-            <div class="admin-card" style="margin-top:0;">
+<div class="admin-card" style="margin-top:0;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                     <p class="admin-card-title" style="margin-bottom:0;">결제 로그</p>
                     <button class="refresh-btn" id="clearLogBtn" style="font-size:0.75rem;">로그 지우기</button>
@@ -719,8 +712,7 @@ let authToken = '';
 let allSubscribers = [];
 let allPayments = [];
 let allChannelKeys = {};
-let adminProfile = { email: '', phone: '' };
-let v1ImpKey = '';
+let adminProfile = { email: '', phone: '', name: '' };
 
 /* ── 날짜 포맷 ── */
 function fmtDate(iso) {
@@ -768,11 +760,12 @@ async function init() {
     // 테스트 결제용 어드민 프로필 정보 로드
     const { data: profileData } = await supabase
         .from('profiles')
-        .select('phone')
+        .select('phone, name')
         .eq('id', session.user.id)
         .single();
     adminProfile.email = session.user.email || '';
     adminProfile.phone = profileData?.phone || '';
+    adminProfile.name  = profileData?.name  || '';
 
     try {
         await adminApi('verify');
@@ -795,7 +788,6 @@ async function init() {
     setupLogout();
     loadChannelKeys();
     loadSubscribers();
-    loadV1ImpKey();
 }
 
 /* ── 탭 전환 ── */
@@ -1128,7 +1120,7 @@ function setTableError(tbodyId, cols, msg) {
 /* ────────────────────────────
    테스트 결제 탭
 ──────────────────────────── */
-const TEST_CHANNEL_IDS      = ['KAKAO', 'KG', 'KPN', 'DANAL', 'TOSS'];
+const TEST_CHANNEL_IDS      = ['KAKAO', 'KG', 'KPN', 'TOSS'];
 const TEST_AUTH_CHANNEL_IDS = ['KG_AUTH'];
 let testSelectedChannelKey = '';
 let testSelectedChannelId  = '';
@@ -1178,6 +1170,7 @@ function renderTestChannelGrid() {
             testSelectedChannelKey = radio.value;
             testSelectedChannelId  = radio.dataset.id;
             payBtn.disabled = !testSelectedChannelKey;
+            payBtn.textContent = testSelectedChannelId === 'KG' ? '빌링키 발급 실행' : '결제 실행';
         });
     });
 
@@ -1215,36 +1208,44 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
     const btn = document.getElementById('testPayBtn');
     btn.disabled = true;
     const channelLabel = allChannelKeys[testSelectedChannelId]?.label || testSelectedChannelId;
+    const customer = {
+        fullName:    adminProfile.name  || '어드민',
+        email:       adminProfile.email,
+        phoneNumber: adminProfile.phone,
+    };
 
-    // 다날: 결제 대신 본인인증
-    if (testSelectedChannelId === 'DANAL') {
-        btn.textContent = '본인인증 창 열리는 중...';
-        const identityVerificationId = `testdanal${Date.now()}`;
-        addLog('info', `본인인증 요청 시작 — 채널: ${channelLabel}, verificationId: ${identityVerificationId}`);
+    // KG이니시스: 빌링키 발급
+    if (testSelectedChannelId === 'KG') {
+        btn.textContent = '빌링키 발급 창 열리는 중...';
+        const issueId = `testbilling${Date.now()}`;
+        addLog('info', `빌링키 발급 요청 시작 — 채널: ${channelLabel}, issueId: ${issueId}`);
         try {
-            const resp = await PortOne.requestIdentityVerification({
-                storeId:                PORTONE_STORE_ID,
-                channelKey:             testSelectedChannelKey,
-                identityVerificationId,
-                customer:               { fullName: '어드민 테스트' },
+            const resp = await PortOne.requestIssueBillingKey({
+                storeId:          PORTONE_STORE_ID,
+                channelKey:       testSelectedChannelKey,
+                billingKeyMethod: 'CARD',
+                issueId,
+                issueName:        'BitLogic 정기결제',
+                customer,
             });
             if (resp?.code) {
                 if (resp.code === 'USER_CANCEL') {
-                    addLog('cancel', `본인인증 취소 — ${resp.message || '사용자가 인증을 취소했습니다.'}`);
+                    addLog('cancel', `빌링키 발급 취소 — ${resp.message || '사용자가 취소했습니다.'}`);
                 } else {
-                    addLog('error', `본인인증 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
+                    addLog('error', `빌링키 발급 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
                 }
             } else {
-                addLog('success', `본인인증 성공 — verificationId: ${resp?.identityVerificationId || identityVerificationId}`);
+                addLog('success', `빌링키 발급 성공 — billingKey: ${resp?.billingKey || '—'}, issueId: ${issueId}`);
             }
         } catch (err) {
             addLog('error', `오류 발생 — ${err.message || String(err)}`);
         }
         btn.disabled = false;
-        btn.textContent = '결제 실행';
+        btn.textContent = '빌링키 발급 실행';
         return;
     }
 
+    // KAKAO / TOSS / KPN: 일반결제
     btn.textContent = '결제 창 열리는 중...';
     const paymentId = `testadmin${Date.now()}`;
     addLog('info', `결제 요청 시작 — 채널: ${channelLabel}, paymentId: ${paymentId}`);
@@ -1256,7 +1257,7 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
         orderName:   'BitLogic 테스트 결제 (관리자)',
         totalAmount: 119000,
         currency:    'KRW',
-        customer:    { fullName: '어드민 테스트' },
+        customer,
     };
 
     if (testSelectedChannelId === 'KAKAO') {
@@ -1269,16 +1270,8 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
         payOptions.payMethod = 'CARD';
     }
 
-    if (['KG', 'KPN'].includes(testSelectedChannelId)) {
-        payOptions.customer.email = adminProfile.email;
-    }
-    if (testSelectedChannelId === 'KG') {
-        payOptions.customer.phoneNumber = adminProfile.phone;
-    }
-
     try {
         const resp = await PortOne.requestPayment(payOptions);
-
         if (resp?.code) {
             if (resp.code === 'USER_CANCEL') {
                 addLog('cancel', `결제 취소 — ${resp.message || '사용자가 결제를 취소했습니다.'}`);
@@ -1313,7 +1306,11 @@ document.getElementById('testAuthBtn').addEventListener('click', async () => {
             storeId:                PORTONE_STORE_ID,
             channelKey:             testAuthChannelKey,
             identityVerificationId,
-            customer:               { fullName: '어드민 테스트' },
+            customer: {
+                fullName:    adminProfile.name  || '어드민',
+                email:       adminProfile.email,
+                phoneNumber: adminProfile.phone,
+            },
         });
 
         if (resp?.code) {
@@ -1333,65 +1330,6 @@ document.getElementById('testAuthBtn').addEventListener('click', async () => {
     btn.textContent = '본인인증 실행';
 });
 
-async function loadV1ImpKey() {
-    const statusEl = document.getElementById('v1ImpKeyStatus');
-    const btn      = document.getElementById('testDanalV1Btn');
-    try {
-        const data = await adminApi('get-v1-imp-key');
-        v1ImpKey = data.impKey || '';
-        if (v1ImpKey) {
-            statusEl.textContent = `IMP 키: ${v1ImpKey.slice(0, 8)}...`;
-            statusEl.style.color = '#4caf93';
-            btn.disabled = false;
-        } else {
-            statusEl.textContent = 'PORTONE_V1_IMP_KEY 환경변수 미설정';
-            statusEl.style.color = '#fa5757';
-        }
-    } catch {
-        statusEl.textContent = 'IMP 키 로드 실패';
-        statusEl.style.color = '#fa5757';
-    }
-}
-
-document.getElementById('testDanalV1Btn').addEventListener('click', async () => {
-    if (!v1ImpKey) return;
-
-    const btn = document.getElementById('testDanalV1Btn');
-    btn.disabled = true;
-    btn.textContent = '결제 창 열리는 중...';
-
-    const merchantUid = `testdanalv1_${Date.now()}`;
-    addLog('info', `다날 V1 결제 요청 시작 — merchantUid: ${merchantUid}`);
-
-    try {
-        IMP.init(v1ImpKey);
-        const resp = await new Promise((resolve) => {
-            IMP.request_pay({
-                pg:           'danal',
-                pay_method:   'phone',
-                merchant_uid: merchantUid,
-                name:         'BitLogic 테스트 결제 V1 (관리자)',
-                amount:       119000,
-                buyer_email:  adminProfile.email,
-                buyer_name:   '어드민 테스트',
-                buyer_tel:    adminProfile.phone || '01000000000',
-            }, resolve);
-        });
-
-        if (resp.success) {
-            addLog('success', `다날 V1 결제 성공 — imp_uid: ${resp.imp_uid}, merchant_uid: ${resp.merchant_uid}`);
-        } else if (resp.error_code === 'F0000' || resp.error_msg?.includes('취소')) {
-            addLog('cancel', `다날 V1 결제 취소 — ${resp.error_msg || '사용자가 결제를 취소했습니다.'}`);
-        } else {
-            addLog('error', `다날 V1 결제 실패 [${resp.error_code || '—'}] — ${resp.error_msg || '알 수 없는 오류'}`);
-        }
-    } catch (err) {
-        addLog('error', `오류 발생 — ${err.message || String(err)}`);
-    }
-
-    btn.disabled = false;
-    btn.textContent = '다날 V1 결제 실행';
-});
 
 document.getElementById('clearLogBtn').addEventListener('click', () => {
     document.getElementById('testPayLog').innerHTML = '<p class="log-empty">결제 실행 후 결과가 여기에 표시됩니다.</p>';
