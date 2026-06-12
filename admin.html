@@ -1245,48 +1245,48 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
         return;
     }
 
-    btn.textContent = '빌링키 발급 창 열리는 중...';
-    const billingKeyId = `testbilling${Date.now()}`;
-    addLog('info', `빌링키 발급 요청 시작 — 채널: ${channelLabel}, billingKeyId: ${billingKeyId}`);
+    btn.textContent = '결제 창 열리는 중...';
+    const paymentId = `testadmin${Date.now()}`;
+    addLog('info', `결제 요청 시작 — 채널: ${channelLabel}, paymentId: ${paymentId}`);
 
-    const issueOptions = {
-        storeId:      PORTONE_STORE_ID,
-        channelKey:   testSelectedChannelKey,
-        billingKeyId,
-        orderName:    'BitLogic 테스트 빌링키 발급 (관리자)',
-        customer:     { fullName: '어드민 테스트' },
+    const payOptions = {
+        storeId:     PORTONE_STORE_ID,
+        channelKey:  testSelectedChannelKey,
+        paymentId,
+        orderName:   'BitLogic 테스트 결제 (관리자)',
+        totalAmount: 119000,
+        currency:    'KRW',
+        customer:    { fullName: '어드민 테스트' },
     };
 
     if (testSelectedChannelId === 'KAKAO') {
-        issueOptions.billingKeyMethod = 'EASY_PAY';
-        issueOptions.easyPay          = { easyPayProvider: 'KAKAOPAY' };
+        payOptions.payMethod = 'EASY_PAY';
+        payOptions.easyPay   = { easyPayProvider: 'KAKAOPAY' };
     } else if (testSelectedChannelId === 'TOSS') {
-        issueOptions.billingKeyMethod = 'EASY_PAY';
-        issueOptions.easyPay          = { easyPayProvider: 'TOSSPAY' };
+        payOptions.payMethod = 'EASY_PAY';
+        payOptions.easyPay   = { easyPayProvider: 'TOSSPAY' };
     } else {
-        issueOptions.billingKeyMethod = 'CARD';
+        payOptions.payMethod = 'CARD';
     }
 
     if (['KG', 'KPN'].includes(testSelectedChannelId)) {
-        issueOptions.customer.email = adminProfile.email;
+        payOptions.customer.email = adminProfile.email;
     }
     if (testSelectedChannelId === 'KG') {
-        issueOptions.customer.phoneNumber = adminProfile.phone;
-        issueOptions.issueName = 'BitLogic 정기결제';
-        issueOptions.issueId   = billingKeyId;
+        payOptions.customer.phoneNumber = adminProfile.phone;
     }
 
     try {
-        const resp = await PortOne.requestIssueBillingKey(issueOptions);
+        const resp = await PortOne.requestPayment(payOptions);
 
         if (resp?.code) {
             if (resp.code === 'USER_CANCEL') {
-                addLog('cancel', `빌링키 발급 취소 — ${resp.message || '사용자가 취소했습니다.'}`);
+                addLog('cancel', `결제 취소 — ${resp.message || '사용자가 결제를 취소했습니다.'}`);
             } else {
-                addLog('error', `빌링키 발급 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
+                addLog('error', `결제 실패 [${resp.code}] — ${resp.message || '알 수 없는 오류'}`);
             }
         } else {
-            addLog('success', `빌링키 발급 성공 — billingKey: ${resp?.billingKey || '—'}, billingKeyId: ${resp?.billingKeyId || billingKeyId}`);
+            addLog('success', `결제 성공 — paymentId: ${resp?.paymentId || paymentId}, txId: ${resp?.txId || '—'}`);
         }
     } catch (err) {
         addLog('error', `오류 발생 — ${err.message || String(err)}`);

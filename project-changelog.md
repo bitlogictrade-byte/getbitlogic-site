@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (111차)
+
+### admin.html 테스트 결제 — 전체 일반결제로 롤백
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 106~108차 변경 롤백: KAKAO / TOSS / KG / KPN 모두 `requestIssueBillingKey()` → `requestPayment()` 복원
+- DANAL 본인인증(`requestIdentityVerification`) 흐름은 변경 없음
+
+---
+
 ## 2026-06-12 (110차)
 
 ### 로그인 버튼 레이아웃 점프 버그 수정
