@@ -545,7 +545,7 @@
                 <div class="form-group">
                     <label class="form-label" for="resetEmail">Email</label>
                     <input type="email" id="resetEmail" name="email" placeholder="이메일 주소" class="form-input" autocomplete="email" required>
-                    <span class="form-error" id="resetEmailError" style="font-size:0.78rem;color:#fa5757;display:none;">올바른 이메일 주소를 입력해 주세요.</span>
+                    <span class="form-error" id="resetEmailError" style="font-size:0.78rem;color:#fa5757;display:block;opacity:0;line-height:1.4;transition:opacity 0.15s;">올바른 이메일 주소를 입력해 주세요.</span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full modal-submit" id="resetSubmitBtn">재설정 링크 보내기</button>
             </form>
@@ -701,10 +701,10 @@
             e.preventDefault();
             const email = document.getElementById('resetEmail')?.value.trim();
             const errEl = document.getElementById('resetEmailError');
-            errEl.style.display = 'none';
+            errEl.style.opacity = '0';
             errEl.textContent = '올바른 이메일 주소를 입력해 주세요.';
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                errEl.style.display = 'block';
+                errEl.style.opacity = '1';
                 return;
             }
             const btn = document.getElementById('resetSubmitBtn');

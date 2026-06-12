@@ -2,6 +2,16 @@
 
 ---
 
+## 2026-06-12 (110차)
+
+### 로그인 버튼 레이아웃 점프 버그 수정
+
+**원인:** `.form-error`가 `display: none/block`으로 토글될 때 공간이 생기고 사라지면서 버튼 위치가 밀림
+**수정:** `display: block; opacity: 0` → `.show`시 `opacity: 1` 로 변경. 공간은 항상 예약, 보임/숨김만 opacity로 처리
+**영향 파일:** `login.html`, `register.html`, `onboarding.html`, `index.html`
+
+---
+
 ## 2026-06-12 (109차)
 
 ### 프로젝트 파일 구조 정리

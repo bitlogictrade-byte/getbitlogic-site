@@ -90,8 +90,8 @@
         .auth-footer-text { text-align: center; font-size: 0.85rem; color: #6a8aaa; margin-top: 24px; }
         .auth-footer-text a { color: var(--cyan); font-weight: 600; text-decoration: none; }
         .auth-footer-text a:hover { text-decoration: underline; }
-        .form-error { font-size: 0.78rem; color: #fa5757; display: none; }
-        .form-error.show { display: block; }
+        .form-error { font-size: 0.78rem; color: #fa5757; display: block; opacity: 0; line-height: 1.4; transition: opacity 0.15s; }
+        .form-error.show { opacity: 1; }
         /* 비밀번호 찾기 모달 */
         .reset-modal-overlay {
             display: none; position: fixed; inset: 0;

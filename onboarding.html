@@ -72,8 +72,8 @@
             border-color: var(--cyan);
             box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.12);
         }
-        .form-error { font-size: 0.78rem; color: #fa5757; display: none; }
-        .form-error.show { display: block; }
+        .form-error { font-size: 0.78rem; color: #fa5757; display: block; opacity: 0; line-height: 1.4; transition: opacity 0.15s; }
+        .form-error.show { opacity: 1; }
         .auth-submit {
             width: 100%;
             padding: 14px;
