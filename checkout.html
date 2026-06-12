@@ -1648,6 +1648,7 @@
             payBtn.disabled    = true;
             payBtn.textContent = '카드 등록 중...';
 
+            let subId;
             try {
                 const issueId = `bitlogic-${planKey}-${Date.now()}`;
                 const channelKey = paymentChannels[selectedPayMethod] || '';
@@ -1696,7 +1697,6 @@
                 if (profileErr && profileErr.code !== '23505') throw profileErr;
 
                 /* 업그레이드: 기존 구독 ID 재사용 / 일반: 새 구독 행 생성 */
-                let subId;
                 if (isUpgradeMode) {
                     subId = activeSub.id;
                 } else {

@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (115차)
+
+### checkout.html — 결제창 취소 시 버튼 "카드 등록 중..." 상태 고착 버그 수정
+
+**수정 파일:** `checkout.html`
+
+**원인:** `let subId`가 `try` 블록 내부에 선언되어, 사용자가 결제창을 닫아 에러가 throw될 때 `catch` 블록에서 `subId`를 참조하면 `ReferenceError` 발생 → `payBtn.disabled = false` 미실행 → 버튼 고착
+
+**수정:** `let subId;` 선언을 `try` 블록 바깥(버튼 disabled 직전)으로 이동
+
+---
+
 ## 2026-06-12 (114차)
 
 ### checkout.html — 카드/카카오페이/토스페이 결제수단 선택 지원
