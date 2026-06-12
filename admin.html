@@ -675,14 +675,7 @@
                     <span class="test-amount-value">119,000원</span>
                     <span class="test-amount-note">테스트 고정금액</span>
                 </div>
-                <div id="danalMethodBox" style="display:none;margin-bottom:16px;">
-                    <label style="font-size:0.8rem;color:var(--muted);font-weight:600;display:block;margin-bottom:8px;">다날 결제 방식</label>
-                    <select id="danalMethodSelect" style="background:#111;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:0.85rem;padding:8px 12px;width:100%;font-family:inherit;">
-                        <option value="VIRTUAL_ACCOUNT">가상계좌 (VIRTUAL_ACCOUNT)</option>
-                        <option value="TRANSFER">계좌이체 (TRANSFER)</option>
-                    </select>
-                </div>
-                <button class="test-pay-btn" id="testPayBtn" disabled>결제 실행</button>
+<button class="test-pay-btn" id="testPayBtn" disabled>결제 실행</button>
             </div>
 
             <div class="admin-card">
@@ -1175,8 +1168,6 @@ function renderTestChannelGrid() {
             testSelectedChannelKey = radio.value;
             testSelectedChannelId  = radio.dataset.id;
             payBtn.disabled = !testSelectedChannelKey;
-            document.getElementById('danalMethodBox').style.display =
-                testSelectedChannelId === 'DANAL' ? 'block' : 'none';
         });
     });
 
@@ -1237,7 +1228,7 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
         payOptions.payMethod = 'EASY_PAY';
         payOptions.easyPay   = { easyPayProvider: 'TOSSPAY' };
     } else if (testSelectedChannelId === 'DANAL') {
-        payOptions.payMethod = document.getElementById('danalMethodSelect').value;
+        payOptions.payMethod = 'EASY_PAY';
     } else {
         payOptions.payMethod = 'CARD';
     }

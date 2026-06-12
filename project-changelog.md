@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (99차)
+
+### admin.html 테스트 결제 — 다날 payMethod EASY_PAY로 변경
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 다날(DANAL) 채널 테스트 결제 `payMethod`를 `EASY_PAY`로 변경
+- 이전에 추가했던 VIRTUAL_ACCOUNT/TRANSFER 드롭다운 UI 제거
+
+---
+
 ## 2026-06-12 (98차)
 
 ### admin.html 테스트 결제 — KG 구매자 정보 동적 조회 및 다날 결제 방식 선택 UI 추가
