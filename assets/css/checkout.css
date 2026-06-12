@@ -1,0 +1,811 @@
+.checkout-page {
+    min-height: 100vh;
+    padding: 100px 24px 80px;
+}
+.checkout-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+}
+
+/* ── Section headings ── */
+.co-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+/* ── Form card ── */
+.co-card {
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 36px 32px;
+}
+
+/* ── Form fields ── */
+.co-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.co-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+.co-label span { color: var(--cyan); margin-left: 2px; }
+.co-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #fff;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.co-input::placeholder { color: rgba(255,255,255,0.3); }
+.co-input:focus {
+    outline: none;
+    border-color: var(--cyan);
+}
+.co-input.error { border-color: #ff5c5c; }
+.co-input-hint {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+}
+.co-error {
+    font-size: 0.78rem;
+    color: #ff5c5c;
+    margin-top: 4px;
+    display: none;
+}
+.co-error.show { display: block; }
+
+/* ── Divider ── */
+.co-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 8px 0;
+}
+
+/* ── Checkboxes ── */
+.co-agree-all {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 14px 16px;
+    background: rgba(0,229,255,0.05);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 10px;
+}
+.co-agree-all input[type="checkbox"] { display: none; }
+.co-check-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+.co-check-box svg { display: none; }
+input[type="checkbox"]:checked + .co-check-box,
+.co-agree-all.checked .co-check-box {
+    background: var(--cyan);
+    border-color: var(--cyan);
+}
+input[type="checkbox"]:checked + .co-check-box svg,
+.co-agree-all.checked .co-check-box svg { display: block; }
+.co-agree-all-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+}
+.co-agree-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+.co-agree-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+.co-agree-item input[type="checkbox"] { display: none; }
+.co-check-sm {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+}
+.co-check-sm svg { display: none; }
+.co-agree-item input[type="checkbox"]:checked + .co-check-sm {
+    background: var(--cyan);
+    border-color: var(--cyan);
+}
+.co-agree-item input[type="checkbox"]:checked + .co-check-sm svg { display: block; }
+.co-agree-text {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+}
+.co-agree-text a {
+    color: var(--cyan);
+    text-decoration: underline;
+}
+.co-agree-text .tag-req {
+    color: var(--cyan);
+    font-weight: 700;
+    margin-right: 4px;
+}
+.co-agree-err {
+    font-size: 0.78rem;
+    color: #ff5c5c;
+    display: none;
+}
+.co-agree-err.show { display: block; }
+
+/* ── Right: Plan Summary ── */
+.co-summary {
+    position: sticky;
+    top: 100px;
+}
+
+.co-plan-card {
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: border-color 0.35s, box-shadow 0.35s;
+}
+.co-plan-card.is-pro {
+    border-color: rgba(91,45,232,0.55);
+    box-shadow: 0 0 32px rgba(91,45,232,0.18);
+}
+
+.co-plan-hdr {
+    background: linear-gradient(135deg, #5b2de8 0%, #00c4e0 100%);
+    padding: 15px 24px;
+    text-align: center;
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.04em;
+}
+
+.co-plan-body {
+    background: #0d0d0d;
+    padding: 24px 28px 28px;
+}
+
+.co-plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+.co-plan-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+.co-plan-sub {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 18px;
+}
+.co-plan-price {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 18px;
+}
+.co-plan-price span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.5);
+}
+.co-plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.co-plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.75);
+}
+.co-plan-features li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    flex-shrink: 0;
+}
+.co-divider-thin {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 20px 0;
+}
+.co-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.co-price-row-label {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.5);
+}
+.co-price-row-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+}
+.co-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+.co-total-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+}
+.co-total-value {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+/* ── 결제 수단 선택 ── */
+.co-pay-methods-wrap {
+    padding-top: 20px;
+    margin-bottom: 16px;
+}
+.co-pay-methods-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.co-pay-methods {
+    display: flex;
+    gap: 8px;
+}
+.co-pay-method-btn {
+    flex: 1;
+    padding: 12px 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+.co-pay-method-btn:hover {
+    border-color: rgba(255,255,255,0.22);
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.06);
+}
+.co-pay-method-btn.selected {
+    border-color: var(--cyan);
+    background: rgba(0,229,255,0.07);
+    color: #fff;
+}
+
+/* ── Pay button ── */
+.co-pay-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--cyan);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: inherit;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s, transform 0.15s;
+}
+.co-pay-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.co-pay-btn:active { transform: translateY(0); }
+.co-pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.co-secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 14px;
+    font-size: 0.74rem;
+    color: rgba(255,255,255,0.35);
+}
+.co-tv-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.28);
+    line-height: 1.5;
+}
+.co-tv-note strong {
+    color: rgba(255,255,255,0.42);
+    font-weight: 600;
+}
+
+/* ── 아코디언 ── */
+.co-accordion-toggle {
+    width: 100%;
+    margin-top: 16px;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    transition: color 0.2s, border-color 0.2s, background 0.2s,
+                border-bottom-left-radius 0s 0.4s,
+                border-bottom-right-radius 0s 0.4s;
+}
+.co-accordion-toggle:hover {
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.08);
+}
+.co-accordion-toggle.open {
+    color: #fff;
+    border-color: rgba(255,255,255,0.2);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    transition: color 0.2s, border-color 0.2s, background 0.2s,
+                border-bottom-left-radius 0s,
+                border-bottom-right-radius 0s;
+}
+.co-accordion-chevron {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+.co-accordion-toggle.open .co-accordion-chevron {
+    transform: rotate(180deg);
+}
+.co-accordion-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    margin-top: 0;
+}
+.co-accordion-panel.open {
+    max-height: 700px;
+}
+.co-alt-plan {
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 14px 14px 16px;
+    margin-bottom: 4px;
+}
+.co-alt-plan.is-pro {
+    border-color: rgba(91,45,232,0.35);
+}
+.co-alt-plan-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+.co-alt-plan-name {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.04em;
+}
+.co-alt-plan-price {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+}
+.co-alt-plan-price span {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+}
+.co-alt-features {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.co-alt-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+}
+.co-alt-features li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    flex-shrink: 0;
+}
+.co-switch-btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 12px;
+    background: transparent;
+    border: 1.5px solid var(--cyan);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, border-color 0.2s, color 0.2s;
+}
+.co-switch-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.co-switch-btn:active { transform: translateY(0); }
+.co-switch-btn.upgrade {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+.co-switch-btn.upgrade:hover { background: rgba(0,229,255,0.07); }
+.co-switch-btn.downgrade {
+    color: rgba(255,255,255,0.45);
+}
+.co-switch-btn.downgrade:hover { color: rgba(255,255,255,0.65); }
+
+/* ── 로그인 모달 ── */
+.login-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.login-modal-overlay.active { display: flex; }
+.login-modal-box {
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    margin: 24px;
+    position: relative;
+}
+.login-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    border-radius: 6px;
+}
+.login-modal-close:hover { color: rgba(255,255,255,0.8); }
+.login-modal-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.8rem;
+    font-family: inherit;
+    padding: 0;
+    margin-bottom: 20px;
+    transition: color 0.2s;
+}
+.login-modal-back:hover { color: rgba(255,255,255,0.8); }
+.login-modal-header { text-align: center; margin-bottom: 28px; }
+.login-modal-sub {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.login-modal-title { font-size: 1.8rem; font-weight: 800; color: #fff; letter-spacing: 0.05em; }
+.lm-form { display: flex; flex-direction: column; gap: 16px; }
+.lm-group { display: flex; flex-direction: column; gap: 6px; }
+.lm-label { font-size: 0.8rem; color: #a0b8cc; font-weight: 500; }
+.lm-input-wrap { position: relative; }
+.lm-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    color: #fff;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+.lm-input.has-toggle { padding-right: 48px; }
+.lm-input::placeholder { color: #4a6070; }
+.lm-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,0.12); }
+.lm-pw-toggle {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: #6a8aaa;
+    padding: 4px; display: flex; align-items: center; transition: color 0.2s;
+}
+.lm-pw-toggle:hover { color: #a0b8cc; }
+.lm-error { font-size: 0.78rem; color: #fa5757; display: none; }
+.lm-error.show { display: block; }
+.lm-submit {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #00b4cc, #0099aa);
+    border: none; border-radius: 10px; color: #fff;
+    font-size: 1rem; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s, transform 0.15s;
+}
+.lm-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+.lm-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.lm-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; }
+.lm-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+.lm-divider-text { font-size: 0.8rem; color: #6a8aaa; white-space: nowrap; }
+.lm-social-group { display: flex; flex-direction: column; gap: 10px; }
+.lm-social-btn {
+    width: 100%; padding: 13px; border: none; border-radius: 10px;
+    font-size: 0.92rem; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; transition: opacity 0.2s;
+}
+.lm-social-btn:hover { opacity: 0.88; }
+.lm-kakao { background: #FEE500; color: rgba(0,0,0,0.85); }
+.lm-google { background: #fff; color: rgba(0,0,0,0.85); border: 1px solid #e0e0e0; }
+.lm-footer-text { text-align: center; font-size: 0.85rem; color: #6a8aaa; margin-top: 20px; }
+.lm-footer-text a { color: var(--cyan); font-weight: 600; text-decoration: none; }
+.lm-footer-text a:hover { text-decoration: underline; }
+
+/* ── Page heading ── */
+.co-page-header { margin-bottom: 8px; }
+.co-page-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.co-page-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.04em;
+    margin-bottom: 32px;
+}
+
+/* ── Order info display ── */
+.co-info-section { display: flex; flex-direction: column; }
+.co-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+}
+.co-thin-div {
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+}
+.co-info-lbl {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    min-width: 58px;
+    flex-shrink: 0;
+}
+.co-req { color: var(--cyan); margin-left: 2px; }
+.co-info-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+.co-info-val {
+    flex: 1;
+    font-size: 0.95rem;
+    color: #fff;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.co-info-val.empty { color: rgba(255,255,255,0.25); font-style: italic; font-size: 0.88rem; }
+.co-edit-input {
+    display: none;
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: #fff;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.co-edit-input:focus { outline: none; border-color: var(--cyan); }
+.co-edit-input.error { border-color: #ff5c5c; }
+.co-edit-btn {
+    padding: 6px 11px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.74rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.co-edit-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.co-confirm-btn {
+    display: none;
+    padding: 6px 11px;
+    background: var(--cyan);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-size: 0.74rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.co-confirm-btn:hover { opacity: 0.85; }
+
+/* ── Pay section ── */
+.co-pay-section {
+    margin-top: 0;
+}
+
+@media (min-width: 769px) {
+    .co-plan-card {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom: none;
+    }
+    .co-pay-section {
+        background: #0d0d0d;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-top: 1px solid rgba(255,255,255,0.08);
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        padding: 0 28px 24px;
+    }
+    .co-plan-card.is-pro {
+        border-color: rgba(91,45,232,0.55);
+    }
+    .co-plan-card.is-pro + .co-pay-section {
+        border-color: rgba(91,45,232,0.55);
+        box-shadow: 0 8px 32px rgba(91,45,232,0.12);
+    }
+}
+.co-pay-note {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .checkout-inner {
+        display: flex;
+        flex-direction: column;
+    }
+    .co-summary {
+        display: contents;
+        position: static;
+    }
+    .co-plan-card   { order: 1; width: 100%; }
+    .co-form-col    { order: 2; width: 100%; }
+    .co-pay-section { order: 3; width: 100%; }
+    .co-plan-card {
+        border-radius: 20px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .co-plan-card.is-pro {
+        border-color: rgba(91,45,232,0.55) !important;
+    }
+    .co-pay-section {
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+    }
+}

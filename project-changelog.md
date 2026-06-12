@@ -2,6 +2,27 @@
 
 ---
 
+## 2026-06-12 (124차)
+
+### CSS 코드 분리 — 페이지별 외부 CSS 파일로 추출
+
+**추가 파일:**
+- `assets/css/admin.css`: admin.html 인라인 스타일 추출
+- `assets/css/checkout.css`: checkout.html 인라인 스타일 추출
+- `assets/css/auth.css`: login/register 공통 레이아웃 스타일 (분리)
+- `assets/css/login.css`: login 전용 스타일 (forgot-link, reset-modal)
+- `assets/css/register.css`: register 전용 스타일 (step-indicator, step-panel 등)
+- `assets/css/mypage.css`: mypage.html 인라인 스타일 추출
+- `assets/css/success.css`: success.html 인라인 스타일 추출
+- `assets/css/onboarding.css`: onboarding.html 인라인 스타일 추출
+- `assets/css/404.css`: 404.html 인라인 스타일 추출
+- `assets/css/policy.css`: privacy-policy/terms-of-service/refund-policy 공통 스타일 (분리)
+
+**수정 파일:** 위 10개 CSS 파일을 참조하도록 각 HTML의 `<style>` 블록 제거 및 `<link>` 태그 추가
+- `admin.html`, `checkout.html`, `login.html`, `register.html`, `mypage.html`, `success.html`, `onboarding.html`, `404.html`, `privacy-policy.html`, `terms-of-service.html`, `refund-policy.html`
+
+---
+
 ## 2026-06-12 (123차)
 - `index.html`: Google Search Console 사이트 인증 메타 태그 추가
 

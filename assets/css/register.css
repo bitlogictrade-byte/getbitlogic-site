@@ -1,0 +1,78 @@
+.auth-right-header { margin-bottom: 28px; }
+
+/* ── Step Indicator ── */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+}
+.step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    border: 2px solid rgba(255,255,255,0.15);
+    color: #6a8aaa; background: transparent;
+    transition: all 0.35s ease; position: relative; z-index: 1;
+}
+.step-dot.active { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 0 4px rgba(0,229,255,0.12); }
+.step-dot.done { border-color: var(--cyan); background: var(--cyan); color: #000; }
+.step-dot.done::after {
+    content: ''; display: block; width: 9px; height: 5px;
+    border-left: 2px solid #000; border-bottom: 2px solid #000;
+    transform: rotate(-45deg) translate(1px, -1px);
+}
+.step-dot.done span { display: none; }
+.step-line { width: 48px; height: 2px; background: rgba(255,255,255,0.1); transition: background 0.35s ease; }
+.step-line.done { background: var(--cyan); }
+.step-label-wrap { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 8px; }
+.step-label { font-size: 0.7rem; color: #4a6070; text-align: center; transition: color 0.35s ease; flex: 1; }
+.step-label.active { color: var(--cyan); }
+.step-label.done { color: #6a8aaa; }
+
+/* ── Step Panels ── */
+.step-panel { display: none; animation: panelIn 0.35s cubic-bezier(0.4,0,0.2,1); }
+.step-panel.active { display: block; }
+@keyframes panelIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.step-panel.go-back { animation: panelBack 0.35s cubic-bezier(0.4,0,0.2,1); }
+@keyframes panelBack {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Back button ── */
+.btn-back {
+    width: 100%; padding: 13px;
+    background: transparent; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; color: #a0b8cc;
+    font-size: 0.92rem; font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    margin-top: 4px; letter-spacing: 0.03em;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-back:hover { border-color: rgba(255,255,255,0.3); color: #fff; background: rgba(255,255,255,0.04); }
+
+/* ── Terms text ── */
+.auth-terms {
+    font-size: 0.72rem; color: #4a6070;
+    text-align: center; margin-top: 16px; line-height: 1.6;
+}
+
+/* ── 전화번호 중복 복구 섹션 ── */
+.phone-dup-recovery {
+    display: none; flex-direction: column; gap: 10px;
+    margin-top: 6px; padding: 16px;
+    background: rgba(250,87,87,0.06);
+    border: 1px solid rgba(250,87,87,0.2); border-radius: 10px;
+}
+.phone-dup-recovery.show { display: flex; }
+.phone-dup-recovery-desc { font-size: 0.8rem; color: #fa9090; line-height: 1.6; margin: 0; }
+.phone-dup-result { font-size: 0.78rem; display: none; }
+.phone-dup-result.show { display: block; }
+.phone-dup-result.ok { color: var(--cyan); }
+.phone-dup-result.err { color: #fa5757; }

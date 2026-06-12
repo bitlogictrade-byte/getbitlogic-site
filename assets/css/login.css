@@ -1,0 +1,23 @@
+.forgot-link {
+    font-size: 0.78rem; color: #a0b8cc; text-decoration: none;
+    text-align: right; display: block; margin-top: -4px;
+}
+.forgot-link:hover { color: var(--cyan); }
+
+/* ── 비밀번호 찾기 모달 ── */
+.reset-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 500;
+    align-items: center; justify-content: center;
+}
+.reset-modal-overlay.active { display: flex; }
+.reset-modal-box {
+    background: #0d1420; border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 400px;
+    position: relative; margin: 24px;
+}
+.reset-modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; color: #6a8aaa;
+    font-size: 1.1rem; cursor: pointer;
+}
