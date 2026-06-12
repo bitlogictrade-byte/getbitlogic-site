@@ -2,7 +2,48 @@
 
 ---
 
-## 2026-06-12 (115차)
+## 2026-06-12 (119차)
+
+### api/charge.js — 포트원 V2 customer.name 필드 형식 수정
+
+**수정 파일:** `api/charge.js`
+
+**원인:** PortOne V2 REST API는 `customer.name`을 문자열이 아닌 `{ full: "이름" }` 객체로 요구함. 문자열 전달 시 `Invalid value for: body (expected '{')` 400 오류 반환
+
+**수정:** `name: customerName` → `name: { full: customerName }`
+
+---
+
+## 2026-06-12 (118차)
+
+### checkout.html — "결제 처리 중..." 버튼 고착 버그 수정
+
+**수정 파일:** `checkout.html`
+
+**원인 1:** `catch` 블록에서 `await supabase.delete()` 가 네트워크 문제로 응답 없이 걸리면, 이후 `showToast`와 버튼 복구 코드가 영원히 실행되지 않음
+
+**원인 2:** `/api/charge` fetch에 타임아웃이 없어 서버가 응답하지 않으면 무한 대기
+
+**수정:**
+- `supabase.delete()` 의 `await` 제거 (fire-and-forget, 클린업은 백그라운드 처리)
+- `AbortController` + 30초 타임아웃을 fetch에 추가
+- AbortError 시 한국어 친화적 에러 메시지 표시
+
+---
+
+## 2026-06-12 (117차)
+
+### checkout.html — 결제창 취소 시 버튼 "카드 등록 중..." 상태 고착 버그 수정
+
+**수정 파일:** `checkout.html`
+
+**원인:** `let subId`가 `try` 블록 내부에 선언되어, 사용자가 결제창을 닫아 에러가 throw될 때 `catch` 블록에서 `subId`를 참조하면 `ReferenceError` 발생 → `payBtn.disabled = false` 미실행 → 버튼 고착
+
+**수정:** `let subId;` 선언을 `try` 블록 바깥(버튼 disabled 직전)으로 이동
+
+---
+
+## 2026-06-12 (116차)
 
 ### 푸터 전화번호 자동 링크 하이라이트 방지
 
@@ -11,6 +52,21 @@
 - `.footer a[href^="tel"]`, `.footer-biz-value a` — 색상 상속, 밑줄 제거, 클릭 비활성화
 - `a[x-apple-data-detectors]` — iOS Safari 전화번호 자동감지 색상 오버라이드
 - 모바일 브라우저에서 전화번호가 파란 링크로 표시되던 문제 해결
+
+---
+
+## 2026-06-12 (115차)
+
+### checkout.html — 카드/카카오페이/토스페이 결제수단 선택 지원
+
+**수정 파일:** `api/admin.js`, `checkout.html`
+
+- `api/admin.js`: `get-payment-channels` 공개 엔드포인트 추가 — 카드(active card PG), 카카오페이, 토스페이 채널키 반환
+- `checkout.html`: 결제수단 선택 UI 추가 (신용/체크카드 · 카카오페이 · 토스페이)
+- 카드 선택 시 `billingKeyMethod: 'CARD'` + 카드 채널키 사용
+- 카카오페이 선택 시 `billingKeyMethod: 'EASY_PAY'` + `easyPay.easyPayProvider: 'KAKAOPAY'` + 카카오 채널키
+- 토스페이 선택 시 `billingKeyMethod: 'EASY_PAY'` + `easyPay.easyPayProvider: 'TOSSPAY'` + 토스 채널키
+- 기존 `EASY_PAY` 하드코딩 제거 — 채널키-결제수단 불일치로 인한 "서브가맹점 정보 미확인" 에러 수정
 
 ---
 

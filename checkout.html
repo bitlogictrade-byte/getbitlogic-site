@@ -321,6 +321,51 @@
             color: #fff;
         }
 
+        /* ── 결제 수단 선택 ── */
+        .co-pay-methods-wrap {
+            padding-top: 20px;
+            margin-bottom: 16px;
+        }
+        .co-pay-methods-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .co-pay-methods {
+            display: flex;
+            gap: 8px;
+        }
+        .co-pay-method-btn {
+            flex: 1;
+            padding: 12px 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.45);
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .co-pay-method-btn:hover {
+            border-color: rgba(255,255,255,0.22);
+            color: rgba(255,255,255,0.75);
+            background: rgba(255,255,255,0.06);
+        }
+        .co-pay-method-btn.selected {
+            border-color: var(--cyan);
+            background: rgba(0,229,255,0.07);
+            color: #fff;
+        }
+
         /* ── Pay button ── */
         .co-pay-btn {
             width: 100%;
@@ -1025,6 +1070,33 @@
                      데스크탑 — co-plan-card 아래에 붙어 하나의 카드처럼 보임 (CSS로 연결)
                      모바일   — display:contents 해체 후 order:3으로 폼 아래에 배치 -->
                 <div class="co-pay-section">
+                    <!-- 결제 수단 선택 -->
+                    <div class="co-pay-methods-wrap">
+                        <p class="co-pay-methods-title">결제 수단</p>
+                        <div class="co-pay-methods">
+                            <button type="button" class="co-pay-method-btn selected" data-method="card">
+                                <svg width="22" height="16" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="2" width="22" height="15" rx="2.5"/>
+                                    <line x1="1" y1="7.5" x2="23" y2="7.5"/>
+                                    <line x1="5" y1="12" x2="9" y2="12"/>
+                                </svg>
+                                <span>신용/체크카드</span>
+                            </button>
+                            <button type="button" class="co-pay-method-btn" data-method="kakao">
+                                <svg width="22" height="20" viewBox="0 0 20 18.758" fill="none">
+                                    <path d="M10 0C4.478 0 0 3.478 0 7.761c0 2.667 1.733 5.017 4.367 6.417L3.261 18.25c-.1.361.311.644.622.439L8.75 15.461c.407.041.824.063 1.25.067C15.522 15.528 20 12.05 20 7.761 20 3.478 15.522 0 10 0" fill="currentColor"/>
+                                </svg>
+                                <span>카카오페이</span>
+                            </button>
+                            <button type="button" class="co-pay-method-btn" data-method="toss">
+                                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                                    <line x1="4" y1="6" x2="18" y2="6"/>
+                                    <line x1="11" y1="6" x2="11" y2="18"/>
+                                </svg>
+                                <span>토스페이</span>
+                            </button>
+                        </div>
+                    </div>
                     <p class="co-pay-note">구매 버튼 클릭 시 매월 자동 결제에 동의하는 것으로 간주됩니다.</p>
                     <button class="co-pay-btn" id="payBtn" type="button">결제하기</button>
                     <p class="co-secure-note">
@@ -1145,13 +1217,10 @@
 
         /* ── PortOne 설정 ── */
         const PORTONE_STORE_ID = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
-        let PORTONE_CHANNEL_KEY = 'channel-key-8394e3df-d441-403b-b12a-4e6299f0bfc1';
+        let paymentChannels = { card: '', kakao: '', toss: '' };
         try {
-            const ckRes = await fetch('/api/admin?action=get-channel-key');
-            if (ckRes.ok) {
-                const { channelKey } = await ckRes.json();
-                if (channelKey) PORTONE_CHANNEL_KEY = channelKey;
-            }
+            const ckRes = await fetch('/api/admin?action=get-payment-channels');
+            if (ckRes.ok) paymentChannels = await ckRes.json();
         } catch { /* 기본값 유지 */ }
 
         /* ── 플랜 데이터 ── */
@@ -1461,6 +1530,16 @@
 
         renderPlan(planKey);
 
+        /* ── 결제 수단 선택 ── */
+        let selectedPayMethod = 'card';
+        document.querySelectorAll('.co-pay-method-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.co-pay-method-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedPayMethod = btn.dataset.method;
+            });
+        });
+
         /* ── 아코디언 토글 ── */
         const accordionToggle = document.getElementById('changePlanBtn');
         const accordionPanel  = document.getElementById('accordionPanel');
@@ -1569,21 +1648,37 @@
             payBtn.disabled    = true;
             payBtn.textContent = '카드 등록 중...';
 
+            let subId;
             try {
                 const issueId = `bitlogic-${planKey}-${Date.now()}`;
-                const response = await PortOne.requestIssueBillingKey({
-                    storeId:          PORTONE_STORE_ID,
-                    channelKey:       PORTONE_CHANNEL_KEY,
-                    billingKeyMethod: 'EASY_PAY',
+                const channelKey = paymentChannels[selectedPayMethod] || '';
+                if (!channelKey) {
+                    throw new Error('선택한 결제수단이 현재 사용 불가합니다. 다른 수단을 이용해 주세요.');
+                }
+
+                const issueParams = {
+                    storeId:   PORTONE_STORE_ID,
+                    channelKey,
                     issueId,
-                    issueName:        `BitLogic ${plan.name} 정기결제`,
+                    issueName: `BitLogic ${plan.name} 정기결제`,
                     customer: {
                         customerId:  currentUser.id,
                         fullName:    name,
                         phoneNumber: phone,
                         email:       currentUser.email,
                     },
-                });
+                };
+                if (selectedPayMethod === 'card') {
+                    issueParams.billingKeyMethod = 'CARD';
+                } else if (selectedPayMethod === 'kakao') {
+                    issueParams.billingKeyMethod = 'EASY_PAY';
+                    issueParams.easyPay = { easyPayProvider: 'KAKAOPAY' };
+                } else if (selectedPayMethod === 'toss') {
+                    issueParams.billingKeyMethod = 'EASY_PAY';
+                    issueParams.easyPay = { easyPayProvider: 'TOSSPAY' };
+                }
+
+                const response = await PortOne.requestIssueBillingKey(issueParams);
 
                 if (response.code != null) {
                     throw new Error(response.message || '카드 등록이 취소되었습니다.');
@@ -1602,7 +1697,6 @@
                 if (profileErr && profileErr.code !== '23505') throw profileErr;
 
                 /* 업그레이드: 기존 구독 ID 재사용 / 일반: 새 구독 행 생성 */
-                let subId;
                 if (isUpgradeMode) {
                     subId = activeSub.id;
                 } else {
@@ -1639,11 +1733,19 @@
                     chargeBody.isUpgrade     = true;
                     chargeBody.planStartedAt = activeSub.started_at || activeSub.created_at;
                 }
-                const chargeRes = await fetch('/api/charge', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(chargeBody),
-                });
+                const chargeAbort = new AbortController();
+                const chargeTimeout = setTimeout(() => chargeAbort.abort(), 30000);
+                let chargeRes;
+                try {
+                    chargeRes = await fetch('/api/charge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(chargeBody),
+                        signal: chargeAbort.signal,
+                    });
+                } finally {
+                    clearTimeout(chargeTimeout);
+                }
 
                 const chargeData = await chargeRes.json();
                 if (!chargeRes.ok) throw new Error(chargeData.error || '결제 실패');
@@ -1651,11 +1753,12 @@
                 window.location.href = `success.html?plan=${planKey}&sub=${subId}`;
 
             } catch (err) {
-                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제
+                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제 (await 없이 fire-and-forget)
                 if (subId && !isUpgradeMode) {
-                    await supabase.from('subscriptions').delete().eq('id', subId).catch(() => {});
+                    supabase.from('subscriptions').delete().eq('id', subId).catch(() => {});
                 }
-                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
+                const msg = err.name === 'AbortError' ? '결제 요청 시간이 초과되었습니다. 다시 시도해 주세요.' : (err.message || '다시 시도해 주세요.');
+                showToast('오류: ' + msg, 'error');
                 payBtn.disabled    = false;
                 payBtn.textContent = isUpgradeMode ? '업그레이드 결제하기' : '결제하기';
             }

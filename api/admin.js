@@ -59,17 +59,40 @@ module.exports = async (req, res) => {
 
     const action = req.query.action || (req.method === 'POST' ? req.body?.action : null);
 
-    /* ── 공개 엔드포인트: 결제 페이지용 활성 채널키 조회 ── */
+    /* ── 공개 엔드포인트: 결제 페이지용 활성 채널키 조회 (하위 호환) ── */
     if (action === 'get-channel-key' && req.method === 'GET') {
         try {
             const rows = await sbFetch('app_settings?key=eq.active_channel_key&select=value');
             const stored = rows?.[0]?.value;
             if (stored) return res.status(200).json({ channelKey: stored });
-            // 설정값 없으면 첫 번째 env 채널키 반환
             const fallback = Object.values(CHANNEL_KEYS).find(k => k.value)?.value || '';
             return res.status(200).json({ channelKey: fallback });
         } catch {
             return res.status(200).json({ channelKey: '' });
+        }
+    }
+
+    /* ── 공개 엔드포인트: 결제수단별 채널키 조회 ── */
+    if (action === 'get-payment-channels' && req.method === 'GET') {
+        try {
+            const rows = await sbFetch('app_settings?key=eq.active_channel_key&select=value');
+            const stored = rows?.[0]?.value;
+            // active_channel_key는 카드 PG 전환용 — 카드 키(KG/KPN/DANAL)만 유효
+            const cardKeys = [
+                CHANNEL_KEYS.KG.value,
+                CHANNEL_KEYS.KPN.value,
+                CHANNEL_KEYS.DANAL.value,
+            ].filter(Boolean);
+            const cardKey = (stored && cardKeys.includes(stored))
+                ? stored
+                : (cardKeys[0] || '');
+            return res.status(200).json({
+                card:  cardKey,
+                kakao: CHANNEL_KEYS.KAKAO.value,
+                toss:  CHANNEL_KEYS.TOSS.value,
+            });
+        } catch {
+            return res.status(200).json({ card: '', kakao: '', toss: '' });
         }
     }
 
