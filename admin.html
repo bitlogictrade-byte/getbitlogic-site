@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <style>
         /* ── 어드민 레이아웃 ── */
         .admin-wrap {
@@ -688,6 +689,13 @@
                 </div>
             </div>
 
+            <div class="admin-card">
+                <p class="admin-card-title">다날 V1 결제 테스트</p>
+                <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">포트원 V1 IMP — <code style="font-size:0.78rem;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;">IMP.request_pay()</code> / pg: danal / pay_method: phone</p>
+                <div id="v1ImpKeyStatus" style="font-size:0.8rem;color:#555;margin-bottom:14px;">IMP 키 로딩 중...</div>
+                <button class="test-pay-btn" id="testDanalV1Btn" disabled>다날 V1 결제 실행</button>
+            </div>
+
             <div class="admin-card" style="margin-top:0;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
                     <p class="admin-card-title" style="margin-bottom:0;">결제 로그</p>
@@ -712,6 +720,7 @@ let allSubscribers = [];
 let allPayments = [];
 let allChannelKeys = {};
 let adminProfile = { email: '', phone: '' };
+let v1ImpKey = '';
 
 /* ── 날짜 포맷 ── */
 function fmtDate(iso) {
@@ -786,6 +795,7 @@ async function init() {
     setupLogout();
     loadChannelKeys();
     loadSubscribers();
+    loadV1ImpKey();
 }
 
 /* ── 탭 전환 ── */
@@ -1321,6 +1331,66 @@ document.getElementById('testAuthBtn').addEventListener('click', async () => {
 
     btn.disabled = false;
     btn.textContent = '본인인증 실행';
+});
+
+async function loadV1ImpKey() {
+    const statusEl = document.getElementById('v1ImpKeyStatus');
+    const btn      = document.getElementById('testDanalV1Btn');
+    try {
+        const data = await adminApi('get-v1-imp-key');
+        v1ImpKey = data.impKey || '';
+        if (v1ImpKey) {
+            statusEl.textContent = `IMP 키: ${v1ImpKey.slice(0, 8)}...`;
+            statusEl.style.color = '#4caf93';
+            btn.disabled = false;
+        } else {
+            statusEl.textContent = 'PORTONE_V1_IMP_KEY 환경변수 미설정';
+            statusEl.style.color = '#fa5757';
+        }
+    } catch {
+        statusEl.textContent = 'IMP 키 로드 실패';
+        statusEl.style.color = '#fa5757';
+    }
+}
+
+document.getElementById('testDanalV1Btn').addEventListener('click', async () => {
+    if (!v1ImpKey) return;
+
+    const btn = document.getElementById('testDanalV1Btn');
+    btn.disabled = true;
+    btn.textContent = '결제 창 열리는 중...';
+
+    const merchantUid = `testdanalv1_${Date.now()}`;
+    addLog('info', `다날 V1 결제 요청 시작 — merchantUid: ${merchantUid}`);
+
+    try {
+        IMP.init(v1ImpKey);
+        const resp = await new Promise((resolve) => {
+            IMP.request_pay({
+                pg:           'danal',
+                pay_method:   'phone',
+                merchant_uid: merchantUid,
+                name:         'BitLogic 테스트 결제 V1 (관리자)',
+                amount:       119000,
+                buyer_email:  adminProfile.email,
+                buyer_name:   '어드민 테스트',
+                buyer_tel:    adminProfile.phone || '01000000000',
+            }, resolve);
+        });
+
+        if (resp.success) {
+            addLog('success', `다날 V1 결제 성공 — imp_uid: ${resp.imp_uid}, merchant_uid: ${resp.merchant_uid}`);
+        } else if (resp.error_code === 'F0000' || resp.error_msg?.includes('취소')) {
+            addLog('cancel', `다날 V1 결제 취소 — ${resp.error_msg || '사용자가 결제를 취소했습니다.'}`);
+        } else {
+            addLog('error', `다날 V1 결제 실패 [${resp.error_code || '—'}] — ${resp.error_msg || '알 수 없는 오류'}`);
+        }
+    } catch (err) {
+        addLog('error', `오류 발생 — ${err.message || String(err)}`);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '다날 V1 결제 실행';
 });
 
 document.getElementById('clearLogBtn').addEventListener('click', () => {

@@ -2,6 +2,21 @@
 
 ---
 
+## 2026-06-12 (103차)
+
+### admin.html / api/admin.js — 다날 V1 테스트 결제 추가
+
+**수정 파일:** `admin.html`, `api/admin.js`
+
+**수정 내용:**
+- `api/admin.js`: `PORTONE_V1_IMP_KEY` 환경변수 로드 및 `get-v1-imp-key` 어드민 인증 엔드포인트 추가
+- `admin.html`: 포트원 V1 SDK(`cdn.iamport.kr/v1/iamport.js`) 스크립트 로드 추가
+- 테스트 결제 탭에 "다날 V1 결제 테스트" 카드 추가 — `IMP.init()` → `IMP.request_pay({ pg: 'danal', pay_method: 'phone' })` 호출
+- `loadV1ImpKey()`: init 시 admin API로 IMP 키 조회, 미설정 시 버튼 비활성화 및 안내 표시
+- `buyer_email` / `buyer_tel` 에 `adminProfile` 정보 자동 포함
+
+---
+
 ## 2026-06-12 (102차)
 
 ### admin.html 테스트 결제 — 다날 채널 본인인증으로 전환

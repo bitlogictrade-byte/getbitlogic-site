@@ -8,6 +8,7 @@
 const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ADMIN_EMAIL   = process.env.ADMIN_EMAIL || 'admin@getbitlogic.com';
+const V1_IMP_KEY    = process.env.PORTONE_V1_IMP_KEY || '';
 
 const CHANNEL_KEYS = {
     KAKAO:   { label: 'KakaoTalk Pay',    value: process.env.PORTONE_CHANNEL_KEY_KAKAO    || '' },
@@ -79,6 +80,11 @@ module.exports = async (req, res) => {
     /* ── 어드민 인증 확인 ── */
     if (action === 'verify') {
         return res.status(200).json({ isAdmin: true });
+    }
+
+    /* ── 포트원 V1 IMP 키 조회 ── */
+    if (action === 'get-v1-imp-key') {
+        return res.status(200).json({ impKey: V1_IMP_KEY });
     }
 
     /* ── 채널키 목록 + 현재 활성키 조회 ── */
