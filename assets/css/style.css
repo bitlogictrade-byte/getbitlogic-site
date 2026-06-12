@@ -1,5 +1,5 @@
 /* ── Reset & Base ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
     --black: #000000;
@@ -1096,6 +1096,23 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 .footer-biz-value {
     color: rgba(255,255,255,0.5);
+}
+
+/* 전화번호 자동 링크 하이라이트 방지 */
+.footer a[href^="tel"],
+.footer-biz-value a {
+    color: inherit;
+    text-decoration: none;
+    pointer-events: none;
+}
+.footer-biz-value {
+    -webkit-text-decoration-skip: none;
+}
+/* iOS Safari 전화번호 자동감지 색상 오버라이드 */
+a[x-apple-data-detectors],
+[x-apple-data-detectors] {
+    color: inherit !important;
+    text-decoration: none !important;
 }
 
 .footer-copy {

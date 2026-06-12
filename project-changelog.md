@@ -2,9 +2,32 @@
 
 ---
 
+## 2026-06-12 (115차)
+
+### 푸터 전화번호 자동 링크 하이라이트 방지
+
+**수정 파일:** `assets/css/style.css`
+
+- `.footer a[href^="tel"]`, `.footer-biz-value a` — 색상 상속, 밑줄 제거, 클릭 비활성화
+- `a[x-apple-data-detectors]` — iOS Safari 전화번호 자동감지 색상 오버라이드
+- 모바일 브라우저에서 전화번호가 파란 링크로 표시되던 문제 해결
+
+---
+
+## 2026-06-12 (114차)
+
+### 안드로이드 터치 하이라이트 제거
+
+**수정 파일:** `assets/css/style.css`
+
+**수정 내용:**
+- 전역 리셋(`*, *::before, *::after`)에 `-webkit-tap-highlight-color: transparent` 추가
+- 안드로이드에서 체크박스/버튼/라벨 터치 시 나타나던 파란색 하이라이트 제거
+
+---
+
 ## 2026-06-12 (113차)
 
-<<<<<<< HEAD
 ### admin.html 테스트 결제 — V2 공식 문서 기준 전면 재작성
 
 **수정 파일:** `admin.html`
@@ -20,7 +43,7 @@
 - `adminProfile`에 `name` 필드 추가, init()에서 `profiles.name` 함께 로드
 - KG 채널 선택 시 버튼 레이블 "빌링키 발급 실행"으로 자동 변경
 - 다날 V1 카드 UI / `loadV1ImpKey` / `testDanalV1Btn` 핸들러 / `v1ImpKey` 전역변수 제거
-=======
+
 ### login.html / register.html — 좌우 분할 풀페이지 레이아웃으로 리디자인
 
 **수정 파일:** `login.html`, `register.html`
@@ -30,7 +53,6 @@
 - 오른쪽 패널: 카드 박스 없이 폼만, `← 홈으로` 링크
 - 모바일(820px 이하): 왼쪽 패널 숨기고 고정 모바일 헤더(로고+홈으로) 표시, 약관 링크는 폼 하단에 표시
 - 기존 nav/footer 제거, JS 로직 전혀 변경 없음
->>>>>>> aaec24e73d22092bb73426f8e65dae00ec6038d6
 
 ---
 
