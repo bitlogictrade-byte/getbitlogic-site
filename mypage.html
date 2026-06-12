@@ -352,6 +352,41 @@
         }
         .plan-action-btn:hover { opacity: 0.85; }
         .plan-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .plan-btn-row {
+            display: flex;
+            gap: 10px;
+            padding: 14px 0 4px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .plan-manage-btn {
+            padding: 8px 20px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            color: #a0b8cc;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+        .plan-manage-btn:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.3);
+            color: #c0d4e4;
+        }
+        .plan-manage-btn.open {
+            border-color: rgba(0,180,204,0.45);
+            color: var(--cyan);
+        }
+        .plan-manage-section {
+            margin-top: 6px;
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
     </style>
 </head>
 <body>
@@ -478,13 +513,15 @@
                     <span class="info-label">만료일</span>
                     <span class="info-value" id="planExpireDate">—</span>
                 </div>
-                <div class="info-row" id="cancelSubRow" style="display:none;">
-                    <span class="info-label"></span>
-                    <button class="cancel-sub-btn" id="cancelSubBtn">구독 해지</button>
-                </div>
-                <div class="info-row" id="planActionRow">
-                    <span class="info-label"></span>
+                <!-- 버튼 행: 플랜 액션 + 플랜 관리 나란히 -->
+                <div class="plan-btn-row" id="planBtnRow">
                     <button class="plan-action-btn buy" id="planActionBtn">플랜 구매하기</button>
+                    <button class="plan-manage-btn" id="planManageBtn" style="display:none;">플랜 관리</button>
+                </div>
+                <!-- 플랜 관리 드로어 (구독 해지 포함) -->
+                <div class="plan-manage-section" id="planManageSection" style="display:none;">
+                    <p style="font-size:0.82rem;color:#6a8aaa;margin-bottom:14px;line-height:1.6;">구독 해지 시 현재 결제 기간이 끝날 때까지 서비스를 계속 이용하실 수 있습니다.</p>
+                    <button class="cancel-sub-btn" id="cancelSubBtn">구독 해지</button>
                 </div>
             </div>
 
@@ -657,6 +694,15 @@
             const body = document.getElementById('deleteAccordionBody');
             const isOpen = body.classList.toggle('open');
             this.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        /* 플랜 관리 토글 */
+        document.getElementById('planManageBtn')?.addEventListener('click', function() {
+            const section = document.getElementById('planManageSection');
+            if (!section) return;
+            const isOpen = section.style.display === 'none' || section.style.display === '';
+            section.style.display = isOpen ? 'block' : 'none';
+            this.classList.toggle('open', isOpen);
         });
 
         /* 비밀번호 토글 */
@@ -874,7 +920,6 @@
             const planEl    = document.getElementById('currentPlan');
             const expireRow = document.getElementById('planExpireRow');
             const expireEl  = document.getElementById('planExpireDate');
-            const cancelRow = document.getElementById('cancelSubRow');
             const actionBtn = document.getElementById('planActionBtn');
 
             /* 미구독 또는 해지 상태 */
@@ -902,7 +947,7 @@
                 planEl.style.color       = '#f0a500';
                 expireRow.style.display  = 'flex';
                 expireEl.textContent     = '결제 처리 중';
-                if (actionBtn) actionBtn.style.display = 'none';
+                document.getElementById('planBtnRow').style.display = 'none';
                 return;
             }
 
@@ -974,7 +1019,8 @@
             if (sub.status === 'active' && sub.next_billing_at) {
                 expireRow.style.display = 'flex';
                 expireEl.textContent    = formatDate(sub.next_billing_at) + ' 다음 결제';
-                cancelRow.style.display = 'flex';
+                const manageBtn = document.getElementById('planManageBtn');
+                if (manageBtn) manageBtn.style.display = '';
                 activeSubId = sub.id;
 
                 /* 7일 이내 결제 임박 경고 */
@@ -1165,7 +1211,9 @@
                 if (error) throw error;
 
                 showToast('구독이 해지되었습니다.', 'success');
-                document.getElementById('cancelSubRow').style.display = 'none';
+                document.getElementById('planManageSection').style.display = 'none';
+                document.getElementById('planManageBtn').style.display = 'none';
+                document.getElementById('planManageBtn').classList.remove('open');
                 const planEl = document.getElementById('currentPlan');
                 planEl.className       = 'plan-badge none';
                 planEl.textContent     = '미구독';
