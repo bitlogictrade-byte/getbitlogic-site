@@ -2,9 +2,23 @@
 
 ---
 
+## 2026-06-12 (114차)
+
+### checkout.html — 카드/카카오페이/토스페이 결제수단 선택 지원
+
+**수정 파일:** `api/admin.js`, `checkout.html`
+
+- `api/admin.js`: `get-payment-channels` 공개 엔드포인트 추가 — 카드(active card PG), 카카오페이, 토스페이 채널키 반환
+- `checkout.html`: 결제수단 선택 UI 추가 (신용/체크카드 · 카카오페이 · 토스페이)
+- 카드 선택 시 `billingKeyMethod: 'CARD'` + 카드 채널키 사용
+- 카카오페이 선택 시 `billingKeyMethod: 'EASY_PAY'` + `easyPay.easyPayProvider: 'KAKAOPAY'` + 카카오 채널키
+- 토스페이 선택 시 `billingKeyMethod: 'EASY_PAY'` + `easyPay.easyPayProvider: 'TOSSPAY'` + 토스 채널키
+- 기존 `EASY_PAY` 하드코딩 제거 — 채널키-결제수단 불일치로 인한 "서브가맹점 정보 미확인" 에러 수정
+
+---
+
 ## 2026-06-12 (113차)
 
-<<<<<<< HEAD
 ### admin.html 테스트 결제 — V2 공식 문서 기준 전면 재작성
 
 **수정 파일:** `admin.html`
@@ -20,7 +34,7 @@
 - `adminProfile`에 `name` 필드 추가, init()에서 `profiles.name` 함께 로드
 - KG 채널 선택 시 버튼 레이블 "빌링키 발급 실행"으로 자동 변경
 - 다날 V1 카드 UI / `loadV1ImpKey` / `testDanalV1Btn` 핸들러 / `v1ImpKey` 전역변수 제거
-=======
+
 ### login.html / register.html — 좌우 분할 풀페이지 레이아웃으로 리디자인
 
 **수정 파일:** `login.html`, `register.html`
@@ -30,7 +44,6 @@
 - 오른쪽 패널: 카드 박스 없이 폼만, `← 홈으로` 링크
 - 모바일(820px 이하): 왼쪽 패널 숨기고 고정 모바일 헤더(로고+홈으로) 표시, 약관 링크는 폼 하단에 표시
 - 기존 nav/footer 제거, JS 로직 전혀 변경 없음
->>>>>>> aaec24e73d22092bb73426f8e65dae00ec6038d6
 
 ---
 
