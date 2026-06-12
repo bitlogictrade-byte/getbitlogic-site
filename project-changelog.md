@@ -4,6 +4,7 @@
 
 ## 2026-06-12 (113차)
 
+<<<<<<< HEAD
 ### admin.html 테스트 결제 — V2 공식 문서 기준 전면 재작성
 
 **수정 파일:** `admin.html`
@@ -19,6 +20,17 @@
 - `adminProfile`에 `name` 필드 추가, init()에서 `profiles.name` 함께 로드
 - KG 채널 선택 시 버튼 레이블 "빌링키 발급 실행"으로 자동 변경
 - 다날 V1 카드 UI / `loadV1ImpKey` / `testDanalV1Btn` 핸들러 / `v1ImpKey` 전역변수 제거
+=======
+### login.html / register.html — 좌우 분할 풀페이지 레이아웃으로 리디자인
+
+**수정 파일:** `login.html`, `register.html`
+
+- 기존 카드/모달 느낌의 `auth-card` 구조 → 420px 왼쪽 브랜딩 패널 + 오른쪽 폼 split layout
+- 왼쪽 패널: 로고, 슬로건, 서비스 특징 3가지, 약관 링크, 그리드 패턴 + 시안 글로우 배경
+- 오른쪽 패널: 카드 박스 없이 폼만, `← 홈으로` 링크
+- 모바일(820px 이하): 왼쪽 패널 숨기고 고정 모바일 헤더(로고+홈으로) 표시, 약관 링크는 폼 하단에 표시
+- 기존 nav/footer 제거, JS 로직 전혀 변경 없음
+>>>>>>> aaec24e73d22092bb73426f8e65dae00ec6038d6
 
 ---
 
