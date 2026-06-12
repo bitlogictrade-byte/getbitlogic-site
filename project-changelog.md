@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (102차)
+
+### admin.html 테스트 결제 — 다날 채널 본인인증으로 전환
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 다날(DANAL) 채널 선택 시 `PortOne.requestPayment()` 대신 `PortOne.requestIdentityVerification()` 호출
+- 로그 메시지 및 버튼 텍스트도 "본인인증" 문구로 분기 처리
+
+---
+
 ## 2026-06-12 (101차)
 
 ### admin.html 테스트 결제 — 다날 payMethod MOBILE로 변경
