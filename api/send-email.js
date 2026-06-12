@@ -250,22 +250,9 @@ module.exports = async (req, res) => {
     try {
         let templateData = { name, planType, amount, nextBillingAt };
 
-        /* reset-password: 이메일 존재 확인 + Supabase Admin API로 복구 링크 생성 */
+        /* reset-password: generate_link 결과로 이메일 존재 확인 + 복구 링크 생성을 한 번에 처리
+           profiles.email 컬럼에 의존하지 않으므로 마이그레이션 시점·가입 경로 무관하게 신뢰 가능 */
         if (type === 'reset-password') {
-            const chkRes = await fetch(
-                `${SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}&select=id`,
-                {
-                    headers: {
-                        'apikey':        SUPABASE_SERVICE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-                    },
-                }
-            );
-            const rows = await chkRes.json();
-            if (!Array.isArray(rows) || rows.length === 0) {
-                return res.status(200).json({ ok: false, notFound: true });
-            }
-
             const linkRes  = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
                 method:  'POST',
                 headers: {
@@ -281,6 +268,10 @@ module.exports = async (req, res) => {
             });
             const linkData = await linkRes.json();
             if (!linkRes.ok || !linkData.action_link) {
+                // 4xx → 이메일 미존재, 5xx → 서버 오류
+                if (linkRes.status >= 400 && linkRes.status < 500) {
+                    return res.status(200).json({ ok: false, notFound: true });
+                }
                 throw new Error(linkData.message || '재설정 링크 생성 실패');
             }
             templateData.resetLink = linkData.action_link;

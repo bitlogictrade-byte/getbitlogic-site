@@ -2,6 +2,68 @@
 
 ---
 
+## 2026-06-12 (97차)
+
+### admin.html 테스트 결제 수정 — KG이니시스 구매자 정보 추가, 다날 결제수단 변경
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- KG이니시스 채널 결제 시 `customer.email = 'admin@getbitlogic.com'` + `customer.phoneNumber = '01000000000'` 자동 포함 (기존엔 이메일만 있었음)
+- 다날(DANAL) 채널 결제수단을 `CARD` → `VIRTUAL_ACCOUNT`로 변경 (DANAL_TPAY 대신 가상계좌로 테스트)
+
+---
+
+## 2026-06-12 (96차)
+
+### 비밀번호 찾기 버그 수정 — 존재하지 않는 이메일에도 "발송됐다"고 뜨는 문제
+
+**수정 파일:** `api/send-email.js`, `login.html`
+
+**원인:**
+- `api/send-email.js`가 `profiles.email` 컬럼으로 이메일 존재 여부를 확인 → 마이그레이션 전 가입 유저는 컬럼이 NULL이므로 신뢰 불가
+- `generate_link` 실패 시 catch에서 `{ ok: false, error }` 반환 → 프론트에서 `d.notFound` 없음 → "발송됐다" 토스트 노출
+
+**수정 내용:**
+- `api/send-email.js`: `profiles.email` 조회 단계 제거, `generate_link` 한 번 호출로 이메일 존재 확인 + 링크 생성 통합. 4xx 응답 → `notFound: true`, 5xx → 예외 처리
+- `login.html`: `d.notFound` 외에 `!d.ok` 조건 추가 → 서버 오류 시 "오류가 발생했습니다" 토스트 표시 (성공 메시지 노출 방지)
+
+---
+
+## 2026-06-11 (95차)
+
+### checkout.html 모바일 플랜카드/폼/결제영역 width 100% 추가
+
+**수정 파일:** `checkout.html`
+
+- 모바일 media query에서 `co-plan-card`, `co-form-col`, `co-pay-section`에 `width: 100%` 추가 → display:contents 해체 시 flex 자식이 콘텐츠 너비로 줄어드는 문제 수정
+
+---
+
+## 2026-06-11 (94차)
+
+### checkout.html 결제 영역 데스크탑/모바일 레이아웃 분리 수정
+
+**수정 파일:** `checkout.html`
+
+- `co-pay-section`을 `co-plan-body` 밖, `co-plan-card` 밖(co-summary 직속 자식)으로 위치 복원
+- 데스크탑(`min-width: 769px`): `co-plan-card` 하단 모서리 제거 + `co-pay-section`에 연결 카드 스타일 적용 → 하나의 카드처럼 보임; Pro 플랜 테두리 색상 동기화
+- 모바일: 연결 카드 스타일 해제, `order: 1/2/3`으로 플랜카드→폼→결제버튼 순서 유지
+
+---
+
+## 2026-06-11 (93차)
+
+### checkout.html 결제 버튼 영역 플랜 카드 안으로 이동 + 모바일 정렬 수정
+
+**수정 파일:** `checkout.html`
+
+- `co-pay-section`(결제하기 버튼, 구매 동의 문구, 안전 결제, TradingView 안내)을 `co-plan-card` 밖에서 `co-plan-body` 안으로 이동 → 데스크탑에서 카드 내부에 표시
+- `co-pay-section` CSS: `margin-top/padding-top: 16px` + `border-top` 구분선 추가
+- 모바일 미디어쿼리: `co-pay-section { order: 3 }` 제거, `co-plan-card` / `co-form-col`에 `width: 100%; box-sizing: border-box` 추가 → 좌측 치우침 해결
+
+---
+
 ## 2026-06-11 (92차)
 
 ### checkout.html 연락처 안내 문구 수정

@@ -1217,12 +1217,17 @@ document.getElementById('testPayBtn').addEventListener('click', async () => {
     } else if (testSelectedChannelId === 'TOSS') {
         payOptions.payMethod = 'EASY_PAY';
         payOptions.easyPay   = { easyPayProvider: 'TOSSPAY' };
+    } else if (testSelectedChannelId === 'DANAL') {
+        payOptions.payMethod = 'VIRTUAL_ACCOUNT';
     } else {
         payOptions.payMethod = 'CARD';
     }
 
     if (['KG', 'KPN'].includes(testSelectedChannelId)) {
         payOptions.customer.email = 'admin@getbitlogic.com';
+    }
+    if (testSelectedChannelId === 'KG') {
+        payOptions.customer.phoneNumber = '01000000000';
     }
 
     try {

@@ -730,9 +730,37 @@
         }
         .co-confirm-btn:hover { opacity: 0.85; }
 
-        /* ── Pay section (plan card 바깥, co-summary 안) ── */
+        /* ── Pay section ── */
+        /* 데스크탑: co-plan-card 바로 아래에 붙어 하나의 카드처럼 보임 */
         .co-pay-section {
             margin-top: 0;
+        }
+
+        /* 데스크탑 전용: co-plan-card + co-pay-section 연결 카드 스타일 */
+        @media (min-width: 769px) {
+            /* 플랜 카드 하단 모서리 제거 → pay-section과 이어지도록 */
+            .co-plan-card {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom: none;
+            }
+            /* pay-section을 카드 하단부처럼 스타일링 */
+            .co-pay-section {
+                background: #0d0d0d;
+                border: 1px solid rgba(255,255,255,0.1);
+                border-top: 1px solid rgba(255,255,255,0.08);
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+                padding: 0 28px 24px;
+            }
+            /* Pro 플랜일 때 테두리 색상 동기화 */
+            .co-plan-card.is-pro {
+                border-color: rgba(91,45,232,0.55);
+            }
+            .co-plan-card.is-pro + .co-pay-section {
+                border-color: rgba(91,45,232,0.55);
+                box-shadow: 0 8px 32px rgba(91,45,232,0.12);
+            }
         }
         .co-pay-note {
             font-size: 0.72rem;
@@ -745,14 +773,10 @@
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
-            .checkout-page {
-                padding: 80px 16px 60px;
-            }
-            /* 1-column flex로 전환, 중앙 정렬 */
+            /* 1-column flex로 전환 */
             .checkout-inner {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
             }
             /* co-summary를 display:contents로 펼쳐서
                co-plan-card / co-pay-section이 직접 flex 자식이 되도록 */
@@ -760,14 +784,24 @@
                 display: contents;
                 position: static;
             }
-            /* 모바일 순서: 플랜카드 → 주문정보(폼) → 결제버튼
-               display:contents로 co-summary가 해체되므로
-               plan-card / pay-section에 명시적 width: 100% 필요 */
+            /* 모바일 순서: 플랜카드 → 주문정보(폼) → 결제버튼 */
             .co-plan-card   { order: 1; width: 100%; }
             .co-form-col    { order: 2; width: 100%; }
             .co-pay-section { order: 3; width: 100%; }
-            /* 헤더(주문 정보 입력)가 카드와 동일 너비로 정렬되도록 */
-            .co-page-header { width: 100%; }
+            /* 모바일에서 연결 카드 스타일 해제 (데스크탑 전용) */
+            .co-plan-card {
+                border-radius: 20px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+            }
+            .co-plan-card.is-pro {
+                border-color: rgba(91,45,232,0.55) !important;
+            }
+            .co-pay-section {
+                background: none;
+                border: none;
+                border-radius: 0;
+                padding: 0;
+            }
         }
     </style>
 </head>
@@ -987,7 +1021,9 @@
                     </div>
                 </div>
 
-                <!-- 모바일에서 주문정보(co-form-col) 아래에 표시되는 결제 버튼 영역 -->
+                <!-- 결제 버튼 영역:
+                     데스크탑 — co-plan-card 아래에 붙어 하나의 카드처럼 보임 (CSS로 연결)
+                     모바일   — display:contents 해체 후 order:3으로 폼 아래에 배치 -->
                 <div class="co-pay-section">
                     <p class="co-pay-note">구매 버튼 클릭 시 매월 자동 결제에 동의하는 것으로 간주됩니다.</p>
                     <button class="co-pay-btn" id="payBtn" type="button">결제하기</button>
