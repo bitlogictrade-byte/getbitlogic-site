@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-06-12 (109차)
+
+### 프로젝트 파일 구조 정리
+
+**변경 내용:**
+- 이미지 파일 (*.png, *.jpg, *.ico) → `assets/images/` 로 이동
+- CSS (`style.css`) → `assets/css/` 로 이동
+- JS (`script.js`, `supabase-auth.js`, `ui.js`) → `assets/js/` 로 이동
+- SQL 파일 (`supabase-*.sql`) → `db/` 로 이동
+- 12개 HTML 파일 내 모든 경로 참조 일괄 수정
+
+---
+
 ## 2026-06-12 (108차)
 
 ### admin.html 테스트 결제 — KG이니시스 빌링키 발급에 issueId 추가

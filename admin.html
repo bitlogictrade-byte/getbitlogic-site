@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#060a14">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <title>Admin | BitLogic</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
     <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <style>
@@ -526,7 +526,7 @@
     <header class="admin-header">
         <div class="admin-header-left">
             <a href="index.html" class="admin-logo-link">
-                <img src="btlogocl.png" alt="BitLogic">
+                <img src="assets/images/btlogocl.png" alt="BitLogic">
                 <span class="admin-logo-text">BitLogic</span>
             </a>
             <span class="admin-badge">ADMIN</span>
@@ -710,9 +710,9 @@
     </main>
 </div>
 
-<script src="ui.js"></script>
+<script src="assets/js/ui.js"></script>
 <script type="module">
-import { supabase, getUser, signOut } from './supabase-auth.js';
+import { supabase, getUser, signOut } from './assets/js/supabase-auth.js';
 
 const PORTONE_STORE_ID = 'store-e58c2367-1a00-4d48-8e24-2e0482cfce17';
 let authToken = '';

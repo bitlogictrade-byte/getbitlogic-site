@@ -1,19 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#060a14">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <title>회원가입 | BitLogic</title>
     <meta name="description" content="BitLogic 알고리즘 서비스 회원가입 페이지입니다.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .auth-page {
             min-height: 100vh;
@@ -334,7 +334,7 @@
     <nav class="nav">
         <div class="nav-inner">
             <a href="index.html" class="nav-logo-link">
-                <img src="btlogocl.png" alt="BitLogic" class="nav-logo-img">
+                <img src="assets/images/btlogocl.png" alt="BitLogic" class="nav-logo-img">
                 <span class="nav-logo-text">BitLogic</span>
             </a>
             <div class="nav-links">
@@ -537,9 +537,9 @@
         </div>
     </footer>
 
-    <script src="ui.js"></script>
+    <script src="assets/js/ui.js"></script>
     <script type="module">
-        import { supabase, signUp, signInWithGoogle, signInWithKakao } from './supabase-auth.js';
+        import { supabase, signUp, signInWithGoogle, signInWithKakao } from './assets/js/supabase-auth.js';
 
         let currentStep = 1;
 

@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#060a14">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
     <title>BitLogic | TradingView 알고리즘 지표 구독</title>
     <meta name="description" content="수백 회 백테스팅으로 검증된 비트코인 알고리즘 소프트웨어. TradingView에서 바로 구동되며, 결제 즉시 활성화됩니다. 데이터로 분석 기준을 세우세요.">
     <meta property="og:type" content="website">
@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
     <nav class="nav at-top">
         <div class="nav-inner">
             <a href="#" class="nav-logo-link">
-                <img src="btlogocl.png" alt="BitLogic" class="nav-logo-img">
+                <img src="assets/images/btlogocl.png" alt="BitLogic" class="nav-logo-img">
                 <span class="nav-logo-text">BitLogic</span>
             </a>
             <div class="nav-links">
@@ -75,7 +75,7 @@
     <!-- HERO -->
     <section class="hero" id="hero">
         <div class="hero-bg">
-            <img src="bg.jpg" alt="" class="hero-bg-img">
+            <img src="assets/images/bg.jpg" alt="" class="hero-bg-img">
             <div class="hero-bg-overlay"></div>
         </div>
         <div class="hero-content">
@@ -98,7 +98,7 @@
             </div>
         </div>
         <div class="hero-image-wrap">
-            <img src="main.png" alt="BitLogic 차트 미리보기" class="hero-main-img">
+            <img src="assets/images/main.png" alt="BitLogic 차트 미리보기" class="hero-main-img">
         </div>
     </section>
 
@@ -197,7 +197,7 @@
         <div class="pricing-stage">
             <!-- Left: chart -->
             <div class="stage-chart">
-                <img src="basic.png" alt="BitLogic 차트" class="stage-chart-img" id="stageChartImg">
+                <img src="assets/images/basic.png" alt="BitLogic 차트" class="stage-chart-img" id="stageChartImg">
             </div>
 
             <!-- Right: info panel -->
@@ -212,7 +212,7 @@
                         </div>
                     </div>
                     <div class="plan-card-img-wrap">
-                        <img src="basic.png" alt="Basic 차트" class="plan-card-img">
+                        <img src="assets/images/basic.png" alt="Basic 차트" class="plan-card-img">
                     </div>
                     <p class="plan-price"><strong>49,000</strong><span>원 / 월</span></p>
                     <p class="plan-desc">상승·하락 흐름을 색상으로 구분해 시각화합니다.<br>방향을 읽는 것부터 시작해보세요.</p>
@@ -234,7 +234,7 @@
                         </div>
                     </div>
                     <div class="plan-card-img-wrap">
-                        <img src="pro.png" alt="Pro 차트" class="plan-card-img">
+                        <img src="assets/images/pro.png" alt="Pro 차트" class="plan-card-img">
                     </div>
                     <p class="plan-price"><strong>119,000</strong><span>원 / 월</span></p>
                     <p class="plan-desc">흐름에 더해 핵심 가격 구간까지 차트 위에 표시합니다.<br>방향은 아는데 구간을 못 잡는 분께 맞는 플랜입니다.</p>
@@ -555,15 +555,15 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src="ui.js"></script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/ui.js"></script>
     <script type="module">
         import {
             supabase,
             signIn, signUp, signOut,
             signInWithGoogle, signInWithKakao,
             resetPassword, onAuthStateChange
-        } from './supabase-auth.js';
+        } from './assets/js/supabase-auth.js';
 
         /* ── OAuth 콜백 처리 (소셜 로그인 완료 후 hash 감지) ── */
         if (window.location.hash.includes('access_token')) {
