@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-12 (98차)
+
+### admin.html 테스트 결제 — KG 구매자 정보 동적 조회 및 다날 결제 방식 선택 UI 추가
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- `init()` 에서 Supabase `profiles` 조회 → `adminProfile.email` (session email), `adminProfile.phone` (profiles.phone) 로드
+- KG이니시스/KPN 결제 시 `customer.email` 을 하드코딩 대신 `adminProfile.email` 로 동적 적용
+- KG이니시스 결제 시 `customer.phoneNumber` 을 하드코딩 대신 `adminProfile.phone` 으로 동적 적용
+- 다날(DANAL) 채널 선택 시 "결제 방식" 드롭다운 표시 → `VIRTUAL_ACCOUNT` / `TRANSFER` 중 선택 가능 (미선택 시 기본 `VIRTUAL_ACCOUNT`)
+
+---
+
 ## 2026-06-12 (97차)
 
 ### admin.html 테스트 결제 수정 — KG이니시스 구매자 정보 추가, 다날 결제수단 변경
