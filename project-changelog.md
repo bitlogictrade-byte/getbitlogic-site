@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (122차)
+
+### checkout.html — PortOne 팝업 닫혀도 SDK 프로미스 미settle 시 강제 복구
+
+**수정 파일:** `checkout.html`
+
+**원인:** `PortOne.requestIssueBillingKey` 팝업이 닫혀도 SDK 내부 프로미스가 resolve/reject되지 않아 `await`가 영원히 대기 → catch/finally 포함 이후 코드 전체 미실행 → "카드 등록 중..." 고착
+
+**수정:** `window.focus` 이벤트로 팝업 닫힘 감지 → 5초 내 SDK 응답 없으면 강제 reject → catch/finally에서 버튼 복구
+
+---
+
 ## 2026-06-12 (121차)
 
 ### checkout.html — 결제 실패 시 버튼 복구를 finally로 보장

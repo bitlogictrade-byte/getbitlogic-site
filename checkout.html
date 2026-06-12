@@ -1678,7 +1678,33 @@
                     issueParams.easyPay = { easyPayProvider: 'TOSSPAY' };
                 }
 
-                const response = await PortOne.requestIssueBillingKey(issueParams);
+                /* 팝업이 닫혀도 SDK 프로미스가 settle되지 않는 케이스 대비:
+                   window focus 복귀 후 5초 내 응답 없으면 강제 reject */
+                const response = await new Promise((resolve, reject) => {
+                    let done = false;
+                    let gracePeriodTimer;
+
+                    function cleanup() {
+                        window.removeEventListener('focus', onWindowFocus);
+                        clearTimeout(gracePeriodTimer);
+                    }
+                    function onWindowFocus() {
+                        if (done) return;
+                        gracePeriodTimer = setTimeout(() => {
+                            if (!done) {
+                                done = true;
+                                cleanup();
+                                reject(new Error('카드 등록창이 닫혔습니다. 다시 시도해 주세요.'));
+                            }
+                        }, 5000);
+                    }
+
+                    window.addEventListener('focus', onWindowFocus);
+                    PortOne.requestIssueBillingKey(issueParams).then(
+                        result => { if (!done) { done = true; cleanup(); resolve(result); } },
+                        err    => { if (!done) { done = true; cleanup(); reject(err);    } }
+                    );
+                });
 
                 if (response.code != null) {
                     throw new Error(response.message || '카드 등록이 취소되었습니다.');
