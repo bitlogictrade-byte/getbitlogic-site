@@ -2,6 +2,11 @@
 
 ---
 
+## 2026-06-12 (123차)
+- `index.html`: Google Search Console 사이트 인증 메타 태그 추가
+
+---
+
 ## 2026-06-12 (122차)
 
 ### checkout.html — PortOne 팝업 닫혀도 SDK 프로미스 미settle 시 강제 복구
