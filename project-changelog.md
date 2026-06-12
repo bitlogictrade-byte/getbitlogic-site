@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-12 (104차)
+
+### admin.html 테스트 결제 — KG이니시스 빌링키 발급 방식으로 변경
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- KG이니시스 채널 선택 시 `PortOne.requestPayment()` 대신 `PortOne.requestIssueBillingKey()` 호출
+- `billingKeyId`: `testbilling${Date.now()}` 형식, `customer.email` / `customer.phoneNumber` 에 `adminProfile` 정보 포함
+- 성공 시 발급된 `billingKey` 값을 로그에 표시
+- 기존 일반결제 흐름에서 KG 전용 customer 주입 코드 제거 (KPN만 email 주입 유지)
+
+---
+
 ## 2026-06-12 (103차)
 
 ### admin.html / api/admin.js — 다날 V1 테스트 결제 추가
