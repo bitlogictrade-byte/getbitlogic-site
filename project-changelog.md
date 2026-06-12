@@ -2,6 +2,17 @@
 
 ---
 
+## 2026-06-12 (101차)
+
+### admin.html 테스트 결제 — 다날 payMethod MOBILE로 변경
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 다날(DANAL) 채널 테스트 결제 `payMethod`를 `CARD` → `MOBILE`로 변경
+
+---
+
 ## 2026-06-12 (100차)
 
 ### admin.html 테스트 결제 — 다날 payMethod CARD로 변경
