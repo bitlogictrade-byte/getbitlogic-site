@@ -1753,14 +1753,21 @@
                 window.location.href = `success.html?plan=${planKey}&sub=${subId}`;
 
             } catch (err) {
-                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제 (await 없이 fire-and-forget)
+                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제 (fire-and-forget)
                 if (subId && !isUpgradeMode) {
                     supabase.from('subscriptions').delete().eq('id', subId).catch(() => {});
                 }
-                const msg = err.name === 'AbortError' ? '결제 요청 시간이 초과되었습니다. 다시 시도해 주세요.' : (err.message || '다시 시도해 주세요.');
-                showToast('오류: ' + msg, 'error');
-                payBtn.disabled    = false;
-                payBtn.textContent = isUpgradeMode ? '업그레이드 결제하기' : '결제하기';
+                try {
+                    const msg = err.name === 'AbortError'
+                        ? '결제 요청 시간이 초과되었습니다. 다시 시도해 주세요.'
+                        : (err.message || '다시 시도해 주세요.');
+                    showToast('오류: ' + msg, 'error');
+                } catch (toastErr) {
+                    console.error('[결제 오류 표시 실패]', toastErr);
+                } finally {
+                    payBtn.disabled    = false;
+                    payBtn.textContent = isUpgradeMode ? '업그레이드 결제하기' : '결제하기';
+                }
             }
         });
 

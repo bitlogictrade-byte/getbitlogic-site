@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (121차)
+
+### checkout.html — 결제 실패 시 버튼 복구를 finally로 보장
+
+**수정 파일:** `checkout.html`
+
+**원인:** catch 블록 내 showToast 등이 예외를 던지면 그 아래 `payBtn.disabled = false` 코드가 실행되지 않아 버튼이 "카드 등록 중..." 또는 "결제 처리 중..."에 고착됨
+
+**수정:** 버튼 복구 코드(`payBtn.disabled = false`, `textContent` 복원)를 `finally` 블록으로 이동 → 어떤 예외가 발생해도 반드시 실행되도록 보장
+
+---
+
 ## 2026-06-12 (120차)
 
 ### api/charge.js — PortOne 에러 응답 상세 메시지 노출 개선
