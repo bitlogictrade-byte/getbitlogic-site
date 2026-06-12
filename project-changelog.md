@@ -4,6 +4,23 @@
 
 ## 2026-06-12 (113차)
 
+<<<<<<< HEAD
+### admin.html 테스트 결제 — V2 공식 문서 기준 전면 재작성
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 테스트 채널을 KAKAO / KG / KPN / TOSS 4개로 재정의 (DANAL 제거)
+- KG이니시스: `requestIssueBillingKey` — `billingKeyMethod: 'CARD'`, `issueId`, `issueName: 'BitLogic 정기결제'`, `customer` (adminProfile)
+- KAKAO: `requestPayment` — `payMethod: 'EASY_PAY'`, `easyPayProvider: 'KAKAOPAY'`
+- TOSS: `requestPayment` — `payMethod: 'EASY_PAY'`, `easyPayProvider: 'TOSSPAY'`
+- KPN: `requestPayment` — `payMethod: 'CARD'`
+- KG_AUTH: `requestIdentityVerification` — `customer` (adminProfile)
+- 모든 `customer`에 `adminProfile.name / email / phoneNumber` 적용 (Supabase profiles에서 조회)
+- `adminProfile`에 `name` 필드 추가, init()에서 `profiles.name` 함께 로드
+- KG 채널 선택 시 버튼 레이블 "빌링키 발급 실행"으로 자동 변경
+- 다날 V1 카드 UI / `loadV1ImpKey` / `testDanalV1Btn` 핸들러 / `v1ImpKey` 전역변수 제거
+=======
 ### login.html / register.html — 좌우 분할 풀페이지 레이아웃으로 리디자인
 
 **수정 파일:** `login.html`, `register.html`
@@ -13,6 +30,7 @@
 - 오른쪽 패널: 카드 박스 없이 폼만, `← 홈으로` 링크
 - 모바일(820px 이하): 왼쪽 패널 숨기고 고정 모바일 헤더(로고+홈으로) 표시, 약관 링크는 폼 하단에 표시
 - 기존 nav/footer 제거, JS 로직 전혀 변경 없음
+>>>>>>> aaec24e73d22092bb73426f8e65dae00ec6038d6
 
 ---
 
