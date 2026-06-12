@@ -2,6 +2,23 @@
 
 ---
 
+## 2026-06-12 (116차)
+
+### checkout.html — "결제 처리 중..." 버튼 고착 버그 수정
+
+**수정 파일:** `checkout.html`
+
+**원인 1:** `catch` 블록에서 `await supabase.delete()` 가 네트워크 문제로 응답 없이 걸리면, 이후 `showToast`와 버튼 복구 코드가 영원히 실행되지 않음
+
+**원인 2:** `/api/charge` fetch에 타임아웃이 없어 서버가 응답하지 않으면 무한 대기
+
+**수정:**
+- `supabase.delete()` 의 `await` 제거 (fire-and-forget, 클린업은 백그라운드 처리)
+- `AbortController` + 30초 타임아웃을 fetch에 추가
+- AbortError 시 한국어 친화적 에러 메시지 표시
+
+---
+
 ## 2026-06-12 (115차)
 
 ### checkout.html — 결제창 취소 시 버튼 "카드 등록 중..." 상태 고착 버그 수정

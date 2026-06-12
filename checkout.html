@@ -1733,11 +1733,19 @@
                     chargeBody.isUpgrade     = true;
                     chargeBody.planStartedAt = activeSub.started_at || activeSub.created_at;
                 }
-                const chargeRes = await fetch('/api/charge', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(chargeBody),
-                });
+                const chargeAbort = new AbortController();
+                const chargeTimeout = setTimeout(() => chargeAbort.abort(), 30000);
+                let chargeRes;
+                try {
+                    chargeRes = await fetch('/api/charge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(chargeBody),
+                        signal: chargeAbort.signal,
+                    });
+                } finally {
+                    clearTimeout(chargeTimeout);
+                }
 
                 const chargeData = await chargeRes.json();
                 if (!chargeRes.ok) throw new Error(chargeData.error || '결제 실패');
@@ -1745,11 +1753,12 @@
                 window.location.href = `success.html?plan=${planKey}&sub=${subId}`;
 
             } catch (err) {
-                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제
+                // 신규 구독 생성 후 결제 실패 시 orphan 방지 — 생성된 행 삭제 (await 없이 fire-and-forget)
                 if (subId && !isUpgradeMode) {
-                    await supabase.from('subscriptions').delete().eq('id', subId).catch(() => {});
+                    supabase.from('subscriptions').delete().eq('id', subId).catch(() => {});
                 }
-                showToast('오류: ' + (err.message || '다시 시도해 주세요.'), 'error');
+                const msg = err.name === 'AbortError' ? '결제 요청 시간이 초과되었습니다. 다시 시도해 주세요.' : (err.message || '다시 시도해 주세요.');
+                showToast('오류: ' + msg, 'error');
                 payBtn.disabled    = false;
                 payBtn.textContent = isUpgradeMode ? '업그레이드 결제하기' : '결제하기';
             }
