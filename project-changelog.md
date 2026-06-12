@@ -2,6 +2,20 @@
 
 ---
 
+## 2026-06-12 (118차)
+
+### api/charge.js — PortOne 에러 응답 상세 메시지 노출 개선
+
+**수정 파일:** `api/charge.js`
+
+**배경:** KG이니시스 결제 시 502 에러가 발생하나 토스트에 상세 원인이 표시되지 않음
+
+**수정:**
+- JSON 파싱 실패 시 크래시 방지 (try/catch 추가)
+- 에러 메시지에 portoneData.code, portoneText 앞 200자 포함 → 실제 KG이니시스 오류 내용 확인 가능
+
+---
+
 ## 2026-06-12 (117차)
 
 ### api/charge.js — 포트원 V2 customer.name 필드 형식 수정

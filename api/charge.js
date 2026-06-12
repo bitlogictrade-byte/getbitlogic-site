@@ -91,10 +91,12 @@ module.exports = async (req, res) => {
         const portoneText = await portoneRes.text();
         console.log('[charge] 포트원 API 응답', { status: portoneRes.status, body: portoneText });
 
-        const portoneData = portoneText ? JSON.parse(portoneText) : {};
+        let portoneData = {};
+        try { portoneData = portoneText ? JSON.parse(portoneText) : {}; } catch { /* non-JSON */ }
 
         if (!portoneRes.ok || portoneData.code != null) {
-            throw new Error(portoneData.message || `포트원 결제 실패 (HTTP ${portoneRes.status})`);
+            const detail = portoneData.message || portoneData.code || portoneText?.slice(0, 200) || '';
+            throw new Error(`포트원 결제 실패 (HTTP ${portoneRes.status})${detail ? ': ' + detail : ''}`);
         }
 
         /* 2. Supabase 구독 상태 업데이트 */
