@@ -2,6 +2,17 @@
 
 ---
 
+## 2026-06-12 (108차)
+
+### admin.html 테스트 결제 — KG이니시스 빌링키 발급에 issueId 추가
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- KG이니시스 빌링키 발급 요청에 `issueId: billingKeyId` 추가 (billingKeyId 값과 동일)
+
+---
+
 ## 2026-06-12 (107차)
 
 ### admin.html 테스트 결제 — KG이니시스 빌링키 발급에 issueName 추가
