@@ -2,6 +2,36 @@
 
 ---
 
+## 2026-06-12 (106차)
+
+### admin.html 테스트 결제 — 전체 빌링키 발급 방식으로 변경
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- KAKAO / TOSS / KG / KPN 채널 모두 `PortOne.requestPayment()` → `PortOne.requestIssueBillingKey()` 로 변경
+- KG / KPN: `billingKeyMethod: 'CARD'`
+- KAKAO: `billingKeyMethod: 'EASY_PAY'`, `easyPay.easyPayProvider: 'KAKAOPAY'`
+- TOSS: `billingKeyMethod: 'EASY_PAY'`, `easyPay.easyPayProvider: 'TOSSPAY'`
+- KG: `customer.email` + `customer.phoneNumber` (`adminProfile`) 포함
+- KPN: `customer.email` (`adminProfile`) 포함
+- 성공 로그에 발급된 `billingKey` 값 표시
+- DANAL 본인인증 흐름은 변경 없음
+
+---
+
+## 2026-06-12 (105차)
+
+### admin.html 테스트 결제 — KG이니시스 일반결제로 롤백
+
+**수정 파일:** `admin.html`
+
+**수정 내용:**
+- 104차 변경 롤백: KG이니시스 빌링키 발급 분기 제거, 일반결제(`requestPayment`) 복원
+- `customer.email` / `customer.phoneNumber` KG/KPN 주입 코드 원복
+
+---
+
 ## 2026-06-12 (104차)
 
 ### admin.html 테스트 결제 — KG이니시스 빌링키 발급 방식으로 변경
