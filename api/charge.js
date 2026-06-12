@@ -80,7 +80,7 @@ module.exports = async (req, res) => {
                     currency: 'KRW',
                     customer: {
                         customerId:  userId,
-                        name:        customerName || '고객',
+                        name:        { full: customerName || '고객' },
                         email:       customerEmail,
                         phoneNumber: customerPhone,
                     },

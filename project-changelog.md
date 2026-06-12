@@ -2,6 +2,18 @@
 
 ---
 
+## 2026-06-12 (117차)
+
+### api/charge.js — 포트원 V2 customer.name 필드 형식 수정
+
+**수정 파일:** `api/charge.js`
+
+**원인:** PortOne V2 REST API는 `customer.name`을 문자열이 아닌 `{ full: "이름" }` 객체로 요구함. 문자열 전달 시 `Invalid value for: body (expected '{')` 400 오류 반환
+
+**수정:** `name: customerName` → `name: { full: customerName }`
+
+---
+
 ## 2026-06-12 (116차)
 
 ### checkout.html — "결제 처리 중..." 버튼 고착 버그 수정
